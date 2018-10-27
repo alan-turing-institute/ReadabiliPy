@@ -1,0 +1,26 @@
+{
+  "name": "ReadabiliPy",
+  "version": "0.1.0",
+  "description": "An augmented Python wrapper for the Mozilla standalone Readability.js package.",
+  "main": "ExtractArticle.js",
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/martintoreilly/ReadabiliPy"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/martintoreilly/ReadabiliPy/issues"
+  },
+  "engines": {
+    "node": ">=11.0.0"
+  },
+  "homepage": "https://github.com/martintoreilly/ReadabiliPy",
+  "devDependencies": {
+  },
+  "dependencies": {
+    "jsdom": ">=12.2.0"
+  }
+}
