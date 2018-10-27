@@ -2,7 +2,6 @@
 
 A Node and filesystem dependent Python wrapper for Mozilla's [Readability.js](https://github.com/mozilla/readability) Node.js package.
 
-This package also augments the output of Readability.js to also return a list of plain text representations of article paragraphs.
 
 ## Package contents
 - `Readability.js` folder
