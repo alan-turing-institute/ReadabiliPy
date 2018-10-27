@@ -26,7 +26,17 @@ def parse(html):
     article_json = dict()
     article_json["title"] = readability_json["title"]
     article_json["byline"] = readability_json["byline"]
-    article_json["content"] = readability_json["content"]
+    article_json["structured_content"] = readability_json["content"]
+    article_json["plain_content"] = extract_paragraphs_as_plain_text(readability_json["content"])
 
     return article_json
 
+
+def extract_paragraphs_as_plain_text(paragraph_html):
+    # Load article as DOM
+    soup = BeautifulSoup(paragraph_html, 'html.parser')
+    # Select all paragraphs
+    paragraphs = soup.find_all('p')
+    # Extract text for each paragraph with leading/trailing whitespace trimmed
+    paragraphs = [p.get_text().strip() for p in paragraphs]
+    return paragraphs

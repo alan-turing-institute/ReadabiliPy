@@ -16,10 +16,11 @@ This package also augments the output of Readability.js to also return a list of
 
   article = readability.extract_article(html_string)
   ```
-  - The function returns a dictionary with the following subset of the fields returned from `Readability.parse()`:
+  - The function returns a dictionary with the following fields:
     - `title`: The article title
     - `byline`: Author information
     - `content`: A simplified HTML representation of the article, with all article text contained in paragraph elements.
+    - `plain_content`: A list containing a plain text representation of each paragraph in the simplified article.
 
 ## Installation
 1. [Install Node.js](https://nodejs.org/en/download/)
