@@ -36,6 +36,14 @@ def test_extract_article_full_article():
     )
 
 
+def test_extract_article_non_article():
+    check_extract_article(
+        "non_article_full_page.html",
+        "non_article_full_page.json"
+    )
+
+
+
 def check_extract_paragraphs_as_plain_text(test_filename, expected_filename):
     test_data_dir = "data"
     # Read readable article test file
@@ -44,7 +52,7 @@ def check_extract_paragraphs_as_plain_text(test_filename, expected_filename):
         article = json.loads(h.read())
 
     # Extract plain text paragraphs
-    paragraphs = readability.extract_paragraphs_as_plain_text(article["structured_content"])
+    paragraphs = readability.extract_paragraphs_as_plain_text(article["content"])
 
     # Get expected plain text paragraphs
     expected_filepath = os.path.join(os.path.dirname(__file__), test_data_dir, expected_filename)
