@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+from bs4.element import Comment, NavigableString
 import json
 import os
 from subprocess import check_call
@@ -39,23 +40,51 @@ def parse(html):
             article_json["byline"] = readability_json["byline"]
         if "content" in readability_json and readability_json["content"] is not "":
             article_json["content"] = readability_json["content"]
-            article_json["plain_content"] = extract_paragraphs_as_plain_text(readability_json["content"])
+            article_json["plain_content"] = plain_content(readability_json["content"])
 
     return article_json
 
 
-def extract_paragraphs_as_plain_text(paragraph_html):
+def plain_content(readability_content):
     # Load article as DOM
-    soup = BeautifulSoup(paragraph_html, 'html.parser')
-    # Select all paragraphs
-    paragraphs = soup.find_all('p')
-    # Extract text for each paragraph
-    paragraphs = [p.get_text() for p in paragraphs]
-    # Normalise unicode such that things that are visually equivalent map tot he same unicode string where possible
+    soup = BeautifulSoup(readability_content, 'html.parser')
+    # Make all elements plain
+    plain_elements = [plain_element(content) for content in soup.contents]
+    # Replace article contents with plain elements
+    soup.contents = plain_elements
+    return str(soup)
+
+
+def plain_element(element):
+    # For lists, we make each item plain text
+    leaf_nodes = ['p', 'li']
+    leaf_types = [NavigableString, Comment]
+    if (element.name in leaf_nodes) or (type(element) in leaf_types):
+        # For leaf node elements, extract the text content, discarding any HTML tags
+        # 1. Get element contents as text
+        if type(element) in leaf_types:
+            plain_text = element.string
+        else:
+            # Strip leading / trailing whitespace and insert space between multiple text parts
+            plain_text = element.get_text()
+        # 2. Normalise the extracted text string to a canonical representation
+        plain_text = normalise_text(plain_text)
+        # 3. Drop element if plain_text is empty
+        if plain_text == "":
+            element = None
+        else:
+            # 4. Update element content to be plain text
+            element.string = plain_text
+    else:
+        # If not a leaf node, call recursively on child nodes, replacing
+        element.contents = [plain_element(content) for content in element.contents]
+    return element
+
+
+def normalise_text(text):
+    # Normalise the unicode representation
     normal_form = "NFKC"
-    paragraphs = [unicodedata.normalize(normal_form, p) for p in paragraphs]
-    # Strip leading and trailing whitespace
-    paragraphs = [p.strip() for p in paragraphs]
-    # Drop empty paragraphs
-    paragraphs = list(filter(None, paragraphs))
-    return paragraphs
+    text = unicodedata.normalize(normal_form, text)
+    # Strip leading and training whitespace again (ensures things like non-breaking whitespaces are removed)
+    text = text.strip()
+    return text
