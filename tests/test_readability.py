@@ -52,6 +52,13 @@ def test_extract_article_unicode_normalisation():
     )
 
 
+def test_extract_article_list_items():
+    check_extract_article(
+        "list_items_full_page.html",
+        "list_items_simple_article_from_full_page.json"
+    )
+
+
 def check_extract_paragraphs_as_plain_text(test_filename, expected_filename):
     test_data_dir = "data"
     # Read readable article test file
@@ -69,13 +76,6 @@ def check_extract_paragraphs_as_plain_text(test_filename, expected_filename):
 
     # Test
     assert paragraphs == expected_paragraphs
-
-
-def test_extract_paragraphs_as_plain_text():
-    check_extract_paragraphs_as_plain_text(
-        "addictinginfo.com-1_simple_article_from_full_article.json",
-        "addictinginfo.com-1_plain_text_paragraphs_from_simple_article.json"
-    )
 
 
 def test_extract_article_command_line_script():
