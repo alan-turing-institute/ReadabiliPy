@@ -85,6 +85,11 @@ def plain_element(element):
     else:
         # If not a leaf node or leaf type call recursively on child nodes, replacing
         element.contents = [plain_element(content) for content in element.contents]
+        content_hash = hashlib.sha256()
+        for content in element.contents:
+            if content and type(content) not in leaf_types:
+                content_hash.update(content["id"].encode('utf-8'))
+        element["id"] = content_hash.hexdigest()
     return element
 
 
