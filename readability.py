@@ -59,13 +59,9 @@ def plain_element(element):
     # For lists, we make each item plain text
     leaf_nodes = ['p', 'li']
     leaf_types = [NavigableString, Comment]
-    if (element.name in leaf_nodes) or (type(element) in leaf_types):
+    if element.name in leaf_nodes:
         # For leaf node elements, extract the text content, discarding any HTML tags
         # 1. Get element contents as text
-        if type(element) in leaf_types:
-            plain_text = element.string
-        else:
-            # Strip leading / trailing whitespace and insert space between multiple text parts
             plain_text = element.get_text()
         # 2. Normalise the extracted text string to a canonical representation
         plain_text = normalise_text(plain_text)
@@ -75,8 +71,15 @@ def plain_element(element):
         else:
             # 4. Update element content to be plain text
             element.string = plain_text
+    elif type(element) in leaf_types:
+        plain_text = element.string
+        plain_text = normalise_text(plain_text)
+        if plain_text == "":
+            element = None
+        else:
+            element.string = plain_text
     else:
-        # If not a leaf node, call recursively on child nodes, replacing
+        # If not a leaf node or leaf type call recursively on child nodes, replacing
         element.contents = [plain_element(content) for content in element.contents]
     return element
 
