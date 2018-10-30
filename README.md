@@ -20,7 +20,7 @@ This package also augments the output of Readability.js to also return a list of
     - `title`: The article title
     - `byline`: Author information
     - `content`: A simplified HTML representation of the article, with all article text contained in paragraph elements.
-    - `plain_content`: A list containing a plain text representation of each paragraph in the simplified article.
+    - `plain_content`: A list containing a plain text representation of each paragraph in the simplified article. The text in each paragraph is encoded as unicode normalised using the "NFKC" normal form. This normal form is used to try and ensure as much as possible that things that appear visually the same are encoded with the same unicode representation (the K part) and characters are represented as a single composite character where possible (the C part).
     - All fields are guaranteed to be present. If individual fields are missing from the output of Readability.js, the value of these fields will be `None`. If no article data is returned by Readability.js, the value of all fields will be `None`.
 
 ## Installation

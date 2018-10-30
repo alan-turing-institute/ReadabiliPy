@@ -3,6 +3,7 @@ import json
 import os
 from subprocess import check_call
 import tempfile
+import unicodedata
 
 
 def parse(html):
@@ -48,6 +49,13 @@ def extract_paragraphs_as_plain_text(paragraph_html):
     soup = BeautifulSoup(paragraph_html, 'html.parser')
     # Select all paragraphs
     paragraphs = soup.find_all('p')
-    # Extract text for each paragraph with leading/trailing whitespace trimmed
-    paragraphs = [p.get_text().strip() for p in paragraphs]
+    # Extract text for each paragraph
+    paragraphs = [p.get_text() for p in paragraphs]
+    # Normalise unicode such that things that are visually equivalent map tot he same unicode string where possible
+    normal_form = "NFKC"
+    paragraphs = [unicodedata.normalize(normal_form, p) for p in paragraphs]
+    # Strip leading and trailing whitespace
+    paragraphs = [p.strip() for p in paragraphs]
+    # Drop empty paragraphs
+    paragraphs = list(filter(None, paragraphs))
     return paragraphs
