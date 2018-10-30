@@ -43,6 +43,12 @@ def test_extract_article_non_article():
     )
 
 
+def test_extract_article_unicode_normalisation():
+    check_extract_article(
+        "conservativehq.com-1_full_page.html",
+        "conservativehq.com-1_simple_article_from_full_page.json"
+    )
+
 
 def check_extract_paragraphs_as_plain_text(test_filename, expected_filename):
     test_data_dir = "data"
