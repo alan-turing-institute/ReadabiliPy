@@ -1,6 +1,8 @@
 import json
 import os
+import subprocess
 from ReadabiliPy import readability
+import tempfile
 
 
 def check_extract_article(test_filename, expected_filename):
@@ -75,3 +77,26 @@ def test_extract_paragraphs_as_plain_text():
         "addictinginfo.com-1_plain_text_paragraphs_from_simple_article.json"
     )
 
+
+def test_extract_article_command_line_script():
+    # Set input file path to test HTML file
+    test_data_dir = "data"
+    test_html_filename = "addictinginfo.com-1_full_page.html"
+    test_hmtl_filepath = os.path.join(os.path.dirname(__file__), test_data_dir, test_html_filename)
+
+    # Set putput file path to temp fiel
+    temp_dir = tempfile.gettempdir()
+    article_json_filepath = os.path.join(temp_dir, "article.json")
+
+    # Call extract article command line script
+    script_path = os.path.join(os.path.dirname(__file__), "..", "extract_article.py")
+    subprocess.check_call(["python", script_path, "-i", test_hmtl_filepath, "-o", article_json_filepath])
+
+    # Test
+    expected_article_json_filename = "addictinginfo.com-1_simple_article_from_full_page.json"
+    expected_article_json_filepath = os.path.join(os.path.dirname(__file__), test_data_dir,
+                                                  expected_article_json_filename)
+    with open(article_json_filepath) as actual, open(expected_article_json_filepath) as expected:
+        actual_article = json.loads(actual.read())
+        expected_article = json.loads(expected.read())
+        assert actual_article == expected_article
