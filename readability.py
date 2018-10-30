@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 from bs4.element import Comment, NavigableString
+import hashlib
 import json
 import os
 from subprocess import check_call
@@ -52,6 +53,7 @@ def plain_content(readability_content):
     plain_elements = [plain_element(content) for content in soup.contents]
     # Replace article contents with plain elements
     soup.contents = plain_elements
+
     return str(soup)
 
 
@@ -62,7 +64,7 @@ def plain_element(element):
     if element.name in leaf_nodes:
         # For leaf node elements, extract the text content, discarding any HTML tags
         # 1. Get element contents as text
-            plain_text = element.get_text()
+        plain_text = element.get_text()
         # 2. Normalise the extracted text string to a canonical representation
         plain_text = normalise_text(plain_text)
         # 3. Drop element if plain_text is empty
@@ -71,6 +73,8 @@ def plain_element(element):
         else:
             # 4. Update element content to be plain text
             element.string = plain_text
+            # Set ID of element to SHA-256 hash of plain content
+            element['id'] = hashlib.sha256(element.string.encode('utf-8')).hexdigest()
     elif type(element) in leaf_types:
         plain_text = element.string
         plain_text = normalise_text(plain_text)
