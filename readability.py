@@ -33,11 +33,11 @@ def parse(html):
     }
     # Populate article fields from readability fields where present
     if readability_json:
-        if "title" in readability_json:
+        if "title" in readability_json and readability_json["title"] is not "":
             article_json["title"] = readability_json["title"]
-        if "byline" in readability_json:
+        if "byline" in readability_json and readability_json["byline"] is not "":
             article_json["byline"] = readability_json["byline"]
-        if "content" in readability_json:
+        if "content" in readability_json and readability_json["content"] is not "":
             article_json["content"] = readability_json["content"]
             article_json["plain_content"] = extract_paragraphs_as_plain_text(readability_json["content"])
 
