@@ -20,8 +20,10 @@ This package also augments the output of Readability.js to also return a list of
     - `title`: The article title
     - `byline`: Author information
     - `content`: A simplified HTML representation of the article, with all article text contained in paragraph elements.
-    - `plain_content`: A list containing a plain text representation of each paragraph in the simplified article. The text in each paragraph is encoded as unicode normalised using the "NFKC" normal form. This normal form is used to try and ensure as much as possible that things that appear visually the same are encoded with the same unicode representation (the K part) and characters are represented as a single composite character where possible (the C part).
-    - All fields are guaranteed to be present. If individual fields are missing from the output of Readability.js, the value of these fields will be `None`. If no article data is returned by Readability.js, the value of all fields will be `None`.
+    - `plain_content`: A reduced version of the simplified Readability.js article HTML present in the `content` field. This attempts to retain only the plain text content of the article, while preserving as much as possible of the HTML structure for retained elements.
+    - `plain_text`: A list containing plain text representations of each paragraph (`<p>`) or list (`<ol>` or `<ul>`) present in the simplified Readability.js article HTML in the `content` field. Each paragraph or list is represented as a single string. List strings look like `"* item 1, * item 2, * item 3,"` for both ordered and unordered lists (note the trailing `,`).
+  - All fields are guaranteed to be present. If individual fields are missing from the output of Readability.js, the value of these fields will be `None`. If no article data is returned by Readability.js, the value of all fields will be `None`.
+  - All text in the `plain_content` and `plain_text` fields is encoded as unicode normalised using the "NFKC" normal form. This normal form is used to try and ensure as much as possible that things that appear visually the same are encoded with the same unicode representation (the K part) and characters are represented as a single composite character where possible (the C part).
 
 ## Installation
 1. [Install Node.js](https://nodejs.org/en/download/)
