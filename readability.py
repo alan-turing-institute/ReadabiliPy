@@ -41,10 +41,45 @@ def parse(html, content_digests=False):
             article_json["byline"] = readability_json["byline"]
         if "content" in readability_json and readability_json["content"] is not "":
             article_json["content"] = readability_json["content"]
-            article_json["plain_content"] = plain_content(readability_json["content"],
-                                                          content_digests)
+            article_json["plain_content"] = \
+                plain_content(readability_json["content"], content_digests)
+            article_json["plain_text"] = \
+                extract_paragraphs_as_plain_text(readability_json["content"])
 
     return article_json
+
+
+def extract_paragraphs_as_plain_text(paragraph_html):
+    # Load article as DOM
+    soup = BeautifulSoup(paragraph_html, 'html.parser')
+    # Select all unordered lists
+    lists = soup.find_all(['ul', 'ol'])
+    # Prefix text in all list items with "* " and make lists parafraphs
+    for l in lists:
+        plain_items = "".join(list(filter(None, [plain_text_leaf_node(li) for li in l.find_all('li')])))
+        l.string = plain_items
+        l.name = "p"
+    # Select all paragraphs
+    paragraphs = soup.find_all('p')
+    paragraphs = [plain_text_leaf_node(p) for p in paragraphs]
+    # Drop empty paragraphs
+    paragraphs = list(filter(None, paragraphs))
+    return paragraphs
+
+
+def plain_text_leaf_node(element):
+    # Extract all text, stripped of any child HTML elements
+    plain_text = element.get_text()
+    # Normalise unicode such that things that are visually equivalent map to the same
+    # unicode string where possible
+    normal_form = "NFKC"
+    plain_text = unicodedata.normalize(normal_form, plain_text)
+    plain_text = plain_text.strip()
+    if plain_text != "" and element.name == "li":
+        plain_text = "* {}, ".format(plain_text)
+    if plain_text == "":
+        plain_text = None
+    return plain_text
 
 
 def plain_content(readability_content, content_digests):
