@@ -8,7 +8,7 @@ import tempfile
 import unicodedata
 
 
-def parse(html):
+def parse(html, content_digests=False):
     temp_dir = tempfile.gettempdir()
     # Write input HTML to temporary file so it is available to the node.js script
     html_path = os.path.join(temp_dir, "full.html");
@@ -41,27 +41,35 @@ def parse(html):
             article_json["byline"] = readability_json["byline"]
         if "content" in readability_json and readability_json["content"] is not "":
             article_json["content"] = readability_json["content"]
-            article_json["plain_content"] = plain_content(readability_json["content"])
+            article_json["plain_content"] = plain_content(readability_json["content"],
+                                                          content_digests)
 
     return article_json
 
 
-def plain_content(readability_content):
+def plain_content(readability_content, content_digests):
     # Load article as DOM
     soup = BeautifulSoup(readability_content, 'html.parser')
     # Make all elements plain
-    plain_elements = [plain_element(content) for content in soup.contents]
+    elements = plain_elements(soup.contents, content_digests)
     # Replace article contents with plain elements
-    soup.contents = plain_elements
-
+    soup.contents = elements
     return str(soup)
 
 
-def plain_element(element):
+def plain_elements(elements, content_digests):
+    # Get plain content versions of all elements
+    elements = [plain_element(element, content_digests) for element in elements]
+    # Drop elements that have no plain content
+    elements = list(filter(None, elements))
+    if content_digests:
+        elements = [add_content_digest(element) for element in elements]
+    return elements
+
+
+def plain_element(element, content_digests):
     # For lists, we make each item plain text
-    leaf_nodes = ['p', 'li']
-    leaf_types = [NavigableString, Comment]
-    if element.name in leaf_nodes:
+    if element.name in leaf_nodes():
         # For leaf node elements, extract the text content, discarding any HTML tags
         # 1. Get element contents as text
         plain_text = element.get_text()
@@ -73,9 +81,9 @@ def plain_element(element):
         else:
             # 4. Update element content to be plain text
             element.string = plain_text
-            # Set ID of element to SHA-256 hash of plain content
-            element['id'] = hashlib.sha256(element.string.encode('utf-8')).hexdigest()
-    elif type(element) in leaf_types:
+            # # Set ID of element to SHA-256 hash of plain content
+            # element['id'] = hashlib.sha256(element.string.encode('utf-8')).hexdigest()
+    elif type(element) in leaf_types():
         plain_text = element.string
         plain_text = normalise_text(plain_text)
         if plain_text == "":
@@ -84,13 +92,46 @@ def plain_element(element):
             element.string = plain_text
     else:
         # If not a leaf node or leaf type call recursively on child nodes, replacing
-        element.contents = [plain_element(content) for content in element.contents]
-        content_hash = hashlib.sha256()
-        for content in element.contents:
-            if content and type(content) not in leaf_types:
-                content_hash.update(content["id"].encode('utf-8'))
-        element["id"] = content_hash.hexdigest()
+        element.contents = plain_elements(element.contents, content_digests)
+        # content_hash = hashlib.sha256()
+        # for content in element.contents:
+        #     if content and type(content) not in leaf_types:
+        #         content_hash.update(content["id"].encode('utf-8'))
+        # element["id"] = content_hash.hexdigest()
     return element
+
+
+def leaf_nodes():
+    return ['p', 'li']
+
+
+def leaf_types ():
+    return [NavigableString, Comment]
+
+
+def add_content_digest(element):
+    element["data-content-digest"] = content_digest(element)
+    return element
+
+
+def content_digest(element):
+    if type(element) in leaf_types():
+        # Hash
+        digest = hashlib.sha256(element.string.encode('utf-8')).hexdigest()
+    else:
+        # Build content digest recursively from content nodes
+        digest = hashlib.sha256()
+        contents = element.contents
+        num_contents = len(contents)
+        if num_contents == 0:
+            digest = None
+        elif num_contents == 1:
+            digest.update(contents[0].string.encode('utf-8'))
+            digest = digest.hexdigest()
+        else:
+            [digest.update(content_digest(content).encode('utf-8')) for content in contents]
+            digest = digest.hexdigest()
+    return digest
 
 
 def normalise_text(text):

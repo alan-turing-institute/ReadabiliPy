@@ -5,7 +5,7 @@ from ReadabiliPy import readability
 import tempfile
 
 
-def check_extract_article(test_filename, expected_filename):
+def check_extract_article(test_filename, expected_filename, content_digests=False):
     test_data_dir = "data"
     # Read HTML test file
     test_filepath = os.path.join(os.path.dirname(__file__), test_data_dir, test_filename)
@@ -13,7 +13,7 @@ def check_extract_article(test_filename, expected_filename):
         html = h.read()
 
     # Extract simplified article HTML
-    article_json = readability.parse(html)
+    article_json = readability.parse(html, content_digests)
 
     # Get expected simplified article HTML
     expected_filepath = os.path.join(os.path.dirname(__file__), test_data_dir, expected_filename)
@@ -76,6 +76,12 @@ def check_extract_paragraphs_as_plain_text(test_filename, expected_filename):
 
     # Test
     assert paragraphs == expected_paragraphs
+def test_extract_article_list_items_content_digests():
+    check_extract_article(
+        "list_items_full_page.html",
+        "list_items_simple_article_from_full_page_content_digests.json",
+        content_digests=True
+    )
 
 
 def test_extract_article_command_line_script():
@@ -100,3 +106,4 @@ def test_extract_article_command_line_script():
         actual_article = json.loads(actual.read())
         expected_article = json.loads(expected.read())
         assert actual_article == expected_article
+
