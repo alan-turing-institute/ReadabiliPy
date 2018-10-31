@@ -31,7 +31,8 @@ def parse(html, content_digests=False):
         "title": None,
         "byline": None,
         "content": None,
-        "plain_content": None
+        "plain_content": None,
+        "plain_text": None
     }
     # Populate article fields from readability fields where present
     if readability_json:
