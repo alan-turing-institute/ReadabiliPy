@@ -59,23 +59,6 @@ def test_extract_article_list_items():
     )
 
 
-def check_extract_paragraphs_as_plain_text(test_filename, expected_filename):
-    test_data_dir = "data"
-    # Read readable article test file
-    test_filepath = os.path.join(os.path.dirname(__file__), test_data_dir, test_filename)
-    with open(test_filepath) as h:
-        article = json.loads(h.read())
-
-    # Extract plain text paragraphs
-    paragraphs = readability.extract_paragraphs_as_plain_text(article["content"])
-
-    # Get expected plain text paragraphs
-    expected_filepath = os.path.join(os.path.dirname(__file__), test_data_dir, expected_filename)
-    with open(expected_filepath) as h:
-        expected_paragraphs = json.loads(h.read())
-
-    # Test
-    assert paragraphs == expected_paragraphs
 def test_extract_article_list_items_content_digests():
     check_extract_article(
         "list_items_full_page.html",
