@@ -96,8 +96,6 @@ def plain_content(readability_content, content_digests):
 def plain_elements(elements, content_digests):
     # Get plain content versions of all elements
     elements = [plain_element(element, content_digests) for element in elements]
-    # Drop elements that have no plain content
-    elements = list(filter(None, elements))
     if content_digests:
         elements = [add_content_digest(element) for element in elements]
     return elements
@@ -111,29 +109,16 @@ def plain_element(element, content_digests):
         plain_text = element.get_text()
         # 2. Normalise the extracted text string to a canonical representation
         plain_text = normalise_text(plain_text)
-        # 3. Drop element if plain_text is empty
-        if plain_text == "":
-            element = None
-        else:
-            # 4. Update element content to be plain text
+        # 3. Update element content to be plain text
             element.string = plain_text
-            # # Set ID of element to SHA-256 hash of plain content
-            # element['id'] = hashlib.sha256(element.string.encode('utf-8')).hexdigest()
     elif type(element) in leaf_types():
         plain_text = element.string
         plain_text = normalise_text(plain_text)
-        if plain_text == "":
-            element = None
-        else:
-            element.string = plain_text
+        # FIXME: Setting element.string = plain_text does not change the
+        element = type(element)(plain_text)
     else:
         # If not a leaf node or leaf type call recursively on child nodes, replacing
         element.contents = plain_elements(element.contents, content_digests)
-        # content_hash = hashlib.sha256()
-        # for content in element.contents:
-        #     if content and type(content) not in leaf_types:
-        #         content_hash.update(content["id"].encode('utf-8'))
-        # element["id"] = content_hash.hexdigest()
     return element
 
 
@@ -146,6 +131,7 @@ def leaf_types ():
 
 
 def add_content_digest(element):
+    if type(element) not in leaf_types():
     element["data-content-digest"] = content_digest(element)
     return element
 
@@ -153,19 +139,25 @@ def add_content_digest(element):
 def content_digest(element):
     if type(element) in leaf_types():
         # Hash
-        digest = hashlib.sha256(element.string.encode('utf-8')).hexdigest()
+        trimmed_string = element.string.strip()
+        if trimmed_string == "":
+            digest = ""
+        else:
+            digest = hashlib.sha256(trimmed_string.encode('utf-8')).hexdigest()
     else:
-        # Build content digest recursively from content nodes
-        digest = hashlib.sha256()
         contents = element.contents
         num_contents = len(contents)
         if num_contents == 0:
-            digest = None
+            # No hash when no child elements exist
+            digest = ""
         elif num_contents == 1:
-            digest.update(contents[0].string.encode('utf-8'))
-            digest = digest.hexdigest()
+            # If single child, use digest of child
+            digest = content_digest(contents[0])
         else:
-            [digest.update(content_digest(content).encode('utf-8')) for content in contents]
+            # Build content digest from the "non-empty" digests of child nodes
+            digest = hashlib.sha256()
+            child_digests = list(filter(lambda x: x != "", [content_digest(content) for content in contents]))
+            [digest.update(child.encode('utf-8')) for child in child_digests]
             digest = digest.hexdigest()
     return digest
 
