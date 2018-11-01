@@ -5,7 +5,7 @@ from ReadabiliPy import readability
 import tempfile
 
 
-def check_extract_article(test_filename, expected_filename, content_digests=False):
+def check_extract_article(test_filename, expected_filename, content_digests=False, node_indexes=False):
     test_data_dir = "data"
     # Read HTML test file
     test_filepath = os.path.join(os.path.dirname(__file__), test_data_dir, test_filename)
@@ -13,7 +13,7 @@ def check_extract_article(test_filename, expected_filename, content_digests=Fals
         html = h.read()
 
     # Extract simplified article HTML
-    article_json = readability.parse(html, content_digests)
+    article_json = readability.parse(html, content_digests, node_indexes)
 
     # Get expected simplified article HTML
     expected_filepath = os.path.join(os.path.dirname(__file__), test_data_dir, expected_filename)
@@ -65,6 +65,21 @@ def test_extract_article_list_items_content_digests():
         "list_items_simple_article_from_full_page_content_digests.json",
         content_digests=True
     )
+
+
+def test_extract_article_list_items_node_indexes():
+    check_extract_article(
+        "list_items_full_page.html",
+        "list_items_simple_article_from_full_page_node_indexes.json",
+        node_indexes=True
+    )
+
+# def test_extract_article_full_page_content_digest():
+#     check_extract_article(
+#         "addictinginfo.com-1_full_page.html",
+#         "addictinginfo.com-1_simple_article_from_full_page.json",
+#         content_digests=True
+#     )
 
 
 def check_extract_paragraphs_as_plain_text(test_filename, expected_filename):
