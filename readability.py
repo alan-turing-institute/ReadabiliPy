@@ -8,7 +8,7 @@ import tempfile
 import unicodedata
 
 
-def parse(html, content_digests=False):
+def parse(html, content_digests=False, node_indexes=False):
     temp_dir = tempfile.gettempdir()
     # Write input HTML to temporary file so it is available to the node.js script
     html_path = os.path.join(temp_dir, "full.html");
@@ -43,7 +43,7 @@ def parse(html, content_digests=False):
         if "content" in readability_json and readability_json["content"] is not "":
             article_json["content"] = readability_json["content"]
             article_json["plain_content"] = \
-                plain_content(readability_json["content"], content_digests)
+                plain_content(readability_json["content"], content_digests, node_indexes)
             article_json["plain_text"] = \
                 extract_paragraphs_as_plain_text(readability_json["content"])
 
@@ -83,25 +83,29 @@ def plain_text_leaf_node(element):
     return plain_text
 
 
-def plain_content(readability_content, content_digests):
+def plain_content(readability_content, content_digests, node_indexes):
     # Load article as DOM
     soup = BeautifulSoup(readability_content, 'html.parser')
     # Make all elements plain
-    elements = plain_elements(soup.contents, content_digests)
+    elements = plain_elements(soup.contents, content_digests, node_indexes)
+    if node_indexes:
+        # Add node index attributes to nodes
+        elements = [add_node_indexes(element) for element in elements]
     # Replace article contents with plain elements
     soup.contents = elements
     return str(soup)
 
 
-def plain_elements(elements, content_digests):
+def plain_elements(elements, content_digests, node_indexes):
     # Get plain content versions of all elements
-    elements = [plain_element(element, content_digests) for element in elements]
+    elements = [plain_element(element, content_digests, node_indexes) for element in elements]
     if content_digests:
+        # Add content digest attrbiute to nodes
         elements = [add_content_digest(element) for element in elements]
     return elements
 
 
-def plain_element(element, content_digests):
+def plain_element(element, content_digests, node_indexes):
     # For lists, we make each item plain text
     if element.name in leaf_nodes():
         # For leaf node elements, extract the text content, discarding any HTML tags
@@ -110,14 +114,14 @@ def plain_element(element, content_digests):
         # 2. Normalise the extracted text string to a canonical representation
         plain_text = normalise_text(plain_text)
         # 3. Update element content to be plain text
-            element.string = plain_text
+        element.string = plain_text
     elif type(element) in leaf_types():
         plain_text = element.string
         plain_text = normalise_text(plain_text)
         element = type(element)(plain_text)
     else:
         # If not a leaf node or leaf type call recursively on child nodes, replacing
-        element.contents = plain_elements(element.contents, content_digests)
+        element.contents = plain_elements(element.contents, content_digests, node_indexes)
     return element
 
 
@@ -129,9 +133,27 @@ def leaf_types ():
     return [NavigableString, Comment]
 
 
+def add_node_indexes(element, node_index="0"):
+    if type(element) in leaf_types():
+        # Can't add attributes to leaf string types
+        return element
+    else:
+        # Add index to current element
+        element["data-node-index"] = node_index
+        # Add index to child elements
+        local_idx = 0
+        for child in element.contents:
+            # Can't add attributes to leaf string types
+            if type(child) not in leaf_types():
+                local_idx = local_idx + 1
+                child_index = "{stem}.{local}".format(stem=node_index, local=local_idx)
+                add_node_indexes(child, node_index=child_index)
+    return element
+
+
 def add_content_digest(element):
     if type(element) not in leaf_types():
-    element["data-content-digest"] = content_digest(element)
+        element["data-content-digest"] = content_digest(element)
     return element
 
 
