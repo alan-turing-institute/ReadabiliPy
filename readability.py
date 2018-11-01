@@ -114,7 +114,6 @@ def plain_element(element, content_digests):
     elif type(element) in leaf_types():
         plain_text = element.string
         plain_text = normalise_text(plain_text)
-        # FIXME: Setting element.string = plain_text does not change the
         element = type(element)(plain_text)
     else:
         # If not a leaf node or leaf type call recursively on child nodes, replacing
