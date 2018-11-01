@@ -16,7 +16,7 @@ def parse(html, content_digests=False, node_indexes=False):
         f.write(html)
 
     # Call Mozilla's Readability.js Readability.parse() function via node, writing output to a temporary file
-    article_json_path = os.path.join(temp_dir, "article.json");
+    article_json_path = os.path.join(temp_dir, "article.json")
     parse_script_path = os.path.join(os.path.dirname(__file__), "ExtractArticle.js")
     check_call(["node", parse_script_path, "-i", html_path, "-o", article_json_path])
 
@@ -43,9 +43,9 @@ def parse(html, content_digests=False, node_indexes=False):
         if "content" in readability_json and readability_json["content"] is not "":
             article_json["content"] = readability_json["content"]
             article_json["plain_content"] = \
-                plain_content(readability_json["content"], content_digests, node_indexes)
+                plain_content(article_json["content"], content_digests, node_indexes)
             article_json["plain_text"] = \
-                extract_paragraphs_as_plain_text(readability_json["content"])
+                extract_paragraphs_as_plain_text(article_json["plain_content"])
 
     return article_json
 
@@ -55,16 +55,16 @@ def extract_paragraphs_as_plain_text(paragraph_html):
     soup = BeautifulSoup(paragraph_html, 'html.parser')
     # Select all unordered lists
     lists = soup.find_all(['ul', 'ol'])
-    # Prefix text in all list items with "* " and make lists parafraphs
+    # Prefix text in all list items with "* " and make lists paragraphs
     for l in lists:
-        plain_items = "".join(list(filter(None, [plain_text_leaf_node(li) for li in l.find_all('li')])))
+        plain_items = "".join(list(filter(None, [plain_text_leaf_node(li)["text"] for li in l.find_all('li')])))
         l.string = plain_items
         l.name = "p"
     # Select all paragraphs
     paragraphs = soup.find_all('p')
     paragraphs = [plain_text_leaf_node(p) for p in paragraphs]
     # Drop empty paragraphs
-    paragraphs = list(filter(None, paragraphs))
+    paragraphs = list(filter(lambda p: p["text"] is not None, paragraphs))
     return paragraphs
 
 
@@ -80,7 +80,11 @@ def plain_text_leaf_node(element):
         plain_text = "* {}, ".format(plain_text)
     if plain_text == "":
         plain_text = None
-    return plain_text
+    if "data-node-index" in element.attrs:
+        plain = {"node_index": element["data-node-index"], "text": plain_text}
+    else:
+        plain = {"text": plain_text}
+    return plain
 
 
 def plain_content(readability_content, content_digests, node_indexes):
