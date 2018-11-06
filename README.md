@@ -8,12 +8,18 @@ This package also augments the output of Readability.js to also return a list of
 - `Readability.js` folder
   - `Readability.js`: Taken unaltered from commit [3be1aaa  ](https://github.com/mozilla/readability/tree/3be1aaa01c078c25b67ed8dfd1c9aa8f9963490b) of Mozilla's [Readability.js](https://github.com/mozilla/readability) Node.js package.
 
+- `ExtractArticle.js`: A Node.js script that reads a file containing a HTML snippet (does not have to be a full document), parses it using [jsdom](https://github.com/jsdom/jsdom), attempts to extract an article using `Readability.parse()` and writes the output to a JSON file.
+  - Usage: `node ExtractArticle.js -i <input_file> -o <output_file>`
+  - All arguments have long and short form versions.
+    - `-i`: The path to an input file containing full or partial HTML as text.
+    - `-o`: The path to the file the output article JSON data should be written to.
+
 - A `readability.py` file containing the wrapper function `parse()`.
   - Usage:
   ```python
   from ReadabiliPy import readability
 
-  article = readability.extract_article(html_string, content_digests=False, node_indexes=False)
+  article = readability.parse(html_string, content_digests=False, node_indexes=False)
   ```
    - The function returns a dictionary with the following fields:
     - `title`: The article title
@@ -26,8 +32,8 @@ This package also augments the output of Readability.js to also return a list of
    - An optional `content_digests` flag can be passed to the Python wrapper. When this is set to `True`, each HTML element in the `plain_content` field has a `data-content-digest` attribute, which holds the SHA-256 hash of its plain text content. For "leaf" nodes (containing only plain text in the output), this is the SHA-256 hash of their plain text content. For nodes containing other nodes, this is the SHA-256 hash of the concatenated SHA-256 hashes of their child nodes.
    - An optional `node_indexes` flag can be passed to the Python wrapper. When this is set to `True`, each HTML element in the `plain_content` field has a `data-node-indexes` attribute, which holds a hierarchical index describing the location of element within the `plain_content` HTML structure.
 
-- `ExtractArticle.js`: A Node.js script that reads a file containing a HTML snippet (does not have to be a full document), parses it using [jsdom](https://github.com/jsdom/jsdom), attempts to extract an article using `Readability.parse()` and writes the output to a JSON file.
-  - Usage: `node ExtractArticle.js -i <input_file> -o <output_file> [-c] [-n]`
+- `extract_article.py`: A Python script that uses `readability.parse()` to extract the augmented readable article data.
+  - Usage: `python extract_article.py -i <input_file> -o <output_file> [-c] [-n]`
   - All arguments have long and short form versions.
     - `-i` / `--input-file`: The path to an input file containing full or partial HTML as text.
     - `-o` / `--output-file`: The path to the file the output article JSON data should be written to.
