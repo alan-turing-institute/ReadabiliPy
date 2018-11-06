@@ -43,7 +43,7 @@ var outFilePath;
 if (typeof(argv['o']) !== 'undefined') {
     outFilePath = argv['o'];
 } else {
-    outFilePath = inFilePath + ".simple.html";
+    outFilePath = inFilePath + ".simple.json";
 }
 var html = readFile(inFilePath);
 
