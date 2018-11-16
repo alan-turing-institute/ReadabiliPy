@@ -45,8 +45,8 @@ This package also augments the output of Readability.js to also return a list of
 1. [Install Node.js](https://nodejs.org/en/download/)
 2. Install the node part of this package by running `npm install`.
 3. Install the requirements for the Python part of this package by running:
-  - As a user of this project `pip install -r requirements.txt`
-  - As a developer of this project `pip install -r requirements-dev.txt`
+    - As a user of this project `pip install -r requirements.txt`
+    - As a developer of this project `pip install -r requirements-dev.txt`
 
 ## Testing
 1. Run the tests with `python -m pytest -vv`
