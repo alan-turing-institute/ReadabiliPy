@@ -18,5 +18,5 @@ def check_blacklisted_html_fragment(test_fragment):
                               "dialog", "summary", "canvas", "noscript",
                               "script", "template", "data", "link", "time",
                               "style", "nav", "br", "hr"]) 
-def test_blacklist_single_element(element):
+def test_html_blacklist_element(element):
     check_blacklisted_html_fragment('<{0}>Lorem ipsum dolor sit amet</{0}>'.format(element))
