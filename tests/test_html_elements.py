@@ -1,30 +1,35 @@
-from ReadabiliPy import readability
+"""Tests for HTML elements."""
 from pytest import mark
+from ReadabiliPy import readability
 
-def check_html_output_contains_text(test_fragment, expected_output = None):
+
+def check_html_output_contains_text(test_fragment, expected_output=None):
     """Check that expected output is present when parsing HTML fragment."""
     article_json = readability.parse(test_fragment)
     if expected_output is None:
         expected_output = test_fragment
+    content = str(article_json["plain_content"])
     # Check that each line of expected output is present
     for line in expected_output.split("\n"):
-        assert(line.strip() in article_json["plain_content"])
+        assert line.strip() in content
 
 
 def check_html_has_no_output(test_fragment):
     """Check that no output is present when parsing HTML fragment."""
     article_json = readability.parse(test_fragment)
     # Check that there is no output
-    assert(article_json["plain_content"] is None)
+    assert article_json["plain_content"] is None
 
 
 def check_html_output_does_not_contain_tag(test_fragment, vetoed_tag):
     """Check that vetoed tag is not present when parsing HTML fragment."""
     article_json = readability.parse(test_fragment)
     # Check that neither <tag nor </tag> appear in the output
-    if article_json["plain_content"] is not None:
+    content = str(article_json["plain_content"])
+    if content is not None:
         for element in ["<{}".format(vetoed_tag), "</{}>".format(vetoed_tag)]:
-            assert(element not in article_json["plain_content"])
+            assert element not in content
+
 
 # Whitelisted HTML elements
 def test_html_whitelist_article():
@@ -115,14 +120,13 @@ def test_html_whitelist_colgroup():
             <th>Price</th>
         </tr>
         </table>
-    """,
-    """
+    """, """
         <colgroup>
             <col span="2"/>
             <col/>
         </colgroup>
-    """
-    )
+    """)
+
 
 def test_html_whitelist_col():
     """The col element describes one or more columns in a table."""
@@ -138,12 +142,11 @@ def test_html_whitelist_col():
             <th>Price</th>
         </tr>
         </table>
-    """,
-    """
+    """, """
         <col span="2"/>
         <col/>
-    """
-    )
+    """)
+
 
 def test_html_whitelist_div():
     """The div element has no special meaning."""
@@ -182,8 +185,7 @@ def test_html_whitelist_dd():
             <dt>Term 1</dt>
             <dd>Description 1</dd>
         </dl>
-    """,
-    "<dd>Description 1</dd>")
+    """, "<dd>Description 1</dd>")
 
 
 def test_html_whitelist_dt():
@@ -193,8 +195,7 @@ def test_html_whitelist_dt():
             <dt>Term 1</dt>
             <dd>Description 1</dd>
         </dl>
-    """,
-    "<dt>Term 1</dt>")
+    """, "<dt>Term 1</dt>")
 
 
 def test_html_whitelist_figure():
@@ -208,8 +209,7 @@ def test_html_whitelist_figure():
             </pre>
         </figure>
         <p>Further details are given in this paragraph.</p>
-    """,
-    """
+    """, """
         <figure id="figref">
     """)
 
@@ -225,8 +225,7 @@ def test_html_whitelist_figcaption():
             </pre>
         </figure>
         <p>Further details are given in this paragraph.</p>
-    """,
-    """
+    """, """
         <figcaption>Listing 1. Code description.</figcaption>
     """)
 
@@ -289,8 +288,7 @@ def test_html_whitelist_li():
             <li>Item 1</li>
             <li>Item 2</li>
         </ul>
-    """,
-    """
+    """, """
         <li>Item 1</li>
         <li>Item 2</li>
     """)
@@ -305,13 +303,13 @@ def test_html_whitelist_main():
             <p>And another one</p>
         </main>
         <footer>The footer</footer>
-    """,
-    """
+    """, """
        <main>
             <p>A paragraph</p>
             <p>And another one</p>
         </main>
     """)
+
 
 def test_html_whitelist_ol():
     """The ol element defines an unordered list."""
@@ -321,6 +319,7 @@ def test_html_whitelist_ol():
             <li>Item 2</li>
         </ol>
     """)
+
 
 def test_html_whitelist_p():
     """The p element defines a paragraph."""
@@ -332,14 +331,15 @@ def test_html_whitelist_p():
         </p>
     """)
 
+
 def test_html_whitelist_pre():
     """The pre element represents a block of preformatted text."""
     check_html_output_contains_text("""
         <pre>
             Some preformatted   text lives  here
         </pre>
-    """)    
-    
+    """)
+
 
 def test_html_whitelist_section():
     """The section element is a generic section of a document."""
@@ -349,15 +349,14 @@ def test_html_whitelist_section():
             <p>This is the first of my chapters. It doesn’t say much.</p>
             <p>But it has two paragraphs!</p>
         </section>
-    """,
-    """    
+    """, """
         <section>
             <h3>My First Chapter</h3>
             <p>This is the first of my chapters. It doesn’t say much.</p>
             <p>But it has two paragraphs!</p>
         </section>
-    """)    
-    
+    """)
+
 
 def test_html_whitelist_table():
     """The table element represents data with more than one dimension."""
@@ -367,8 +366,7 @@ def test_html_whitelist_table():
             <td>Table contents</td>
         </tr>
         </table>
-    """, 
-    "<table><tr><td>Content</td></tr></table>")
+    """, "<table><tr><td>Content</td></tr></table>")
 
 
 def test_html_whitelist_tbody():
@@ -379,8 +377,7 @@ def test_html_whitelist_tbody():
             <td>Table body content</td>
         </tbody>
         </table>
-    """, 
-    "<tbody><td>Content</td></tbody>")
+    """, "<tbody><td>Content</td></tbody>")
 
 
 def test_html_whitelist_thead():
@@ -393,8 +390,7 @@ def test_html_whitelist_thead():
             </tr>
         </thead>
         </table>
-    """,
-    "<thead><tr><th>Header</th></tr></thead>")
+    """, "<thead><tr><th>Header</th></tr></thead>")
 
 
 def test_html_whitelist_tfoot():
@@ -407,8 +403,7 @@ def test_html_whitelist_tfoot():
             </tr>
         </tfoot>
         </table>
-    """,
-    "<tfoot><tr><td>Sum of column</td></tr></tfoot>")
+    """, "<tfoot><tr><td>Sum of column</td></tr></tfoot>")
 
 
 def test_html_whitelist_tr():
@@ -419,8 +414,7 @@ def test_html_whitelist_tr():
             <td>Content</td>
         </tr>
         </table>
-    """,
-    "<tr><td>Content</td></tr>")
+    """, "<tr><td>Content</td></tr>")
 
 
 def test_html_whitelist_td():
@@ -431,8 +425,7 @@ def test_html_whitelist_td():
             <td>Cell content</td>
         </tr>
         </table>
-    """,
-    "<td>Cell content</td>")
+    """, "<td>Cell content</td>")
 
 
 def test_html_whitelist_th():
@@ -443,8 +436,7 @@ def test_html_whitelist_th():
             <th>Header text</th>
         </tr>
         </table>
-    """,
-    "<th>Header text</th>")
+    """, "<th>Header text</th>")
 
 
 def test_html_whitelist_ul():
@@ -464,7 +456,7 @@ def test_html_blacklist_button():
         <button type="button">Click Me!</button>
     """)
 
-    
+
 def test_html_blacklist_datalist():
     """The datalist element represents a set of option elements."""
     check_html_has_no_output("""
@@ -486,7 +478,7 @@ def test_html_blacklist_fieldset():
 
 
 def test_html_blacklist_form():
-    """A form is a user-interactive area of a document containing form controls."""
+    """The form element is a user-interactive area of a document."""
     check_html_has_no_output("""
         <form>
             <div>
@@ -517,7 +509,7 @@ def test_html_blacklist_label():
 
 
 def test_html_blacklist_legend():
-    """The legend element represents a caption for the contents of its parent fieldset."""
+    """The legend element has a caption for its parent fieldset."""
     check_html_output_does_not_contain_tag("""
         <fieldset>
             <legend>Pizza Size</legend>
@@ -527,14 +519,14 @@ def test_html_blacklist_legend():
 
 
 def test_html_blacklist_meter():
-    """The meter element represents a scalar measurement within a known range."""
+    """The meter element represents a measurement within a known range."""
     check_html_has_no_output("""
         <meter value=6 max=8>6 blocks used (out of 8 total)</meter>
     """)
 
 
 def test_html_blacklist_optgroup():
-    """The optgroup element represents a group of option elements with a common label."""
+    """The optgroup element is a group of option elements."""
     check_html_output_does_not_contain_tag("""
         <select name="c">
             <optgroup label="8.01 Subject 1"/>
@@ -552,7 +544,7 @@ def test_html_blacklist_optgroup():
 
 
 def test_html_blacklist_option():
-    """The option element represents an option in a select or datalist element."""
+    """The option element is an option in a select or datalist element."""
     check_html_output_does_not_contain_tag("""
         <datalist id=sexes>
             <option value="Female"/>
@@ -562,9 +554,10 @@ def test_html_blacklist_option():
 
 
 def test_html_blacklist_output():
-    """The output element represents the result of a calculation or a user action."""
+    """The output element is the result of a calculation or a user action."""
     check_html_output_does_not_contain_tag("""
-        <form onsubmit="return false" oninput="o.value = a.valueAsNumber + b.valueAsNumber">
+        <form onsubmit="return false"
+              oninput="o.value = a.valueAsNumber + b.valueAsNumber">
             <input name=a type=number step=any> +
             <input name=b type=number step=any> =
             <output name=o for="a b"></output>
@@ -577,12 +570,16 @@ def test_html_blacklist_progress():
     check_html_output_does_not_contain_tag("""
         <section>
         <h2>Task Progress</h2>
-        <p>Progress: <progress id="progbar" max=100><span>0</span>%</progress></p>
+        <p>
+            Progress:
+            <progress id="progbar" max=100><span>0</span>%</progress>
+        </p>
         <script>
             var progressBar = document.getElementById('progbar');
             function updateProgress(amount) {
                 progressBar.value += amount;
-                progressBar.getElementsByTagName('span')[0].textContent = progressBar.value;
+                progressBar.getElementsByTagName('span')[0]
+                    .textContent = progressBar.value;
             }
         </script>
         <button type=button onclick="updateProgress(10)">Click here</button>
@@ -591,7 +588,7 @@ def test_html_blacklist_progress():
 
 
 def test_html_blacklist_select():
-    """The select element represents a control for selecting amongst a set of options."""
+    """The select element is a control for selecting from a set of options."""
     check_html_output_does_not_contain_tag("""
         <select id="number" name="number">
             <option value="1"> One </option>
@@ -614,11 +611,10 @@ def test_html_blacklist_area():
     check_html_output_does_not_contain_tag("""
         <p>
             Please select a shape:
-            <img src="shapes.png" usemap="#shapes" alt="Two shapes are available: a hollow red box and a green circle.">
+            <img src="shapes.png" usemap="#shapes" alt="Shapes."/>
             <map name="shapes">
-                <area shape=rect coords="50,50,100,100"> <!-- the hole in the red box -->
-                <area shape=rect coords="25,25,125,125" href="red.html" alt="Red box.">
-                <area shape=circle coords="200,75,50" href="green.html" alt="Green circle.">
+                <area shape=rect coords="25,25,125,125" href="red.html"/>
+                <area shape=circle coords="200,75,50" href="green.html"/>
             </map>
         </p>
     """, "area")
@@ -629,11 +625,10 @@ def test_html_blacklist_img():
     check_html_output_does_not_contain_tag("""
         <p>
             Please select a shape:
-            <img src="shapes.png" usemap="#shapes" alt="Two shapes are available: a hollow red box and a green circle.">
+            <img src="shapes.png" usemap="#shapes" alt="Shapes."/>
             <map name="shapes">
-                <area shape=rect coords="50,50,100,100"> <!-- the hole in the red box -->
-                <area shape=rect coords="25,25,125,125" href="red.html" alt="Red box.">
-                <area shape=circle coords="200,75,50" href="green.html" alt="Green circle.">
+                <area shape=rect coords="25,25,125,125" href="red.html"/>
+                <area shape=circle coords="200,75,50" href="green.html"/>
             </map>
         </p>
     """, "area")
@@ -644,34 +639,33 @@ def test_html_blacklist_map():
     check_html_output_does_not_contain_tag("""
         <p>
             Please select a shape:
-            <img src="shapes.png" usemap="#shapes" alt="Two shapes are available: a hollow red box and a green circle.">
+            <img src="shapes.png" usemap="#shapes" alt="Shapes."/>
             <map name="shapes">
-                <area shape=rect coords="50,50,100,100"> <!-- the hole in the red box -->
-                <area shape=rect coords="25,25,125,125" href="red.html" alt="Red box.">
-                <area shape=circle coords="200,75,50" href="green.html" alt="Green circle.">
+                <area shape=rect coords="25,25,125,125" href="red.html"/>
+                <area shape=circle coords="200,75,50" href="green.html"/>
             </map>
         </p>
     """, "area")
 
 
 def test_html_blacklist_picture():
-    """The picture element provides multiples sources for its contained img element."""
+    """The picture element provides multiple sources for its img element."""
     check_html_output_does_not_contain_tag("""
         <picture>
-            <source media="(min-width: 650px)" srcset="img_pink_flowers.jpg">
-            <source media="(min-width: 465px)" srcset="img_white_flower.jpg">
-            <img src="img_orange_flowers.jpg" alt="Flowers" style="width:auto;">
+            <source media="(min-width: 650px)" srcset="img_pink_flowers.jpg"/>
+            <source media="(min-width: 465px)" srcset="img_white_flower.jpg"/>
+            <img src="img_orange_flowers.jpg" style="width:auto;"/>
         </picture>
     """, "picture")
 
 
 def test_html_blacklist_source():
-    """The source element specifies an alternative source for an media resource."""
+    """The source element specifies an alternative source for a resource."""
     check_html_output_does_not_contain_tag("""
         <picture>
-            <source media="(min-width: 650px)" srcset="img_pink_flowers.jpg">
-            <source media="(min-width: 465px)" srcset="img_white_flower.jpg">
-            <img src="img_orange_flowers.jpg" alt="Flowers" style="width:auto;">
+            <source media="(min-width: 650px)" srcset="img_pink_flowers.jpg"/>
+            <source media="(min-width: 465px)" srcset="img_white_flower.jpg"/>
+            <img src="img_orange_flowers.jpg" style="width:auto;"/>
         </picture>
     """, "source")
 
@@ -688,12 +682,14 @@ def test_html_blacklist_audio():
 
 
 def test_html_blacklist_track():
-    """The track element specifies subtitles or other text for media elements."""
+    """The track element specifies subtitles or other text for media."""
     check_html_output_does_not_contain_tag("""
         <video width="320" height="240" controls>
             <source src="film.mp4" type="video/mp4">
-            <track src="subtitles_en.vtt" kind="subtitles" srclang="en" label="English">
-            <track src="subtitles_no.vtt" kind="subtitles" srclang="no" label="Norwegian">
+            <track src="subtitles_en.vtt" kind="subtitles"
+                   srclang="en" label="English">
+            <track src="subtitles_no.vtt" kind="subtitles"
+                   srclang="no" label="Norwegian">
             Your browser does not support the video tag.
         </video>
     """, "track")
@@ -711,7 +707,7 @@ def test_html_blacklist_video():
 
 
 def test_html_blacklist_embed():
-    """The embed element provides an external (typically non-HTML) application."""
+    """The embed element provides an external (typically non-HTML) resource."""
     check_html_output_does_not_contain_tag("""
         <embed src="flashgame.swf" quality="high"/>
     """, "embed")
@@ -731,11 +727,11 @@ def test_html_blacklist_math():
                         <msqrt>
                             <msup> <mi>b</mi> <mn>2</mn> </msup>
                             <mo>-</mo>
-                            <mn>4</mn> <mo>⁢</mo> <mi>a</mi> <mo>⁢</mo> <mi>c</mi>
+                            <mn>4</mn> <mi>a</mi> <mi>c</mi>
                         </msqrt>
                     </mrow>
                     <mrow>
-                        <mn>2</mn> <mo>⁢</mo> <mi>a</mi>
+                        <mn>2</mn> <mi>a</mi>
                     </mrow>
                 </mfrac>
             </math>
@@ -764,32 +760,28 @@ def test_html_blacklist_param():
 def test_html_blacklist_svg():
     """The svg element contains an embedded SVG graphic."""
     check_html_output_does_not_contain_tag("""
-        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="5cm" height="5cm">
-            <desc>Two groups, each of two rectangles</desc>
+        <svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+             width="5cm" height="5cm">
+            <desc>A group of two rectangles</desc>
             <g id="group1" fill="red">
                 <rect x="1cm" y="1cm" width="1cm" height="1cm"/>
                 <rect x="3cm" y="1cm" width="1cm" height="1cm"/>
             </g>
-            <g id="group2" fill="blue">
-                <rect x="1cm" y="3cm" width="1cm" height="1cm"/>
-                <rect x="3cm" y="3cm" width="1cm" height="1cm"/>
-            </g>
-            <rect x=".01cm" y=".01cm" width="4.98cm" height="4.98cm" fill="none" stroke="blue" stroke-width=".02cm"/>
         </svg>
     """, "svg")
 
 
 def test_html_blacklist_details():
-    """The details element is an expandable widget which provides additional information or controls."""
+    """The details element is an expandable widget with additional context."""
     check_html_output_does_not_contain_tag("""
         <section class="progress window">
             <h1>Copying "Really Achieving Your Childhood Dreams"</h1>
             <details>
-                <summary>Copying... <progress max="100" value="25"></progress> 25%</summary>
+                <summary>Copying...
+                    <progress max="100" value="25">25%</progress>
+                </summary>
                 <dl>
                     <dt>Transfer rate:</dt> <dd>452KB/s</dd>
-                    <dt>Local filename:</dt> <dd>/home/username/raycd.m4v</dd>
-                    <dt>Remote filename:</dt> <dd>/var/www/lectures/raycd.m4v</dd>
                     <dt>Duration:</dt> <dd>01:16:27</dd>
                 </dl>
             </details>
@@ -800,26 +792,24 @@ def test_html_blacklist_details():
 def test_html_blacklist_dialog():
     """The dialog element is a user-interactive area for performing."""
     check_html_output_does_not_contain_tag("""
-        <p><b>Note:</b> The dialog tag is not supported in Edge/Internet Explorer.</p>
+        <p><b>Note:</b> The dialog tag is not supported in Edge.</p>
         <p>January <dialog open>This is an open dialog window</dialog></p>
         <p>February</p>
     """, "dialog")
 
 
 def test_html_blacklist_summary():
-    """The summary element provides a summary, caption, or legend for its details element."""
+    """The summary element provides a summary for its details element."""
     check_html_output_does_not_contain_tag("""
         <section class="progress window">
             <h1>Copying "Really Achieving Your Childhood Dreams"</h1>
             <details>
-                <summary>Copying... <progress max="375505392" value="97543282"></progress> 25%</summary>
+                <summary>Copying...
+                    <progress max="100" value="25">25%</progress>
+                </summary>
                 <dl>
                     <dt>Transfer rate:</dt> <dd>452KB/s</dd>
-                    <dt>Local filename:</dt> <dd>/home/rpausch/raycd.m4v</dd>
-                    <dt>Remote filename:</dt> <dd>/var/www/lectures/raycd.m4v</dd>
                     <dt>Duration:</dt> <dd>01:16:27</dd>
-                    <dt>Color profile:</dt> <dd>SD (6-1-6)</dd>
-                    <dt>Dimensions:</dt> <dd>320×240</dd>
                 </dl>
             </details>
         </section>
@@ -827,7 +817,7 @@ def test_html_blacklist_summary():
 
 
 def test_html_blacklist_canvas():
-    """The canvas element provides a resolution-dependent bitmap canvas, which can be used on the fly by scripts."""
+    """The canvas element provides a resolution-dependent bitmap canvas."""
     check_html_output_does_not_contain_tag("""
         <canvas id="myCanvas" width="200" height="100"></canvas>
     """, "canvas")
@@ -838,11 +828,15 @@ def test_html_blacklist_noscript():
     check_html_output_does_not_contain_tag("""
         <p id="demo"></p>
 
-        <script>document.getElementById("demo").innerHTML = "Hello JavaScript!";</script>
+        <script>
+            document.getElementById("demo").innerHTML = "Hello JavaScript!";
+        </script>
 
-        <noscript><p>Sorry, your browser does not support JavaScript!</p></noscript>
+        <noscript>
+            <p>Sorry, your browser does not support JavaScript!</p>
+        </noscript>
 
-        <p>A browser without support for JavaScript will show the text written inside the noscript element.</p>
+        <p>Browsers without JavaScript support will show the noscript text.</p>
     """, "noscript")
 
 
@@ -851,18 +845,25 @@ def test_html_blacklist_script():
     check_html_output_does_not_contain_tag("""
         <p id="demo"></p>
 
-        <script>document.getElementById("demo").innerHTML = "Hello JavaScript!";</script>
+        <script>
+            document.getElementById("demo").innerHTML = "Hello JavaScript!";
+        </script>
 
-        <noscript><p>Sorry, your browser does not support JavaScript!</p></noscript>
+        <noscript>
+            <p>Sorry, your browser does not support JavaScript!</p>
+        </noscript>
 
-        <p>A browser without support for JavaScript will show the text written inside the noscript element.</p>
+        <p>Browsers without JavaScript support will show the noscript text.</p>
     """, "script")
 
 
 def test_html_blacklist_template():
-    """The template element provides HTML fragments that can be manipulated by scripts."""
+    """The template element provides HTML fragments for use by scripts."""
     check_html_output_does_not_contain_tag("""
-        <p>Click the button to fill the web page with one new DIV element for each item in an array.</p>
+        <p>
+            Click the button to fill the web page with one new DIV element for
+            each item in an array.
+        </p>
 
         <button onclick="showContent()">Show content</button>
 
@@ -887,7 +888,7 @@ def test_html_blacklist_template():
 
 
 def test_html_blacklist_data():
-    """The data element contains text and a machine-readable value attribute."""
+    """The data element has text and a machine-readable value attribute."""
     check_html_output_does_not_contain_tag("""
         <ul>
           <li><data value="21053">Cherry Tomato</data></li>
@@ -906,9 +907,11 @@ def test_html_blacklist_link():
 
 
 def test_html_blacklist_time():
-    """The time element contains a time and a machine-readable datetime attribute."""
+    """The time element has a time and a machine-readable datetime."""
     check_html_output_does_not_contain_tag("""
-        <p>We open at <time datetime="2018-11-21 10:00">10:00 tomorrow</time>.</p>
+        <p>
+            We open at <time datetime="2018-11-21 10:00">10:00 tomorrow</time>.
+        </p>
     """, "time")
 
 
@@ -960,24 +963,21 @@ def test_html_special_q():
     """The q element contains quoted text."""
     check_html_output_contains_text("""
         <p>Some text <q>this bit is quoted</q> and now back to normal</p>
-    """,
-    '<p>Some text "this bit is quoted" and now back to normal</p>')
+    """, '<p>Some text "this bit is quoted" and now back to normal</p>')
 
 
 def test_html_special_sub():
     """The sub element contains subscript text."""
     check_html_output_contains_text("""
         <p>This text contains <sub>subscript</sub> text.</p>
-    """,
-    '<p>This text contains _subscript text.</p>')
+    """, '<p>This text contains _subscript text.</p>')
 
 
 def test_html_special_sup():
     """The sup element contains superscript text."""
     check_html_output_contains_text("""
         <p>This text contains <sup>superscript</sup> text.</p>
-    """,
-    '<p>This text contains ^superscript text.</p>')
+    """, '<p>This text contains ^superscript text.</p>')
 
 
 # Remaining HTML elements - use a parametrized test here for simplicity
@@ -987,7 +987,8 @@ def test_html_special_sup():
                               "s", "samp", "small", "span", "strong", "u",
                               "var", "wbr"])
 def test_html_remaining_element(element):
-    """Simple standalone elements which can contain text. Check that the inner text is kept and the tag is discarded."""
-    html_fragment = "<{0}>Lorem ipsum dolor sit amet</{0}>".format(element)
-    check_html_output_contains_text(html_fragment, "Lorem ipsum dolor sit amet")
-    check_html_output_does_not_contain_tag(html_fragment, element)
+    """Simple standalone elements which can contain text.
+       Check that the inner text is kept and the tag is discarded."""
+    fragment = "<{0}>Lorem ipsum dolor sit amet</{0}>".format(element)
+    check_html_output_contains_text(fragment, "Lorem ipsum dolor sit amet")
+    check_html_output_does_not_contain_tag(fragment, element)
