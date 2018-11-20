@@ -1,5 +1,5 @@
-// NOTE: Based on commit 3be1aaa of Mozilla's Readability.js Node.js package.
-// Source: https://github.com/mozilla/readability/tree/3be1aaa01c078c25b67ed8dfd1c9aa8f9963490b
+// NOTE: Based on commit 876c81f of Mozilla's Readability.js Node.js package.
+// Source: https://github.com/mozilla/readability/tree/876c81f710711ba2afb36dd83889d4c5b4fc2743
 // Added publication date extraction
 
 /*eslint-env es6:false*/
@@ -1145,7 +1145,7 @@ Readability.prototype = {
           this._attempts.push({articleContent: articleContent, textLength: textLength});
           // No luck after removing flags, just return the longest text we found during the different loops
           this._attempts.sort(function (a, b) {
-            return a.textLength < b.textLength;
+            return b.textLength - a.textLength;
           });
 
           // But first check if we actually have something
@@ -1705,7 +1705,7 @@ Readability.prototype = {
   },
 
   _isProbablyVisible: function(node) {
-    return node.style.display != "none" && !node.hasAttribute("hidden");
+    return (!node.style || node.style.display != "none") && !node.hasAttribute("hidden");
   },
 
   /**
