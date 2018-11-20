@@ -1,0 +1,9 @@
+language: python
+python: 3.6
+
+install:
+  - pip install bs4 pytest pyflakes
+
+script:
+  - py.test tests
+  - pyflakes .
