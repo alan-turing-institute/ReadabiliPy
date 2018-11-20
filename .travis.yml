@@ -2,6 +2,12 @@ language: python
 python: 3.6
 
 install:
+  # Install node.js and dependencies
+  - sudo apt install curl
+  - curl -sL https://deb.nodesource.com/setup_11.x | sudo bash -
+  - sudo apt install nodejs
+  - npm install
+  # Install python dependencies
   - pip install bs4 pytest pyflakes
 
 script:
