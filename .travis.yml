@@ -1,15 +1,22 @@
+sudo: enabled
+dist: xenial
 language: python
 python: 3.6
 
-install:
-  # Install node.js and dependencies
+before_install:
+  # Install node.js
   - sudo apt install curl
   - curl -sL https://deb.nodesource.com/setup_11.x | sudo bash -
   - sudo apt install nodejs
+
+install:
+  # Install node.js dependencies
   - npm install
   # Install python dependencies
   - pip install bs4 pytest pyflakes
 
 script:
+  # Run all pytest unit tests
   - py.test tests
+  # Run pyflakes for error detection
   - pyflakes .
