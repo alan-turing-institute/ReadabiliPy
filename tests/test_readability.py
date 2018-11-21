@@ -1,8 +1,6 @@
 import json
 import os
-import subprocess
 from ReadabiliPy import readability
-import tempfile
 
 
 def check_extract_article(test_filename, expected_filename, content_digests=False, node_indexes=False):
