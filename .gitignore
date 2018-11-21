@@ -1,6 +1,8 @@
 # PyCharm IDE stuff
 .idea/
 
+# npm packages
+.package-lock.json
 
 # ===== PYTHON STUFF ====
 # Byte-compiled / optimized / DLL files
