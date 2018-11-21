@@ -17,6 +17,6 @@ install:
 
 script:
   # Run all pytest unit tests
-  - py.test tests
+  - py.test -v tests
   # Run pyflakes for error detection
   - pyflakes .
