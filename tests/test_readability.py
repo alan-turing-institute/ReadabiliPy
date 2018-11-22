@@ -1,8 +1,41 @@
+import bs4 as BeautifulSoup
 import json
 import os
 from ReadabiliPy import readability
 
+# ===== TEST HTML ELEMENT CONTENT TYPE IDENTIFICATION =====
+def test_is_embedded_content():
+    embedded_tags = ['audio', 'canvas', 'embed', 'iframe', 'img', 'math', 'object', 'picture', 'svg', 'video']
+    for tag_name in embedded_tags:
+        element = BeautifulSoup.Tag(name=tag_name)
+        assert readability.is_embedded_content(element)
 
+
+def test_is_interactive_content():
+    # Some tags are always interactive
+    unconditional_interactive_tags = ['button', 'details', 'embed', 'iframe', 'label', 'select', 'textarea']
+    for tag_name in unconditional_interactive_tags:
+        element = BeautifulSoup.Tag(name=tag_name)
+        assert readability.is_interactive_content(element)
+    # For other tags it depends on the presence of certain attributes
+    # - a (if the href attribute is present)
+    assert readability.is_interactive_content(BeautifulSoup.Tag(name='a', attrs={'href': ''}))
+    assert not(readability.is_interactive_content(BeautifulSoup.Tag(name='a')))
+    # - audio (if the controls attribute is present)
+    assert readability.is_interactive_content(BeautifulSoup.Tag(name='audio', attrs={'controls': None}))
+    assert not(readability.is_interactive_content(BeautifulSoup.Tag(name='audio')))
+    # - img (if the usemap attribute is present)
+    assert readability.is_interactive_content(BeautifulSoup.Tag(name='img', attrs={'usemap': ''}))
+    assert not(readability.is_interactive_content(BeautifulSoup.Tag(name='img')))
+    # - input (if the type attribute is not in the Hidden state)
+    assert readability.is_interactive_content(BeautifulSoup.Tag(name='input', attrs={'type': 'text'}))
+    assert not(readability.is_interactive_content(BeautifulSoup.Tag(name='type')))
+    # - video (if the controls attribute is present)
+    assert readability.is_interactive_content(BeautifulSoup.Tag(name='video', attrs={'controls': None}))
+    assert not(readability.is_interactive_content(BeautifulSoup.Tag(name='video')))
+
+
+# ===== TEST END TO END ARTICLE EXTRACTION =====
 def check_extract_article(test_filename, expected_filename, content_digests=False, node_indexes=False):
     test_data_dir = "data"
     # Read HTML test file
@@ -57,6 +90,13 @@ def test_extract_article_list_items():
     )
 
 
+def test_extract_article_headers_and_non_paragraph_blockquote_text():
+    check_extract_article(
+        "davidwolfe.com-1_full_page.html",
+        "davidwolfe.com-1_simple_article_from_full_page.json"
+    )
+
+
 def test_extract_article_list_items_content_digests():
     check_extract_article(
         "list_items_full_page.html",
@@ -98,6 +138,7 @@ def test_extract_article_full_page_content_digest_node_indexes():
     )
 
 
+# ==== TEST PLAIN TEXT EXTRACTION =====
 def check_extract_paragraphs_as_plain_text(test_filename, expected_filename):
     test_data_dir = "data"
     # Read readable article test file
@@ -131,6 +172,7 @@ def test_extract_paragraphs_as_plain_text_node_indexes():
     )
 
 
+# ===== TEST COMMAND LINE SCRIPT =====
 # def validate_extract_article_command_line_script(test_html_filepath, expected_article_json_filepath,
 #                                                  content_digest=False, node_indexes=False):
 #     # Set output file path to temp file
