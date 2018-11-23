@@ -4,38 +4,6 @@ import json
 import os
 from ReadabiliPy import readability
 
-# ===== TEST HTML ELEMENT CONTENT TYPE IDENTIFICATION =====
-def test_is_embedded_content():
-    embedded_tags = ['audio', 'canvas', 'embed', 'iframe', 'img', 'math', 'object', 'picture', 'svg', 'video']
-    for tag_name in embedded_tags:
-        element = BeautifulSoup.Tag(name=tag_name)
-        assert readability.is_embedded_content(element)
-
-
-def test_is_interactive_content():
-    # Some tags are always interactive
-    unconditional_interactive_tags = ['button', 'details', 'embed', 'iframe', 'label', 'select', 'textarea']
-    for tag_name in unconditional_interactive_tags:
-        element = BeautifulSoup.Tag(name=tag_name)
-        assert readability.is_interactive_content(element)
-    # For other tags it depends on the presence of certain attributes
-    # - a (if the href attribute is present)
-    assert readability.is_interactive_content(BeautifulSoup.Tag(name='a', attrs={'href': ''}))
-    assert not(readability.is_interactive_content(BeautifulSoup.Tag(name='a')))
-    # - audio (if the controls attribute is present)
-    assert readability.is_interactive_content(BeautifulSoup.Tag(name='audio', attrs={'controls': None}))
-    assert not(readability.is_interactive_content(BeautifulSoup.Tag(name='audio')))
-    # - img (if the usemap attribute is present)
-    assert readability.is_interactive_content(BeautifulSoup.Tag(name='img', attrs={'usemap': ''}))
-    assert not(readability.is_interactive_content(BeautifulSoup.Tag(name='img')))
-    # - input (if the type attribute is not in the Hidden state)
-    assert readability.is_interactive_content(BeautifulSoup.Tag(name='input', attrs={'type': 'text'}))
-    assert not(readability.is_interactive_content(BeautifulSoup.Tag(name='type')))
-    # - video (if the controls attribute is present)
-    assert readability.is_interactive_content(BeautifulSoup.Tag(name='video', attrs={'controls': None}))
-    assert not(readability.is_interactive_content(BeautifulSoup.Tag(name='video')))
-
-
 # ===== TEST END TO END ARTICLE EXTRACTION =====
 def check_extract_article(test_filename, expected_filename, content_digests=False, node_indexes=False):
     test_data_dir = "data"
