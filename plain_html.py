@@ -1,13 +1,11 @@
 from bs4 import BeautifulSoup
-from bs4.element import Comment, NavigableString
-import regex
-import unicodedata
 from .text_manipulation import normalise_text
 
+BREAK_INDICATOR = "|CLOSE_AND_REOPEN|"
 
 def elements_to_delete():
     html5_form_elements = ['button', 'datalist', 'fieldset', 'form', 'input', 'label', 'legend', 'meter', 'optgroup',
-                            'option', 'output', 'progress', 'select', 'textarea']
+                           'option', 'output', 'progress', 'select', 'textarea']
     html5_image_elements = ['area', 'img', 'map', 'picture', 'source']
     html5_media_elements = ['audio', 'track', 'video']
     html5_embedded_elements = ['embed', 'math', 'object', 'param', 'svg']
@@ -27,7 +25,13 @@ def elements_to_delete():
 def elements_to_replace_with_contents():
     """Elements that we will discard while keeping their contents."""
     elements = ['a', 'abbr', 'address', 'b', 'bdi', 'bdo', 'cite', 'code', 'del', 'dfn', 'em', 'i', 'ins', 'kbs',
-                'mark', 'q', 'rb', 'ruby', 'rp', 'rt', 'rtc', 's', 'samp', 'small', 'span', 'strong', 'u', 'var', 'wbr']
+                'mark', 'rb', 'ruby', 'rp', 'rt', 'rtc', 's', 'samp', 'small', 'span', 'strong', 'u', 'var', 'wbr']
+    return elements
+
+
+def special_elements():
+    """Elements that we will discard while keeping their contents that need additional processing."""
+    elements = ['q', 'sub', 'sup']
     return elements
 
 
@@ -37,29 +41,6 @@ def block_level_whitelist():
                 'figcaption', 'footer', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'li', 'main', 'ol', 'p', 'pre',
                 'section', 'table', 'tbody', 'thead' 'tfoot', 'tr', 'td', 'th', 'ul']
     return elements
-
-
-# def normalise_unicode(text):
-#     """Normalise unicode such that things that are visually equivalent map to the same unicode string where possible."""
-#     normal_form = "NFKC"
-#     text = unicodedata.normalize(normal_form, text)
-#     return text
-
-
-# def normalise_whitespace(text):
-#     """Replace runs of whitespace characters with a single space as this is what happens when HTML text is displayed."""
-#     text = regex.sub(r"\s+", " ", text)
-#     # Remove leading and trailing whitespace
-#     text = text.strip()
-#     return text
-
-
-# def normalise_text(text):
-#     """Normalise unicode and whitespace."""
-#     # Normalise unicode first to try and standardise whitespace characters as much as possible before normalising them
-#     text = normalise_unicode(text)
-#     text = normalise_whitespace(text)
-#     return text
 
 
 def remove_blacklist(soup):
@@ -76,27 +57,43 @@ def flatten_elements(soup):
             element.unwrap()
 
 
-def reformat_linebreaks(soup):
-    """Replace linebreaks with close-parent reopen-parent."""
+def process_special_elements(soup):
+    """Flatten special elements while processing their contents."""
+    for element_name in special_elements():
+        for element in soup.find_all(element_name):
+            if element.name == "q":
+                element.string = '"{0}"'.format(element.string)
+            if element.name == "sub":
+                element.string = "_{0}".format(element.string)
+            if element.name == "sup":
+                element.string = "^{0}".format(element.string)
+            element.unwrap()
 
-    BREAK_INDICATOR = "|CLOSE_AND_REOPEN|"
 
-    # Iterate through the tree, removing single <br> and replacingmultiple <br> with BREAK_INDICATOR
+def remove_empty_strings(soup):
+    """Remove any string elements which contain only whitespace. Without this, consecutive linebreaks may not be identified correctly."""
+    for element in soup.find_all(string=True):
+        if not normalise_text(str(element)):
+            element.extract()
+
+
+def identify_linebreaks(soup):
+    """Identify linebreaks."""
+    # Iterate through the <br> elements in the tree
     for element in soup.find_all("br"):
-        # This check is needed since we're modifying the list while iterating through it
-        if element.name == "br":
-            # Start with empty list and populate it with all consecutive <br> elements
-            element_list, current = [], element
-            while current.name == "br":
-                element_list.append(current)
-                current = current.next_sibling
+        # If the next element is not another <br> then count how long the chain is up to this point
+        if element.next_sibling.name != "br":
+            br_element_chain = [element]
+            while br_element_chain[-1].previous_sibling.name == "br":
+                br_element_chain.append(br_element_chain[-1].previous_sibling)
+
             # If there's only one <br> then we strip it out
-            if len(element_list) == 1:
-                element_list[0].decompose()
+            if len(br_element_chain) == 1:
+                br_element_chain[0].decompose()
             # If there are multiple <br>s then we replace them with BREAK_INDICATOR
             else:
-                element_list[0].replace_with(BREAK_INDICATOR)
-                for element in element_list[1:]:
+                br_element_chain[0].replace_with(BREAK_INDICATOR)
+                for element in br_element_chain[1:]:
                     element.decompose()
 
     # Iterate through the tree, replacing <hr> with BREAK_INDICATOR
@@ -104,25 +101,30 @@ def reformat_linebreaks(soup):
         # This check is needed since we're modifying the list while iterating through it
         if element.name == "hr":
             element.replace_with(BREAK_INDICATOR)
-    
-    # print_all(soup)
 
-    # Iterate through the tree again replacing BREAK_INDICATOR with close-parent reopen-parent
-    for element in soup.descendants:
-        element_as_string = str(element)
 
-        # For each element where we find a BREAK_INDICATOR, replace this with a "close-parent reopen-parent" string
-        if BREAK_INDICATOR in element_as_string:
-            multielement_string = element_as_string.replace(BREAK_INDICATOR, "</{0}><{0}>".format(element.name))
+def apply_linebreaks(soup):
+    """Replace linebreak markers with close-parent reopen-parent."""
+    # Iterate through the tree, splitting elements which contain BREAK_INDICATOR
+    for element in soup.find_all(string=True):
+        if BREAK_INDICATOR in element:
+            # Split the text into two or more fragments (there maybe be multiple BREAK_INDICATORs in the string)
+            text_fragments = [s.strip() for s in str(element).split(BREAK_INDICATOR)]
 
-            # Now we need to re-parse this string to correctly split it into elements
-            parse_tree = BeautifulSoup(multielement_string, "html.parser")            
+            # Make a list of connected parent elements (the first of which is the original element)
+            parent_elements = [element.parent]
+            for _ in range(len(text_fragments) - 1):
+                new_element = soup.new_tag(element.parent.name)
+                parent_elements[-1].insert_after(new_element)
+                parent_elements.append(new_element)
 
-            # ... and replace the element with the parsed output
-            element.replace_with(parse_tree)
+            # Set the string for each element
+            for parent_element, text_fragment in zip(parent_elements, text_fragments):
+                parent_element.string = text_fragment
 
 
 def normalise_strings(soup):
+    """Remove extraneous whitespace and fix unicode issues in all strings."""
     # Iterate over all strings in the tree (including bare strings outside tags)
     for element in soup.find_all(string=True):
         # Treat Beautiful Soup text elements as strings when normalising since normalisation returns a copy of the string
@@ -133,6 +135,7 @@ def normalise_strings(soup):
 
 
 def consolidate_text(soup):
+    """Join any consecutive NavigableStrings together with spaces."""
     # Iterate over all strings in the tree
     for element in soup.find_all(string=True):
         # If the previous element is the same type then extract the current string and append to previous
@@ -143,6 +146,7 @@ def consolidate_text(soup):
 
 
 def wrap_bare_text(soup):
+    """Wrap any remaining bare text in <p> tags."""
     # Iterate over all strings in the tree
     for element in soup.find_all(string=True):
         # Identify any strings whose parent is not a whitelisted element
@@ -152,17 +156,14 @@ def wrap_bare_text(soup):
             p_element.string = element
             element.replace_with(p_element)
 
+
 def strip_attributes(soup):
+    """Strip tag attributes."""
     for element in soup.find_all():
         element.attrs = {}
-        # print(element.attrs)
-
-# def print_all(soup):
-#     for element in soup.descendants:
-#         print(type(element), element.name, element)
 
 
-def parse_to_tree(html, content_digests=False, node_indexes=False):
+def parse_to_tree(html):
     # Convert the HTML into a Soup parse tree
     soup = BeautifulSoup(html, "html.parser")
 
@@ -171,15 +172,21 @@ def parse_to_tree(html, content_digests=False, node_indexes=False):
 
     # Flatten elements where we want to keep the text but drop the containing tag
     flatten_elements(soup)
-    
-    # Replace <br> and <hr> elements
-    reformat_linebreaks(soup)
 
-    # Consolidate text, joining any consecutive NavigableStrings together
-    consolidate_text(soup)
+    # Process elements with special innerText handling
+    process_special_elements(soup)
+
+    # Remove empty string elements
+    remove_empty_strings(soup)
+
+    # Replace <br> and <hr> elements with break indicator
+    identify_linebreaks(soup)
 
     # Normalise all strings, removing whitespace and fixing unicode issues
     normalise_strings(soup)
+
+    # Consolidate text, joining any consecutive NavigableStrings together
+    consolidate_text(soup)
 
     # Wrap any remaining bare text in <p> tags
     wrap_bare_text(soup)
@@ -187,49 +194,10 @@ def parse_to_tree(html, content_digests=False, node_indexes=False):
     # Strip tag attributes
     strip_attributes(soup)
 
+    # Replace the linebreak placeholders
+    apply_linebreaks(soup)
+
     # Finally wrap the whole tree in a div
     root = soup.new_tag("div")
     root.append(soup)
     return root
-
-
-
-
-if __name__ == "__main__":
-    html="""
-        <article>
-        <header>
-            <h2>Lorem ipsum dolor sit amet</h2>
-            <p>Consectetur adipiscing elit</p>
-        </header>
-        <p>Vestibulum leo nulla, imperdiet a pellentesque ultrices aliquam.</p>
-        <button type="button">Click Me!</button>
-        </article>
-        <datalist id=sexes>
-            <option value="Female">
-            <option value="Male">
-        </datalist>
-        <span>Some text here</span>
-        <p class="something">Some extra text, single-broken,<br/> that is split with double <br/><br/> line breaks in such a way that
-        it is wrapped<hr/>and has horizontal rules as well as <br/><br/><br/> triple
-        line breaks</p>
-
-        <a href="whatever">here are <cite>nested</cite> flat elements</a>
-        <p>Here is
-        a paragraph
-        with non-syntactical line-breaks
-        </p>
-
-        And finish with some bare
-        text that has linebreaks
-        in odd places
-
-        Another piece of text
-        <br>
-        <br>
-        A new paragaph
-        <br>
-        I should be merged with the previous paragraph
-    """
-    parsed_html = parse_to_tree(html, node_indexes=True)
-    print(parsed_html.prettify())

@@ -1,10 +1,6 @@
 """Tests for HTML elements."""
 from pytest import mark
-from ReadabiliPy import readability
-# from bs4 import BeautifulSoup
-# from ..plain_html import normalise_text
-# import htmlmin
-from ReadabiliPy import text_manipulation
+from ReadabiliPy import readability, text_manipulation
 
 def check_html_output_contains_text(test_fragment, expected_output=None):
     """Check that expected output is present when parsing HTML fragment."""
@@ -16,7 +12,7 @@ def check_html_output_contains_text(test_fragment, expected_output=None):
     normalised_expected_output = text_manipulation.simplify_html(expected_output)
     normalised_content = text_manipulation.simplify_html(content)
     assert normalised_expected_output in normalised_content
-    
+
 
 def check_html_has_no_output(test_fragment):
     """Check that no output is present when parsing HTML fragment."""
@@ -58,7 +54,7 @@ def test_html_whitelist_aside():
         </p>
         <aside>
             <p>Aenean libero neque</p>
-        </aside>    
+        </aside>
         <p>Pellentesque non sapien nec arcu facilisis gravida.</p>
     """)
 
@@ -157,7 +153,7 @@ def test_html_whitelist_div():
     check_html_output_contains_text("""
         <p>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean
-            libero neque, ullamcorper quis tristique id pretium dapibus turpis. 
+            libero neque, ullamcorper quis tristique id pretium dapibus turpis.
         </p>
         <div>
             <p>Here is an example of using div for stylistic reasons.</p>
@@ -243,7 +239,7 @@ def test_html_whitelist_footer():
     """The footer element is the footer for its nearest ancestor section."""
     check_html_output_contains_text("""
         <p>
-            A dolor sit amet, consectetur adipisicing elit, sed do eiusmod 
+            A dolor sit amet, consectetur adipisicing elit, sed do eiusmod
             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
             minim veniam, quis nostrud exercitation ullamco laboris nisi ut
             aliquip ex ea commodo consequat.
@@ -968,28 +964,28 @@ def test_html_blacklist_hr():
 
 
 # Special HTML elements
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_special_q():
     """The q element contains quoted text."""
-    check_html_output_contains_text("""
-        <p>Some text <q>this bit is quoted</q> and now back to normal</p>
-    """, '<p>Some text "this bit is quoted" and now back to normal</p>')
+    check_html_output_contains_text(
+        "<p>Some text <q>this bit is quoted</q> and now back to normal</p>",
+        '<p>Some text "this bit is quoted" and now back to normal</p>'
+    )
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_special_sub():
     """The sub element contains subscript text."""
-    check_html_output_contains_text("""
-        <p>This text contains <sub>subscript</sub> text.</p>
-    """, '<p>This text contains _subscript text.</p>')
+    check_html_output_contains_text(
+        "<p>This text contains <sub>subscript</sub> text.</p>",
+        "<p>This text contains _subscript text.</p>"
+    )
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_special_sup():
     """The sup element contains superscript text."""
-    check_html_output_contains_text("""
-        <p>This text contains <sup>superscript</sup> text.</p>
-    """, '<p>This text contains ^superscript text.</p>')
+    check_html_output_contains_text(
+        "<p>This text contains <sup>superscript</sup> text.</p>",
+        "<p>This text contains ^superscript text.</p>"
+    )
 
 
 # Remaining HTML elements - use a parametrized test here for simplicity
@@ -1004,3 +1000,29 @@ def test_html_remaining_element(element):
     fragment = "<{0}>Lorem ipsum dolor sit amet</{0}>".format(element)
     check_html_output_contains_text(fragment, "Lorem ipsum dolor sit amet")
     check_html_output_does_not_contain_tag(fragment, element)
+
+
+# Test bare text behaviours
+def test_html_bare_text():
+    """Bare text should be wrapped in <p> tags."""
+    check_html_output_contains_text(
+        "Bare text here",
+        "<p>Bare text here</p>"
+    )
+
+
+def test_html_bare_text_linebreaks():
+    """Line breaks in bare text should be removed."""
+    check_html_output_contains_text("""
+        Bare text with
+        some linebreaks here
+    """, "<p>Bare text with some linebreaks here</p>")
+
+
+def test_html_bare_text_double_br():
+    """Double <br> in bare text should trigger a new paragraph."""
+    check_html_output_contains_text("""
+        Bare text with
+        <br/><br/>
+        some linebreaks here
+    """, "<p>Bare text with</p><p>some linebreaks here</p>")

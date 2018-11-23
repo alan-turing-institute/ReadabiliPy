@@ -1,4 +1,5 @@
 """Test readability.py on sample articles"""
+from bs4 import BeautifulSoup
 import json
 import os
 from ReadabiliPy import readability

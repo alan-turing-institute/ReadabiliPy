@@ -1,11 +1,11 @@
-from bs4 import BeautifulSoup
-from bs4.element import Comment, NavigableString
 import hashlib
 import json
 import os
-from subprocess import check_call
 import tempfile
 import unicodedata
+from subprocess import check_call
+from bs4 import BeautifulSoup
+from bs4.element import Comment, NavigableString
 from .plain_html import parse_to_tree
 
 
@@ -30,7 +30,7 @@ def parse(html, content_digests=False, node_indexes=False, use_readability=False
         input_json = {
             "content": str(parse_to_tree(html))
         }
-    
+
     # Only keep the subset of Readability.js fields we are using (and therefore testing for accuracy of extraction)
     # TODO: Add tests for additional fields and include them when we look at packaging this wrapper up for PyPI
     # Initialise output article to include all fields with null values
@@ -140,7 +140,7 @@ def leaf_nodes():
     return ['p', 'li']
 
 
-def leaf_types ():
+def leaf_types():
     return [NavigableString, Comment]
 
 
