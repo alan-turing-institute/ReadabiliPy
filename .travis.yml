@@ -4,7 +4,8 @@ language: python
 python: 3.6
 
 before_install:
-  # Install node.js
+  # Install node.js following instructions from
+  #   https://nodejs.org/en/download/package-manager/
   - sudo apt install curl
   - curl -sL https://deb.nodesource.com/setup_11.x | sudo bash -
   - sudo apt install nodejs
@@ -13,10 +14,10 @@ install:
   # Install node.js dependencies
   - npm install
   # Install python dependencies
-  - pip install bs4 pytest pyflakes
+  - pip install -r requirements-dev.txt
 
 script:
   # Run all pytest unit tests
-  - py.test -v tests
+  - python -m pytest -v tests
   # Run pyflakes for error detection
   - pyflakes .
