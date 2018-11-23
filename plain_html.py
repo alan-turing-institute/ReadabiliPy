@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 from bs4.element import Comment, NavigableString
 import regex
 import unicodedata
+from .text_manipulation import normalise_text
 
 
 def elements_to_delete():
@@ -38,27 +39,27 @@ def block_level_whitelist():
     return elements
 
 
-def normalise_unicode(text):
-    """Normalise unicode such that things that are visually equivalent map to the same unicode string where possible."""
-    normal_form = "NFKC"
-    text = unicodedata.normalize(normal_form, text)
-    return text
+# def normalise_unicode(text):
+#     """Normalise unicode such that things that are visually equivalent map to the same unicode string where possible."""
+#     normal_form = "NFKC"
+#     text = unicodedata.normalize(normal_form, text)
+#     return text
 
 
-def normalise_whitespace(text):
-    """Replace runs of whitespace characters with a single space as this is what happens when HTML text is displayed."""
-    text = regex.sub("\s+", " ", text)
-    # Remove leading and trailing whitespace
-    text = text.strip()
-    return text
+# def normalise_whitespace(text):
+#     """Replace runs of whitespace characters with a single space as this is what happens when HTML text is displayed."""
+#     text = regex.sub(r"\s+", " ", text)
+#     # Remove leading and trailing whitespace
+#     text = text.strip()
+#     return text
 
 
-def normalise_text(text):
-    """Normalise unicode and whitespace."""
-    # Normalise unicode first to try and standardise whitespace characters as much as possible before normalising them
-    text = normalise_unicode(text)
-    text = normalise_whitespace(text)
-    return text
+# def normalise_text(text):
+#     """Normalise unicode and whitespace."""
+#     # Normalise unicode first to try and standardise whitespace characters as much as possible before normalising them
+#     text = normalise_unicode(text)
+#     text = normalise_whitespace(text)
+#     return text
 
 
 def remove_blacklist(soup):
@@ -151,6 +152,11 @@ def wrap_bare_text(soup):
             p_element.string = element
             element.replace_with(p_element)
 
+def strip_attributes(soup):
+    for element in soup.find_all():
+        element.attrs = {}
+        # print(element.attrs)
+
 # def print_all(soup):
 #     for element in soup.descendants:
 #         print(type(element), element.name, element)
@@ -169,14 +175,17 @@ def parse_to_tree(html, content_digests=False, node_indexes=False):
     # Replace <br> and <hr> elements
     reformat_linebreaks(soup)
 
-    # Consolidate text 
+    # Consolidate text, joining any consecutive NavigableStrings together
     consolidate_text(soup)
 
-    # Normalise all strings
+    # Normalise all strings, removing whitespace and fixing unicode issues
     normalise_strings(soup)
 
     # Wrap any remaining bare text in <p> tags
     wrap_bare_text(soup)
+
+    # Strip tag attributes
+    strip_attributes(soup)
 
     # Finally wrap the whole tree in a div
     root = soup.new_tag("div")
@@ -186,41 +195,41 @@ def parse_to_tree(html, content_digests=False, node_indexes=False):
 
 
 
-# if __name__ == "__main__":
-#     html="""
-#         <article>
-#         <header>
-#             <h2>Lorem ipsum dolor sit amet</h2>
-#             <p>Consectetur adipiscing elit</p>
-#         </header>
-#         <p>Vestibulum leo nulla, imperdiet a pellentesque ultrices aliquam.</p>
-#         <button type="button">Click Me!</button>
-#         </article>
-#         <datalist id=sexes>
-#             <option value="Female">
-#             <option value="Male">
-#         </datalist>
-#         <span>Some text here</span>
-#         <p class="something">Some extra text, single-broken,<br/> that is split with double <br/><br/> line breaks in such a way that
-#         it is wrapped<hr/>and has horizontal rules as well as <br/><br/><br/> triple
-#         line breaks</p>
+if __name__ == "__main__":
+    html="""
+        <article>
+        <header>
+            <h2>Lorem ipsum dolor sit amet</h2>
+            <p>Consectetur adipiscing elit</p>
+        </header>
+        <p>Vestibulum leo nulla, imperdiet a pellentesque ultrices aliquam.</p>
+        <button type="button">Click Me!</button>
+        </article>
+        <datalist id=sexes>
+            <option value="Female">
+            <option value="Male">
+        </datalist>
+        <span>Some text here</span>
+        <p class="something">Some extra text, single-broken,<br/> that is split with double <br/><br/> line breaks in such a way that
+        it is wrapped<hr/>and has horizontal rules as well as <br/><br/><br/> triple
+        line breaks</p>
 
-#         <a href="whatever">here are <cite>nested</cite> flat elements</a>
-#         <p>Here is
-#         a paragraph
-#         with non-syntactical line-breaks
-#         </p>
+        <a href="whatever">here are <cite>nested</cite> flat elements</a>
+        <p>Here is
+        a paragraph
+        with non-syntactical line-breaks
+        </p>
 
-#         And finish with some bare
-#         text that has linebreaks
-#         in odd places
+        And finish with some bare
+        text that has linebreaks
+        in odd places
 
-#         Another piece of text
-#         <br>
-#         <br>
-#         A new paragaph
-#         <br>
-#         I should be merged with the previous paragraph
-#     """
-#     parsed_html = parse_html(html, node_indexes=True)
-#     print(parsed_html.prettify())
+        Another piece of text
+        <br>
+        <br>
+        A new paragaph
+        <br>
+        I should be merged with the previous paragraph
+    """
+    parsed_html = parse_to_tree(html, node_indexes=True)
+    print(parsed_html.prettify())
