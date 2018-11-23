@@ -1,3 +1,4 @@
+"""Test readability.py on sample articles"""
 import json
 import os
 from ReadabiliPy import readability
