@@ -1,4 +1,4 @@
-import bs4 as BeautifulSoup
+"""Test readability.py on sample articles"""
 import json
 import os
 from ReadabiliPy import readability
