@@ -1,4 +1,4 @@
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, CData, Comment, Doctype
 from .text_manipulation import normalise_text
 
 BREAK_INDICATOR = "|CLOSE_AND_REOPEN|"
@@ -14,6 +14,7 @@ def elements_to_delete():
     html5_data_elements = ['data', 'link', 'time']
     html5_formatting_elements = ['style']
     html5_navigation_elements = ['nav']
+    # html5_header_elements = ['head']
 
     elements = html5_form_elements + html5_image_elements + html5_media_elements  \
         + html5_embedded_elements + html5_interactive_elements + html5_scripting_elements + html5_data_elements \
@@ -24,7 +25,7 @@ def elements_to_delete():
 
 def elements_to_replace_with_contents():
     """Elements that we will discard while keeping their contents."""
-    elements = ['a', 'abbr', 'address', 'b', 'bdi', 'bdo', 'cite', 'code', 'del', 'dfn', 'em', 'i', 'ins', 'kbs',
+    elements = ['a', 'abbr', 'address', 'b', 'bdi', 'bdo', 'center', 'cite', 'code', 'del', 'dfn', 'em', 'i', 'html', 'ins', 'kbs',
                 'mark', 'rb', 'ruby', 'rp', 'rt', 'rtc', 's', 'samp', 'small', 'span', 'strong', 'u', 'var', 'wbr']
     return elements
 
@@ -40,13 +41,25 @@ def block_level_whitelist():
     elements = ['article', 'aside', 'blockquote', 'caption', 'colgroup', 'col', 'div', 'dl', 'dt', 'dd', 'figure',
                 'figcaption', 'footer', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'li', 'main', 'ol', 'p', 'pre',
                 'section', 'table', 'tbody', 'thead' 'tfoot', 'tr', 'td', 'th', 'ul']
+    elements += ['title']
     return elements
+
+
+# def remove_metadata(soup):
+#     """Remove comments and doctype as well as meta, title and head elements."""
+#     for comment in soup.findAll(string=lambda text:any([isinstance(text, x) for x in [CData, Comment, Doctype]])):
+#         print("Removing comment:", comment)
+#         comment.extract()
+#     # for element in soup.find_all(["title", "meta", "head"]):
+#     #     print("Removing meta-element:", element)
+#     #     element.decompose()
 
 
 def remove_blacklist(soup):
     """Remove all blacklisted elements."""
     for element_name in elements_to_delete():
         for element in soup.find_all(element_name):
+            print("REMOVING:", element.name, str(element))
             element.decompose()
 
 
@@ -71,7 +84,7 @@ def process_special_elements(soup):
 
 
 def remove_empty_strings(soup):
-    """Remove any string elements which contain only whitespace. Without this, consecutive linebreaks may not be identified correctly."""
+    """Remove any strings which contain only whitespace. Without this, consecutive linebreaks may not be identified correctly."""
     for element in soup.find_all(string=True):
         if not normalise_text(str(element)):
             element.extract()
@@ -162,40 +175,121 @@ def strip_attributes(soup):
     for element in soup.find_all():
         element.attrs = {}
 
+# def remove_empty_elements(soup):
+#     """Remove any elements which contain only whitespace."""
+
+#     for element in soup.find_all():
+#         if not element.contents:
+#             print("  ELEMENT:", element.name, str(element).strip(), element.contents)
+#             element.decompose()
+
+def recursively_flatten(soup):
+    """Recursively replace any elements which contain 0 or 1 children."""
+    def single_replace():
+        nRemoved = 0
+        for element in soup.find_all():
+            print("ALL:", element.name, len(list(element.children)), "->", str(element).strip())
+        for element in soup.find_all(lambda elem:len(list(elem.children)) == 0):
+            print(":", element.name, len(list(element.children)), "->", str(element).strip())
+            element.decompose()
+            nRemoved += 1
+        print("Removed", nRemoved)
+        return nRemoved
+
+    # single_replace()
+    # while True:
+    #     single_replace():
+    #         break
+    while single_replace():
+        print("\n\n\n")
+        pass
+
+
+
+def PRINTALL(soup):
+    for element in soup.find_all():
+        print("  ELEMENT:", element.name, len(list(element.children)))
 
 def parse_to_tree(html):
     # Convert the HTML into a Soup parse tree
-    soup = BeautifulSoup(html, "html.parser")
+    # soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(html, "html5lib")
+
+    # # Remove comments, as well as meta, title and head elements
+    # remove_metadata(soup)
 
     # Remove blacklisted elements
     remove_blacklist(soup)
 
+    # PRINTALL(soup)
+
     # Flatten elements where we want to keep the text but drop the containing tag
     flatten_elements(soup)
+
+    # print("*V post-flatten_elements V*")
+    # PRINTALL(soup)
+    # print("*^ post-flatten_elements ^*")
 
     # Process elements with special innerText handling
     process_special_elements(soup)
 
+    # print("*V post-process_special_elements V*")
+    # PRINTALL(soup)
+    # print("*^ post-process_special_elements ^*")
+
     # Remove empty string elements
     remove_empty_strings(soup)
+
+    # print("*V post-remove_empty_strings V*")
+    # PRINTALL(soup)
+    # print("*^ post-remove_empty_strings ^*")
 
     # Replace <br> and <hr> elements with break indicator
     identify_linebreaks(soup)
 
+    # print("*V post-identify_linebreaks V*")
+    # PRINTALL(soup)
+    # print("*^ post-identify_linebreaks ^*")
+
     # Normalise all strings, removing whitespace and fixing unicode issues
     normalise_strings(soup)
+
+    # print("*V post-normalise_strings V*")
+    # PRINTALL(soup)
+    # print("*^ post-normalise_strings ^*")
 
     # Consolidate text, joining any consecutive NavigableStrings together
     consolidate_text(soup)
 
+    # print("*V post-consolidate_text V*")
+    # PRINTALL(soup)
+    # print("*^ post-consolidate_text ^*")
+
     # Wrap any remaining bare text in <p> tags
     wrap_bare_text(soup)
+
+    # print("*V post-wrap_bare_text V*")
+    # PRINTALL(soup)
+    # print("*^ post-wrap_bare_text ^*")
 
     # Strip tag attributes
     strip_attributes(soup)
 
+    # print("*V post-strip_attributes V*")
+    # PRINTALL(soup)
+    # print("*^ post-strip_attributes ^*")
+
     # Replace the linebreak placeholders
     apply_linebreaks(soup)
+
+    # print("*V post-apply_linebreaks V*")
+    # PRINTALL(soup)
+    # print("*^ post-apply_linebreaks ^*")
+
+    # # Recursively replace any elements which contain 0 or 1 children
+    # recursively_flatten(soup)
+
+    # PRINTALL(soup)
 
     # Finally wrap the whole tree in a div
     root = soup.new_tag("div")

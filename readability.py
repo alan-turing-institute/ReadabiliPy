@@ -7,6 +7,7 @@ from subprocess import check_call
 from bs4 import BeautifulSoup
 from bs4.element import Comment, NavigableString
 from .plain_html import parse_to_tree
+from .text_manipulation import normalise_text
 
 
 def parse(html, content_digests=False, node_indexes=False, use_readability=False):
@@ -194,10 +195,10 @@ def content_digest(element):
     return digest
 
 
-def normalise_text(text):
-    # Normalise the unicode representation
-    normal_form = "NFKC"
-    text = unicodedata.normalize(normal_form, text)
-    # Strip leading and training whitespace again (ensures things like non-breaking whitespaces are removed)
-    text = text.strip()
-    return text
+# def normalise_text(text):
+#     # Normalise the unicode representation
+#     normal_form = "NFKC"
+#     text = unicodedata.normalize(normal_form, text)
+#     # Strip leading and training whitespace again (ensures things like non-breaking whitespaces are removed)
+#     text = text.strip()
+#     return text
