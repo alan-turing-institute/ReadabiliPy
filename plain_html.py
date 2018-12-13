@@ -45,6 +45,12 @@ def block_level_whitelist():
     return elements
 
 
+def known_elements():
+    """All elements that we know by name."""
+    structural_elements = ["html", "head", "body", "meta"]
+    return structural_elements + elements_to_delete() + elements_to_replace_with_contents() + special_elements() + block_level_whitelist()
+
+
 def remove_metadata(soup):
     """Remove comments and doctype."""
     for comment in soup.findAll(string=lambda text:any([isinstance(text, x) for x in [CData, Comment, Doctype]])):
@@ -170,12 +176,14 @@ def strip_attributes(soup):
     for element in soup.find_all():
         element.attrs = {}
 
-def remove_empty_elements(soup):
-    """Remove any elements which contain only whitespace."""
-    for element in soup.find_all():
-        if not element.contents:
-            print("  ELEMENT:", element.name, str(element).strip(), element.contents)
-            element.decompose()
+
+# def remove_empty_elements(soup):
+#     """Remove any elements which contain only whitespace."""
+#     for element in soup.find_all():
+#         if not element.contents:
+#             print("  ELEMENT:", element.name, str(element).strip(), element.contents)
+#             element.decompose()
+
 
 def recursively_prune(soup):
     """Recursively prune out any elements which have no children."""
@@ -188,6 +196,13 @@ def recursively_prune(soup):
     # Repeatedly apply single_replace() until no elements are being removed
     while single_replace():
         pass
+
+
+def process_unknown_elements(soup):
+    """Replace any unknown elements with their contents."""
+    for element in soup.find_all():
+        if element.name not in known_elements():
+            element.unwrap()
 
 
 def parse_to_tree(html):
@@ -205,6 +220,9 @@ def parse_to_tree(html):
 
     # Process elements with special innerText handling
     process_special_elements(soup)
+
+    # Process unknown elements
+    process_unknown_elements(soup)
 
     # Remove empty string elements
     remove_empty_strings(soup)

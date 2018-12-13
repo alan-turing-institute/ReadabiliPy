@@ -91,61 +91,51 @@ def test_html_whitelist_caption():
                     <th>H</th>
                     <th>T</th>
                 </tr>
-                <tr>
-                    <th>H</th>
-                    <td>HH</td>
-                    <td>TH</td>
-                </tr>
-                <tr>
-                    <th>T</th>
-                    <td>HT</td>
-                    <td>TT</td>
-                </tr>
             </tbody>
         </table>
-    """)
+    """, "<caption>Table 1. This shows the possible results of flipping two coins.</caption>")
 
 
-def test_html_whitelist_colgroup():
-    """The colgroup element groups col elements inside its parent table."""
-    check_html_output_contains_text("""
-        <table>
-        <colgroup>
-            <col span="2" style="background-color:red"/>
-            <col style="background-color:yellow"/>
-        </colgroup>
-        <tr>
-            <th>ISBN</th>
-            <th>Title</th>
-            <th>Price</th>
-        </tr>
-        </table>
-    """, """
-        <colgroup>
-            <col/>
-            <col/>
-        </colgroup>
-    """)
+# def test_html_whitelist_colgroup():
+#     """The colgroup element groups col elements inside its parent table."""
+#     check_html_output_contains_text("""
+#         <table>
+#         <colgroup>
+#             <col span="2" style="background-color:red"/>
+#             <col style="background-color:yellow"/>
+#         </colgroup>
+#         <tr>
+#             <th>ISBN</th>
+#             <th>Title</th>
+#             <th>Price</th>
+#         </tr>
+#         </table>
+#     """, """
+#         <colgroup>
+#             <col/>
+#             <col/>
+#         </colgroup>
+#     """)
 
 
-def test_html_whitelist_col():
-    """The col element describes one or more columns in a table."""
-    check_html_output_contains_text("""
-        <table>
-        <colgroup>
-            <col span="2" style="background-color:red"/>
-            <col style="background-color:yellow"/>
-        </colgroup>
-        <tr>
-            <th>ISBN</th>
-            <th>Title</th>
-            <th>Price</th>
-        </tr>
-        </table>
-    """, """
-        <col/>
-        <col/>
-    """)
+# def test_html_whitelist_col():
+#     """The col element describes one or more columns in a table."""
+#     check_html_output_contains_text("""
+#         <table>
+#         <colgroup>
+#             <col span="2" style="background-color:red"/>
+#             <col style="background-color:yellow"/>
+#         </colgroup>
+#         <tr>
+#             <th>ISBN</th>
+#             <th>Title</th>
+#             <th>Price</th>
+#         </tr>
+#         </table>
+#     """, """
+#         <col/>
+#         <col/>
+#     """)
 
 
 def test_html_whitelist_div():
@@ -367,11 +357,13 @@ def test_html_whitelist_table():
     """The table element represents data with more than one dimension."""
     check_html_output_contains_text("""
         <table>
-        <tr>
-            <td>Table contents</td>
-        </tr>
+        <tbody>
+            <tr>
+                <td>Table contents</td>
+            </tr>
+        </tbody>
         </table>
-    """, "<table><tr><td>Table contents</td></tr></table>")
+    """, "<table><tbody><tr><td>Table contents</td></tr></tbody></table>")
 
 
 def test_html_whitelist_tbody():
@@ -379,10 +371,12 @@ def test_html_whitelist_tbody():
     check_html_output_contains_text("""
         <table>
         <tbody>
-            <td>Table body content</td>
+            <tr>
+                <td>Table body content</td>
+            </tr>
         </tbody>
         </table>
-    """, "<tbody><td>Table body content</td></tbody>")
+    """, "<tbody><tr><td>Table body content</td></tr></tbody>")
 
 
 def test_html_whitelist_thead():
@@ -911,15 +905,6 @@ def test_html_blacklist_link():
     """, "link")
 
 
-def test_html_blacklist_time():
-    """The time element has a time and a machine-readable datetime."""
-    check_html_output_does_not_contain_tag("""
-        <p>
-            We open at <time datetime="2018-11-21 10:00">10:00 tomorrow</time>.
-        </p>
-    """, "time")
-
-
 def test_html_blacklist_style():
     """The style element embeds style information in the document."""
     check_html_output_does_not_contain_tag("""
@@ -992,8 +977,8 @@ def test_html_special_sup():
 @mark.parametrize("element", ["a", "abbr", "address", "b", "bdi", "bdo",
                               "cite", "code", "del", "dfn", "em", "i", "ins",
                               "kbs", "mark", "rb", "ruby", "rp", "rt", "rtc",
-                              "s", "samp", "small", "span", "strong", "u",
-                              "var", "wbr"])
+                              "s", "samp", "small", "span", "strong", "time",
+                              "u", "var", "wbr"])
 def test_html_remaining_element(element):
     """Simple standalone elements which can contain text.
        Check that the inner text is kept and the tag is discarded."""
