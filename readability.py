@@ -6,7 +6,7 @@ import unicodedata
 from subprocess import check_call
 from bs4 import BeautifulSoup
 from bs4.element import Comment, NavigableString
-from .plain_html import parse_to_tree, block_level_whitelist
+from .plain_html import parse_to_tree
 from .text_manipulation import normalise_text
 
 

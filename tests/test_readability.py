@@ -1,9 +1,7 @@
 """Test readability.py on sample articles"""
-from bs4 import BeautifulSoup
 import json
 import os
 from ReadabiliPy import readability
-from pytest import mark
 
 # ===== TEST END TO END ARTICLE EXTRACTION =====
 def check_extract_article(test_filename, expected_filename, content_digests=False, node_indexes=False):
