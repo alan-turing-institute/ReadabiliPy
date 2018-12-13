@@ -1,11 +1,15 @@
+"""Turn input HTML into a cleaned parsed tree."""
 from bs4 import BeautifulSoup, CData, Comment, Doctype
 from .text_manipulation import normalise_text
 
 BREAK_INDICATOR = "|CLOSE_AND_REOPEN|"
 
+
 def elements_to_delete():
-    html5_form_elements = ['button', 'datalist', 'fieldset', 'form', 'input', 'label', 'legend', 'meter', 'optgroup',
-                           'option', 'output', 'progress', 'select', 'textarea']
+    """Elements that will be deleted together with their contents."""
+    html5_form_elements = ['button', 'datalist', 'fieldset', 'form', 'input',
+                           'label', 'legend', 'meter', 'optgroup', 'option',
+                           'output', 'progress', 'select', 'textarea']
     html5_image_elements = ['area', 'img', 'map', 'picture', 'source']
     html5_media_elements = ['audio', 'track', 'video']
     html5_embedded_elements = ['embed', 'math', 'object', 'param', 'svg']
@@ -15,46 +19,54 @@ def elements_to_delete():
     html5_formatting_elements = ['style']
     html5_navigation_elements = ['nav']
 
-    elements = html5_form_elements + html5_image_elements + html5_media_elements  \
-        + html5_embedded_elements + html5_interactive_elements + html5_scripting_elements + html5_data_elements \
-        + html5_formatting_elements + html5_navigation_elements
+    elements = html5_form_elements + html5_image_elements \
+        + html5_media_elements + html5_embedded_elements \
+        + html5_interactive_elements + html5_scripting_elements \
+        + html5_data_elements + html5_formatting_elements \
+        + html5_navigation_elements
 
     return elements
 
 
 def elements_to_replace_with_contents():
     """Elements that we will discard while keeping their contents."""
-    elements = ['a', 'abbr', 'address', 'b', 'bdi', 'bdo', 'center', 'cite', 'code', 'del', 'dfn', 'em', 'i', 'html',
-                'ins', 'kbs', 'mark', 'rb', 'ruby', 'rp', 'rt', 'rtc', 's', 'samp', 'small', 'span', 'strong', 'time',
-                'u', 'var', 'wbr']
+    elements = ['a', 'abbr', 'address', 'b', 'bdi', 'bdo', 'center', 'cite',
+                'code', 'del', 'dfn', 'em', 'i', 'html', 'ins', 'kbs', 'mark',
+                'rb', 'ruby', 'rp', 'rt', 'rtc', 's', 'samp', 'small', 'span',
+                'strong', 'time', 'u', 'var', 'wbr']
     return elements
 
 
 def special_elements():
-    """Elements that we will discard while keeping their contents that need additional processing."""
+    """Elements that we will discard while keeping their contents that need
+    additional processing."""
     elements = ['q', 'sub', 'sup']
     return elements
 
 
 def block_level_whitelist():
     """Elements that we will always accept."""
-    elements = ['article', 'aside', 'blockquote', 'caption', 'colgroup', 'col', 'div', 'dl', 'dt', 'dd', 'figure',
-                'figcaption', 'footer', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'li', 'main', 'ol', 'p', 'pre',
-                'section', 'table', 'tbody', 'thead', 'tfoot', 'tr', 'td', 'th', 'ul']
+    elements = ['article', 'aside', 'blockquote', 'caption', 'colgroup', 'col',
+                'div', 'dl', 'dt', 'dd', 'figure', 'figcaption', 'footer',
+                'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'li', 'main',
+                'ol', 'p', 'pre', 'section', 'table', 'tbody', 'thead',
+                'tfoot', 'tr', 'td', 'th', 'ul']
     elements += ['title']
     return elements
 
 
 def known_elements():
     """All elements that we know by name."""
-    structural_elements = ["html", "head", "body", "meta"]
-    linebreak_elements =["br", "hr"]
-    return structural_elements + linebreak_elements + elements_to_delete() + elements_to_replace_with_contents() + special_elements() + block_level_whitelist()
+    structural_elements = ['html', 'head', 'body', 'meta']
+    linebreak_elements = ['br', 'hr']
+    return structural_elements + linebreak_elements + elements_to_delete() \
+        + elements_to_replace_with_contents() + special_elements() \
+        + block_level_whitelist()
 
 
 def remove_metadata(soup):
     """Remove comments and doctype."""
-    for comment in soup.findAll(string=lambda text:any([isinstance(text, x) for x in [CData, Comment, Doctype]])):
+    for comment in soup.findAll(string=lambda text: any([isinstance(text, x) for x in [CData, Comment, Doctype]])):
         comment.extract()
 
 
@@ -72,22 +84,22 @@ def flatten_elements(soup):
             element.unwrap()
 
 
-
 def process_special_elements(soup):
     """Flatten special elements while processing their contents."""
     for element_name in special_elements():
         for element in soup.find_all(element_name):
-            if element.name == "q":
+            if element.name == 'q':
                 element.string = '"{0}"'.format(element.string)
-            if element.name == "sub":
-                element.string = "_{0}".format(element.string)
-            if element.name == "sup":
-                element.string = "^{0}".format(element.string)
+            if element.name == 'sub':
+                element.string = '_{0}'.format(element.string)
+            if element.name == 'sup':
+                element.string = '^{0}'.format(element.string)
             element.unwrap()
 
 
 def remove_empty_strings(soup):
-    """Remove any strings which contain only whitespace. Without this, consecutive linebreaks may not be identified correctly."""
+    """Remove any strings which contain only whitespace. Without this,
+    consecutive linebreaks may not be identified correctly."""
     for element in soup.find_all(string=True):
         if not normalise_text(str(element)):
             element.extract()
@@ -96,26 +108,26 @@ def remove_empty_strings(soup):
 def identify_linebreaks(soup):
     """Identify linebreaks."""
     # Iterate through the <br> elements in the tree
-    for element in soup.find_all("br"):
-        # If the next element is not another <br> then count how long the chain is up to this point
-        if (element.next_sibling is None) or (element.next_sibling.name != "br"):
+    for element in soup.find_all('br'):
+        # When the next element is not another <br> count how long the chain is
+        if (element.next_sibling is None) or (element.next_sibling.name != 'br'):
             br_element_chain = [element]
-            while (br_element_chain[-1].previous_sibling is not None) and (br_element_chain[-1].previous_sibling.name == "br"):
+            while (br_element_chain[-1].previous_sibling is not None) and (br_element_chain[-1].previous_sibling.name == 'br'):
                 br_element_chain.append(br_element_chain[-1].previous_sibling)
 
             # If there's only one <br> then we strip it out
             if len(br_element_chain) == 1:
                 br_element_chain[0].decompose()
-            # If there are multiple <br>s then we replace them with BREAK_INDICATOR
+            # If there are multiple <br>s then replace them with BREAK_INDICATOR
             else:
                 br_element_chain[0].replace_with(BREAK_INDICATOR)
-                for element in br_element_chain[1:]:
-                    element.decompose()
+                for inner_element in br_element_chain[1:]:
+                    inner_element.decompose()
 
     # Iterate through the tree, replacing <hr> with BREAK_INDICATOR
-    for element in soup.find_all("hr"):
+    for element in soup.find_all('hr'):
         # This check is needed since we're modifying the list while iterating through it
-        if element.name == "hr":
+        if element.name == 'hr':
             element.replace_with(BREAK_INDICATOR)
 
 
@@ -125,7 +137,8 @@ def apply_linebreaks(soup):
     for element in soup.find_all(string=True):
         if BREAK_INDICATOR in element:
             # Split the text into two or more fragments (there maybe be multiple BREAK_INDICATORs in the string)
-            text_fragments = [s.strip() for s in str(element).split(BREAK_INDICATOR)]
+            text_fragments = [s.strip()
+                              for s in str(element).split(BREAK_INDICATOR)]
 
             # Make a list of connected parent elements (the first of which is the original element)
             parent_elements = [element.parent]
@@ -187,11 +200,11 @@ def strip_attributes(soup):
 def recursively_prune(soup):
     """Recursively prune out any elements which have no children."""
     def single_replace():
-        nRemoved = 0
-        for element in soup.find_all(lambda elem:len(list(elem.children)) == 0):
+        n_removed = 0
+        for element in soup.find_all(lambda elem: len(list(elem.children)) == 0):
             element.decompose()
-            nRemoved += 1
-        return nRemoved
+            n_removed += 1
+        return n_removed
     # Repeatedly apply single_replace() until no elements are being removed
     while single_replace():
         pass
@@ -203,12 +216,9 @@ def process_unknown_elements(soup):
         if element.name not in known_elements():
             element.unwrap()
 
-# def find_element_by_text(soup, text):
-#     for element in soup.find_all(string=True):
-#         if text in element:
-#             print(element.parent)
 
 def parse_to_tree(html):
+    """Turn input HTML into a cleaned parsed tree."""
     # Convert the HTML into a Soup parse tree
     soup = BeautifulSoup(html, "html5lib")
 
@@ -254,7 +264,7 @@ def parse_to_tree(html):
     # Finally wrap the whole tree in a div
     root = soup.new_tag("div")
     # ... after stripping out enclosing elements that cannot live inside a div
-    while (len(soup.contents) > 0) and (soup.contents[0].name in ["html", "body"]):
+    while soup.contents and (soup.contents[0].name in ["html", "body"]):
         soup.contents[0].unwrap()
     root.append(soup)
     return root

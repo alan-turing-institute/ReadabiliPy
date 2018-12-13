@@ -22,7 +22,8 @@ def main():
     with open(args.input_file) as h:
         html = h.read()
 
-    article = readability.parse(html, content_digests=args.content_digests, node_indexes=args.node_indexes)
+    article = readability.parse(
+        html, content_digests=args.content_digests, node_indexes=args.node_indexes)
 
     with open(args.output_file, "w") as j:
         json.dump(article, j, ensure_ascii=False)

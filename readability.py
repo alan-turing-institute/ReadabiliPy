@@ -20,8 +20,10 @@ def parse(html, content_digests=False, node_indexes=False, use_readability=False
 
         # Call Mozilla's Readability.js Readability.parse() function via node, writing output to a temporary file
         article_json_path = os.path.join(temp_dir, "article.json")
-        parse_script_path = os.path.join(os.path.dirname(__file__), "ExtractArticle.js")
-        check_call(["node", parse_script_path, "-i", html_path, "-o", article_json_path])
+        parse_script_path = os.path.join(
+            os.path.dirname(__file__), "ExtractArticle.js")
+        check_call(["node", parse_script_path, "-i",
+                    html_path, "-o", article_json_path])
 
         # Read output of call to Readability.parse() from JSON file and return as Python dictionary
         with open(article_json_path) as f:
@@ -50,10 +52,10 @@ def parse(html, content_digests=False, node_indexes=False, use_readability=False
             article_json["byline"] = input_json["byline"]
         if "content" in input_json and input_json["content"] is not "":
             article_json["content"] = input_json["content"]
-            article_json["plain_content"] = \
-                plain_content(article_json["content"], content_digests, node_indexes)
-            article_json["plain_text"] = \
-                extract_text_blocks_as_plain_text(article_json["plain_content"])
+            article_json["plain_content"] = plain_content(
+                article_json["content"], content_digests, node_indexes)
+            article_json["plain_text"] = extract_text_blocks_as_plain_text(
+                article_json["plain_content"])
 
     return article_json
 
@@ -65,12 +67,12 @@ def extract_text_blocks_as_plain_text(paragraph_html):
     lists = soup.find_all(['ul', 'ol'])
     # Prefix text in all list items with "* " and make lists paragraphs
     for l in lists:
-        plain_items = "".join(list(filter(None, [plain_text_leaf_node(li)["text"] for li in l.find_all('li')])))
+        plain_items = "".join(list(
+            filter(None, [plain_text_leaf_node(li)["text"] for li in l.find_all('li')])))
         l.string = plain_items
         l.name = "p"
     # Select all text blocks
-    # text_blocks = soup.find_all(block_level_whitelist())
-    text_blocks = [string_element.parent for string_element in soup.find_all(string=True)]
+    text_blocks = [s.parent for s in soup.find_all(string=True)]
     text_blocks = [plain_text_leaf_node(block) for block in text_blocks]
     # Drop empty paragraphs
     text_blocks = list(filter(lambda p: p["text"] is not None, text_blocks))
@@ -111,7 +113,8 @@ def plain_content(readability_content, content_digests, node_indexes):
 
 def plain_elements(elements, content_digests, node_indexes):
     # Get plain content versions of all elements
-    elements = [plain_element(element, content_digests, node_indexes) for element in elements]
+    elements = [plain_element(element, content_digests, node_indexes)
+                for element in elements]
     if content_digests:
         # Add content digest attrbiute to nodes
         elements = [add_content_digest(element) for element in elements]
@@ -134,7 +137,8 @@ def plain_element(element, content_digests, node_indexes):
         element = type(element)(plain_text)
     else:
         # If not a leaf node or leaf type call recursively on child nodes, replacing
-        element.contents = plain_elements(element.contents, content_digests, node_indexes)
+        element.contents = plain_elements(
+            element.contents, content_digests, node_indexes)
     return element
 
 
@@ -159,7 +163,8 @@ def add_node_indexes(element, node_index="0"):
             # Can't add attributes to leaf string types
             if type(child) not in leaf_types():
                 local_idx = local_idx + 1
-                child_index = "{stem}.{local}".format(stem=node_index, local=local_idx)
+                child_index = "{stem}.{local}".format(
+                    stem=node_index, local=local_idx)
                 add_node_indexes(child, node_index=child_index)
     return element
 
@@ -190,7 +195,9 @@ def content_digest(element):
         else:
             # Build content digest from the "non-empty" digests of child nodes
             digest = hashlib.sha256()
-            child_digests = list(filter(lambda x: x != "", [content_digest(content) for content in contents]))
-            [digest.update(child.encode('utf-8')) for child in child_digests]
+            child_digests = list(
+                filter(lambda x: x != "", [content_digest(content) for content in contents]))
+            for child in child_digests:
+                digest.update(child.encode('utf-8'))
             digest = digest.hexdigest()
     return digest

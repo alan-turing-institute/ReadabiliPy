@@ -2,6 +2,7 @@
 from pytest import mark
 from ReadabiliPy import readability, text_manipulation
 
+
 def check_html_output_contains_text(test_fragment, expected_output=None):
     """Check that expected output is present when parsing HTML fragment."""
     if expected_output is None:
@@ -9,7 +10,8 @@ def check_html_output_contains_text(test_fragment, expected_output=None):
     article_json = readability.parse(test_fragment)
     content = str(article_json["plain_content"])
     # Check that expected output is present after simplifying the HTML
-    normalised_expected_output = text_manipulation.simplify_html(expected_output)
+    normalised_expected_output = text_manipulation.simplify_html(
+        expected_output)
     normalised_content = text_manipulation.simplify_html(content)
     assert normalised_expected_output in normalised_content
 

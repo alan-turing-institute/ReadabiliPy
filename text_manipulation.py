@@ -2,6 +2,7 @@
 import unicodedata
 import regex
 
+
 def normalise_unicode(text):
     """Normalise unicode such that things that are visually equivalent map to the same unicode string where possible."""
     normal_form = "NFKC"
@@ -23,6 +24,7 @@ def normalise_text(text):
     text = normalise_unicode(text)
     text = normalise_whitespace(text)
     return text
+
 
 def simplify_html(text):
     """Simplify HTML by stripping whitespace."""
