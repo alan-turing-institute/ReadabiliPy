@@ -72,6 +72,7 @@ def flatten_elements(soup):
             element.unwrap()
 
 
+
 def process_special_elements(soup):
     """Flatten special elements while processing their contents."""
     for element_name in special_elements():
@@ -97,9 +98,9 @@ def identify_linebreaks(soup):
     # Iterate through the <br> elements in the tree
     for element in soup.find_all("br"):
         # If the next element is not another <br> then count how long the chain is up to this point
-        if element.next_sibling.name != "br":
+        if (element.next_sibling is None) or (element.next_sibling.name != "br"):
             br_element_chain = [element]
-            while br_element_chain[-1].previous_sibling.name == "br":
+            while (br_element_chain[-1].previous_sibling is not None) and (br_element_chain[-1].previous_sibling.name == "br"):
                 br_element_chain.append(br_element_chain[-1].previous_sibling)
 
             # If there's only one <br> then we strip it out
@@ -155,7 +156,11 @@ def consolidate_text(soup):
     for element in soup.find_all(string=True):
         # If the previous element is the same type then extract the current string and append to previous
         if type(element.previous_sibling) is type(element):
-            text = " ".join([str(element.previous_sibling), str(element)])
+            # Join with no spaces if this is a smart quotation mark
+            if str(element.previous_sibling)[-1] in ['“', '‘'] or str(element)[0] in ['”', '’']:
+                text = "".join([str(element.previous_sibling), str(element)])
+            else:
+                text = " ".join([str(element.previous_sibling), str(element)])
             element.previous_sibling.replace_with(text)
             element.extract()
 
@@ -198,6 +203,10 @@ def process_unknown_elements(soup):
         if element.name not in known_elements():
             element.unwrap()
 
+# def find_element_by_text(soup, text):
+#     for element in soup.find_all(string=True):
+#         if text in element:
+#             print(element.parent)
 
 def parse_to_tree(html):
     # Convert the HTML into a Soup parse tree
@@ -238,10 +247,6 @@ def parse_to_tree(html):
 
     # Replace the linebreak placeholders
     apply_linebreaks(soup)
-
-    # # print("*V post-apply_linebreaks V*")
-    # PRINTALL(soup)
-    # # print("*^ post-apply_linebreaks ^*")
 
     # Recursively replace any elements which contain 0 or 1 children
     recursively_prune(soup)

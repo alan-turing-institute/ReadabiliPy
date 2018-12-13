@@ -46,7 +46,6 @@ def test_extract_article_non_article():
     )
 
 
-@mark.skip(reason="not yet updated to new format")
 def test_extract_article_unicode_normalisation():
     check_extract_article(
         "conservativehq.com-1_full_page.html",
