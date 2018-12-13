@@ -979,9 +979,9 @@ def test_html_special_sup():
 # Remaining HTML elements - use a parametrized test here for simplicity
 @mark.parametrize("element", ["a", "abbr", "address", "b", "bdi", "bdo",
                               "cite", "code", "del", "dfn", "em", "i", "ins",
-                              "kbs", "mark", "rb", "ruby", "rp", "rt", "rtc",
-                              "s", "samp", "small", "span", "strong", "time",
-                              "u", "var", "wbr"])
+                              "kbs", "mark", "marquee", "rb", "ruby", "rp",
+                              "rt", "rtc", "s", "samp", "small", "span",
+                              "strong", "time", "u", "var", "wbr"])
 def test_html_remaining_element(element):
     """Simple standalone elements which can contain text.
        Check that the inner text is kept and the tag is discarded."""

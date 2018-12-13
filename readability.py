@@ -6,7 +6,7 @@ import unicodedata
 from subprocess import check_call
 from bs4 import BeautifulSoup
 from bs4.element import Comment, NavigableString
-from .plain_html import parse_to_tree
+from .plain_html import parse_to_tree, block_level_whitelist
 from .text_manipulation import normalise_text
 
 
@@ -53,27 +53,28 @@ def parse(html, content_digests=False, node_indexes=False, use_readability=False
             article_json["plain_content"] = \
                 plain_content(article_json["content"], content_digests, node_indexes)
             article_json["plain_text"] = \
-                extract_paragraphs_as_plain_text(article_json["plain_content"])
+                extract_text_blocks_as_plain_text(article_json["plain_content"])
 
     return article_json
 
 
-def extract_paragraphs_as_plain_text(paragraph_html):
+def extract_text_blocks_as_plain_text(paragraph_html):
     # Load article as DOM
     soup = BeautifulSoup(paragraph_html, 'html.parser')
-    # Select all unordered lists
+    # Select all lists
     lists = soup.find_all(['ul', 'ol'])
     # Prefix text in all list items with "* " and make lists paragraphs
     for l in lists:
         plain_items = "".join(list(filter(None, [plain_text_leaf_node(li)["text"] for li in l.find_all('li')])))
         l.string = plain_items
         l.name = "p"
-    # Select all paragraphs
-    paragraphs = soup.find_all('p')
-    paragraphs = [plain_text_leaf_node(p) for p in paragraphs]
+    # Select all text blocks
+    # text_blocks = soup.find_all(block_level_whitelist())
+    text_blocks = [string_element.parent for string_element in soup.find_all(string=True)]
+    text_blocks = [plain_text_leaf_node(block) for block in text_blocks]
     # Drop empty paragraphs
-    paragraphs = list(filter(lambda p: p["text"] is not None, paragraphs))
-    return paragraphs
+    text_blocks = list(filter(lambda p: p["text"] is not None, text_blocks))
+    return text_blocks
 
 
 def plain_text_leaf_node(element):
@@ -193,12 +194,3 @@ def content_digest(element):
             [digest.update(child.encode('utf-8')) for child in child_digests]
             digest = digest.hexdigest()
     return digest
-
-
-# def normalise_text(text):
-#     # Normalise the unicode representation
-#     normal_form = "NFKC"
-#     text = unicodedata.normalize(normal_form, text)
-#     # Strip leading and training whitespace again (ensures things like non-breaking whitespaces are removed)
-#     text = text.strip()
-#     return text
