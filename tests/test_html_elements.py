@@ -96,46 +96,49 @@ def test_html_whitelist_caption():
     """, "<caption>Table 1. This shows the possible results of flipping two coins.</caption>")
 
 
-# def test_html_whitelist_colgroup():
-#     """The colgroup element groups col elements inside its parent table."""
-#     check_html_output_contains_text("""
-#         <table>
-#         <colgroup>
-#             <col span="2" style="background-color:red"/>
-#             <col style="background-color:yellow"/>
-#         </colgroup>
-#         <tr>
-#             <th>ISBN</th>
-#             <th>Title</th>
-#             <th>Price</th>
-#         </tr>
-#         </table>
-#     """, """
-#         <colgroup>
-#             <col/>
-#             <col/>
-#         </colgroup>
-#     """)
+def test_html_whitelist_colspan():
+    """The colspan attribute allows cells to span multiple columns."""
+    check_html_output_contains_text("""
+        <table>
+            <tr>
+                <th>Month</th>
+                <th>Savings</th>
+            </tr>
+            <tr>
+                <td>January</td>
+                <td>100</td>
+            </tr>
+            <tr>
+                <td>February</td>
+                <td>80</td>
+            </tr>
+            <tr>
+                <td colspan="2">Sum: 180</td>
+            </tr>
+        </table>
+    """, '<td colspan="2">Sum: 180</td>')
 
 
-# def test_html_whitelist_col():
-#     """The col element describes one or more columns in a table."""
-#     check_html_output_contains_text("""
-#         <table>
-#         <colgroup>
-#             <col span="2" style="background-color:red"/>
-#             <col style="background-color:yellow"/>
-#         </colgroup>
-#         <tr>
-#             <th>ISBN</th>
-#             <th>Title</th>
-#             <th>Price</th>
-#         </tr>
-#         </table>
-#     """, """
-#         <col/>
-#         <col/>
-#     """)
+def test_html_whitelist_rowspan():
+    """The rowspan attribute allows cells to span multiple rows."""
+    check_html_output_contains_text("""
+    <table>
+        <tr>
+            <th>Month</th>
+            <th>Savings</th>
+            <th>Savings for holiday!</th>
+        </tr>
+        <tr>
+            <td>January</td>
+            <td>100</td>
+            <td rowspan="2">50</td>
+        </tr>
+        <tr>
+            <td>February</td>
+            <td>80</td>
+        </tr>
+    </table>
+    """, '<td rowspan="2">50</td>')
 
 
 def test_html_whitelist_div():

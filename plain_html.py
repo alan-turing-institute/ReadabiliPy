@@ -172,17 +172,12 @@ def wrap_bare_text(soup):
 
 
 def strip_attributes(soup):
-    """Strip tag attributes."""
+    """Strip class and style attributes."""
     for element in soup.find_all():
-        element.attrs = {}
-
-
-# def remove_empty_elements(soup):
-#     """Remove any elements which contain only whitespace."""
-#     for element in soup.find_all():
-#         if not element.contents:
-#             print("  ELEMENT:", element.name, str(element).strip(), element.contents)
-#             element.decompose()
+        print(element.attrs)
+        element.attrs.pop("class", None)
+        element.attrs.pop("style", None)
+        print("->", element.attrs)
 
 
 def recursively_prune(soup):
