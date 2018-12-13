@@ -203,7 +203,7 @@ def test_html_whitelist_figure():
         </figure>
         <p>Further details are given in this paragraph.</p>
     """, """
-        <figure>
+        <figure id="figref">
             <figcaption>Listing 1. Code description.</figcaption>
             <pre>
                 Some formatted code lives here

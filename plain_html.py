@@ -40,7 +40,7 @@ def block_level_whitelist():
     """Elements that we will always accept."""
     elements = ['article', 'aside', 'blockquote', 'caption', 'colgroup', 'col', 'div', 'dl', 'dt', 'dd', 'figure',
                 'figcaption', 'footer', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'li', 'main', 'ol', 'p', 'pre',
-                'section', 'table', 'tbody', 'thead' 'tfoot', 'tr', 'td', 'th', 'ul']
+                'section', 'table', 'tbody', 'thead', 'tfoot', 'tr', 'td', 'th', 'ul']
     elements += ['title']
     return elements
 
@@ -48,7 +48,8 @@ def block_level_whitelist():
 def known_elements():
     """All elements that we know by name."""
     structural_elements = ["html", "head", "body", "meta"]
-    return structural_elements + elements_to_delete() + elements_to_replace_with_contents() + special_elements() + block_level_whitelist()
+    linebreak_elements =["br", "hr"]
+    return structural_elements + linebreak_elements + elements_to_delete() + elements_to_replace_with_contents() + special_elements() + block_level_whitelist()
 
 
 def remove_metadata(soup):
@@ -174,10 +175,8 @@ def wrap_bare_text(soup):
 def strip_attributes(soup):
     """Strip class and style attributes."""
     for element in soup.find_all():
-        print(element.attrs)
         element.attrs.pop("class", None)
         element.attrs.pop("style", None)
-        print("->", element.attrs)
 
 
 def recursively_prune(soup):
