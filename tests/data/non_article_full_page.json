@@ -1,7 +1,9 @@
 {
   "title": null,
   "byline": null,
-  "content": "<div id=\"readability-page-1\" class=\"page\">No article here!\n</div>",
-  "plain_content": "<div class=\"page\" id=\"readability-page-1\">No article here!</div>",
-  "plain_text": []
+  "content": "<div><body><p>No article here!</p></body></div>",
+  "plain_content": "<div><body><p>No article here!</p></body></div>",
+  "plain_text": [
+    {"text": "No article here!"}
+  ]
 }

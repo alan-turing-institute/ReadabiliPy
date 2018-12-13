@@ -39,7 +39,6 @@ def test_extract_article_full_article():
     )
 
 
-@mark.skip(reason="not yet updated to new format")
 def test_extract_article_non_article():
     check_extract_article(
         "non_article_full_page.html",
