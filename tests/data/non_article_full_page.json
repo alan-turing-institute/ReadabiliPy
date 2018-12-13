@@ -1,8 +1,8 @@
 {
   "title": null,
   "byline": null,
-  "content": "<div><body><p>No article here!</p></body></div>",
-  "plain_content": "<div><body><p>No article here!</p></body></div>",
+  "content": "<div><p>No article here!</p></div>",
+  "plain_content": "<div><p>No article here!</p></div>",
   "plain_text": [
     {"text": "No article here!"}
   ]

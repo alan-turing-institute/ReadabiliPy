@@ -53,7 +53,6 @@ def test_extract_article_unicode_normalisation():
     )
 
 
-@mark.skip(reason="not yet updated to new format")
 def test_extract_article_list_items():
     check_extract_article(
         "list_items_full_page.html",

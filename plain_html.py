@@ -253,5 +253,8 @@ def parse_to_tree(html):
 
     # Finally wrap the whole tree in a div
     root = soup.new_tag("div")
+    # ... after stripping out enclosing elements that cannot live inside a div
+    while (len(soup.contents) > 0) and (soup.contents[0].name in ["html", "body"]):
+        soup.contents[0].unwrap()
     root.append(soup)
     return root
