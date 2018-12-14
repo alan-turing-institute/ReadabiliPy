@@ -65,9 +65,16 @@ def known_elements():
 
 
 def remove_metadata(soup):
-    """Remove comments and doctype."""
-    for comment in soup.findAll(string=lambda text: any([isinstance(text, x) for x in [CData, Comment, Doctype]])):
+    """Remove comments and doctype. These are not rendered by browsers."""
+    for comment in soup.findAll(string=lambda text: any([isinstance(text, x) for x in [Comment, Doctype]])):
         comment.extract()
+
+
+def process_cdata(soup):
+    """Remove CData. We were a bit worried about potentially removing content here but satisfied ourselves it won't
+    be displayed by most browsers in most cases (see https://github.com/alan-turing-institute/ReadabiliPy/issues/32)"""
+    for cdata in soup.findAll(string=lambda text: isinstance(text, CData)):
+        cdata.extract()
 
 
 def remove_blacklist(soup):
@@ -224,6 +231,9 @@ def parse_to_tree(html):
 
     # Remove comments and DOCTYPE strings
     remove_metadata(soup)
+
+    # Handle CDATA
+    process_cdata(soup)
 
     # Remove blacklisted elements
     remove_blacklist(soup)
