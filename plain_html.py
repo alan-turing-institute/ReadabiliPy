@@ -95,8 +95,10 @@ def remove_blacklist(soup):
             element.decompose()
 
 
-def flatten_elements(soup):
+def unwrap_elements(soup):
     """Flatten all elements where we are only interested in their contents."""
+    # We do not need to unwrap from the "bottom up" as all we are doing is replacing elements with their contents so
+    # we will still find child elements after their parent has been unwrapped.
     for element_name in elements_to_replace_with_contents():
         for element in soup.find_all(element_name):
             element.unwrap()
@@ -250,7 +252,7 @@ def parse_to_tree(html):
     remove_blacklist(soup)
 
     # Flatten elements where we want to keep the text but drop the containing tag
-    flatten_elements(soup)
+    unwrap_elements(soup)
 
     # Process elements with special innerText handling
     process_special_elements(soup)
@@ -264,23 +266,28 @@ def parse_to_tree(html):
     # Replace <br> and <hr> elements with break indicator
     identify_linebreaks(soup)
 
-    # Normalise all strings, removing whitespace and fixing unicode issues
+    # Normalise all strings, removing whitespace and fixing unicode issues.
+    # Must happen AFTER identifying linebreaks and BEFORE applying converting these linebreaks to text blocks.
     normalise_strings(soup)
 
     # Consolidate text, joining any consecutive NavigableStrings together
+    # Must happen AFTER identifying linebreaks and BEFORE applying converting these linebreaks to text blocks.
     consolidate_text(soup)
 
-    # Wrap any remaining bare text in <p> tags
+    # Wrap any remaining bare text in a suitable block level element
+    # Must happen AFTER identifying linebreaks and BEFORE applying converting these linebreaks to text blocks.
     wrap_bare_text(soup)
 
-    # Strip tag attributes
-    strip_attributes(soup)
-
-    # Replace the linebreak placeholders
-    apply_linebreaks(soup)
+    # Convert the linebreak placeholders to text blocks. This must happen AFTER we do any consolidation of raw text as
+    # otherwise we risk wrapping text that would not display as separate visual paragraphs in the original page with
+    # block level elements that mean they will display as separate visual paragraphs in the simplified page.
+    convert_linebreaks_to_text_blocks(soup)
 
     # Recursively replace any elements which contain 0 or 1 children
     recursively_prune(soup)
+
+    # Strip tag attributes
+    strip_attributes(soup)
 
     # Finally wrap the whole tree in a div
     root = soup.new_tag("div")
