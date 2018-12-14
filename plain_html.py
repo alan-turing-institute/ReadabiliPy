@@ -2,7 +2,7 @@
 from bs4 import BeautifulSoup, CData, Comment, Doctype
 from .text_manipulation import normalise_text
 
-BREAK_INDICATOR = "|CLOSE_AND_REOPEN|"
+BREAK_INDICATOR = "|BREAK_HERE|"
 
 
 def elements_to_delete():
@@ -151,27 +151,6 @@ def identify_linebreaks(soup):
             element.replace_with(BREAK_INDICATOR)
 
 
-def apply_linebreaks(soup):
-    """Replace linebreak markers with close-parent reopen-parent."""
-    # Iterate through the tree, splitting elements which contain BREAK_INDICATOR
-    for element in soup.find_all(string=True):
-        if BREAK_INDICATOR in element:
-            # Split the text into two or more fragments (there maybe be multiple BREAK_INDICATORs in the string)
-            text_fragments = [s.strip()
-                              for s in str(element).split(BREAK_INDICATOR)]
-
-            # Make a list of connected parent elements (the first of which is the original element)
-            parent_elements = [element.parent]
-            for _ in range(len(text_fragments) - 1):
-                new_element = soup.new_tag(element.parent.name)
-                parent_elements[-1].insert_after(new_element)
-                parent_elements.append(new_element)
-
-            # Set the string for each element
-            for parent_element, text_fragment in zip(parent_elements, text_fragments):
-                parent_element.string = text_fragment
-
-
 def normalise_strings(soup):
     """Remove extraneous whitespace and fix unicode issues in all strings."""
     # Iterate over all strings in the tree (including bare strings outside tags)
@@ -198,13 +177,43 @@ def consolidate_text(soup):
             element.extract()
 
 
+def split_strings_on_linebreaks(soup):
+    """Split strings on linebreak markers. If the parent is a <p> tag then close-parent reopen-parent."""
+    # Iterate through the tree, splitting elements which contain BREAK_INDICATOR
+    # Use a list rather than the generator, since we are altering the tree as we traverse it
+    for element in list(soup.find_all(string=True)):
+        if BREAK_INDICATOR in element:
+            # Split the text into two or more fragments (there maybe be multiple BREAK_INDICATORs in the string)
+            text_fragments = [s.strip() for s in str(element).split(BREAK_INDICATOR)]
+
+            # Get the parent element
+            parent_element = element.parent
+
+            # If the parent is a paragraph then we want to close and reopen by creating a new tag
+            if parent_element.name == "p":
+                # Iterate in reverse order as we are repeatedly adding new elements directly after the original one
+                for text_fragment in text_fragments[:0:-1]:
+                    new_p_element = soup.new_tag("p")
+                    new_p_element.string = text_fragment
+                    parent_element.insert_after(new_p_element)
+                parent_element.string.replace_with(text_fragments[0])
+            # Otherwise we want to simply include all the text fragments as independent NavigableStrings (that will be wrapped later)
+            else:
+                # Iterate in reverse order as we are repeatedly adding new elements directly after the original one
+                for text_fragment in text_fragments[:0:-1]:
+                    element.insert_after(soup.new_string(text_fragment))
+                element.string.replace_with(text_fragments[0])
+
+
 def wrap_bare_text(soup):
     """Wrap any remaining bare text in <p> tags."""
     # Iterate over all strings in the tree
     for element in soup.find_all(string=True):
-        # Identify any strings whose parent is not a whitelisted element
-        if element.parent.name not in block_level_whitelist():
-            # ... and wrap them in <p> tags
+        # If this is the only child of a whitelisted block then do nothing
+        if element.parent.name in block_level_whitelist() and len(element.parent.contents) == 1:
+            pass
+        # ... otherwise wrap them in <p> tags
+        else:
             p_element = soup.new_tag("p")
             p_element.string = element
             element.replace_with(p_element)
@@ -274,14 +283,14 @@ def parse_to_tree(html):
     # Must happen AFTER identifying linebreaks and BEFORE applying converting these linebreaks to text blocks.
     consolidate_text(soup)
 
-    # Wrap any remaining bare text in a suitable block level element
-    # Must happen AFTER identifying linebreaks and BEFORE applying converting these linebreaks to text blocks.
-    wrap_bare_text(soup)
-
     # Convert the linebreak placeholders to text blocks. This must happen AFTER we do any consolidation of raw text as
     # otherwise we risk wrapping text that would not display as separate visual paragraphs in the original page with
     # block level elements that mean they will display as separate visual paragraphs in the simplified page.
-    convert_linebreaks_to_text_blocks(soup)
+    split_strings_on_linebreaks(soup)
+
+    # Wrap any remaining bare text in a suitable block level element
+    # Must happen AFTER identifying linebreaks and BEFORE applying converting these linebreaks to text blocks.
+    wrap_bare_text(soup)
 
     # Recursively replace any elements which contain 0 or 1 children
     recursively_prune(soup)
