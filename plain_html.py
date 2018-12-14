@@ -51,15 +51,26 @@ def block_level_whitelist():
                 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'li', 'main',
                 'ol', 'p', 'pre', 'section', 'table', 'tbody', 'thead',
                 'tfoot', 'tr', 'td', 'th', 'ul']
-    elements += ['title']
     return elements
+
+
+def structural_elements():
+    """Structural elements we do no further processing on (though we do remove attributes and alter their contents)"""
+    return ['html', 'head', 'body']
+
+
+def metadata_elements():
+    """Metadata elements we do no further processing on (though we do remove attributes and alter their contents)"""
+    return ['meta', 'link', 'base', 'title']
+
+
+def linebreak_elements():
+    return ['br', 'hr']
 
 
 def known_elements():
     """All elements that we know by name."""
-    structural_elements = ['html', 'head', 'body', 'meta']
-    linebreak_elements = ['br', 'hr']
-    return structural_elements + linebreak_elements + elements_to_delete() \
+    return structural_elements() + metadata_elements() + linebreak_elements() + elements_to_delete() \
         + elements_to_replace_with_contents() + special_elements() \
         + block_level_whitelist()
 
