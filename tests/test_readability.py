@@ -1,7 +1,7 @@
 """Test readability.py on sample articles"""
 import json
 import os
-from ReadabiliPy import readability
+from ReadabiliPy import readability, text_manipulation
 
 # ===== TEST END TO END ARTICLE EXTRACTION =====
 
@@ -16,15 +16,28 @@ def check_extract_article(test_filename, expected_filename, content_digests=Fals
 
     # Extract simplified article HTML
     article_json = readability.parse(html, content_digests, node_indexes)
+    print(article_json)
 
     # Get expected simplified article HTML
-    expected_filepath = os.path.join(os.path.dirname(
-        __file__), test_data_dir, expected_filename)
+    expected_filepath = os.path.join(os.path.dirname(__file__),
+                                     test_data_dir, expected_filename)
     with open(expected_filepath) as h:
         expected_article_json = json.loads(h.read())
 
     # Test full JSON matches (checks for unexpected fields in either actual or expected JSON)
     assert article_json == expected_article_json
+
+
+def check_exact_html_output(test_fragment, expected_output=None):
+    """Check that expected output is present when parsing HTML fragment."""
+    if expected_output is None:
+        expected_output = test_fragment
+    article_json = readability.parse(test_fragment)
+    content = str(article_json["plain_content"])
+    # Check that expected output is present after simplifying the HTML
+    normalised_output = text_manipulation.simplify_html(expected_output)
+    normalised_content = text_manipulation.simplify_html(content)
+    assert normalised_output == normalised_content
 
 
 def test_extract_article_full_page():
@@ -114,8 +127,8 @@ def test_extract_article_full_page_content_digest_node_indexes():
 def check_extract_paragraphs_as_plain_text(test_filename, expected_filename):
     test_data_dir = "data"
     # Read readable article test file
-    test_filepath = os.path.join(os.path.dirname(
-        __file__), test_data_dir, test_filename)
+    test_filepath = os.path.join(os.path.dirname(__file__),
+                                 test_data_dir, test_filename)
     with open(test_filepath) as h:
         article = json.loads(h.read())
 
@@ -124,12 +137,13 @@ def check_extract_paragraphs_as_plain_text(test_filename, expected_filename):
         article["plain_content"])
 
     # Get expected plain text paragraphs
-    expected_filepath = os.path.join(os.path.dirname(
-        __file__), test_data_dir, expected_filename)
+    expected_filepath = os.path.join(os.path.dirname(__file__),
+                                     test_data_dir, expected_filename)
     with open(expected_filepath) as h:
         expected_paragraphs = json.loads(h.read())
 
     # Test
+    print(paragraphs)
     assert paragraphs == expected_paragraphs
 
 
@@ -147,75 +161,14 @@ def test_extract_paragraphs_as_plain_text_node_indexes():
     )
 
 
-# ===== TEST COMMAND LINE SCRIPT =====
-# def validate_extract_article_command_line_script(test_html_filepath, expected_article_json_filepath,
-#                                                  content_digest=False, node_indexes=False):
-#     # Set output file path to temp file
-#     temp_dir = tempfile.gettempdir()
-#     article_json_filepath = os.path.join(temp_dir, "article.json")
-#     # Call extract article command line script
-#     script_path = os.path.join(os.path.dirname(__file__), "..", "extract_article.py")
-#     subprocess.check_call(["python", script_path, "-i", test_html_filepath, "-o", article_json_filepath])
-#
-#     # Call extract article command line script
-#     script_path = os.path.join(os.path.dirname(__file__), "..", "extract_article.py")
-#     cmd = ["python", script_path, "-i", test_html_filepath, "-o", article_json_filepath]
-#     # Only add optional commandline argument if provided. This way we casn test the default behaviour works for
-#     # optional arguments when they are not provided
-#     if content_digest:
-#         cmd = cmd + ["-c"]
-#     if node_indexes:
-#         cmd = cmd + ["-n"]
-#     # Call command line script
-#     subprocess.check_call(cmd)
-#
-#     # Test
-#     with open(article_json_filepath) as actual, open(expected_article_json_filepath) as expected:
-#         actual_article = json.loads(actual.read())
-#         expected_article = json.loads(expected.read())
-#         assert actual_article == expected_article
-#
-#
-# def test_extract_article_command_line_script():
-#     # Set input file path to test HTML file
-#     test_data_dir = "data"
-#     test_html_filename = "addictinginfo.com-1_full_page.html"
-#     test_html_filepath = os.path.join(os.path.dirname(__file__), test_data_dir, test_html_filename)
-#     # Set path for expected article JSON file
-#     expected_article_json_filename = "addictinginfo.com-1_simple_article_from_full_page.json"
-#     expected_article_json_filepath = os.path.join(os.path.dirname(__file__), test_data_dir,
-#                                                   expected_article_json_filename)
-#
-#     # Test
-#     validate_extract_article_command_line_script(test_html_filepath, expected_article_json_filepath)
-#
-#
-# def test_extract_article_command_line_script_content_digest():
-#     # Set input file path to test HTML file
-#     test_data_dir = "data"
-#     test_html_filename = "list_items_full_page.html"
-#     test_html_filepath = os.path.join(os.path.dirname(__file__), test_data_dir, test_html_filename)
-#     # Set path for expected article JSON file
-#     expected_article_json_filename = "list_items_simple_article_from_full_page_content_digests.json"
-#     expected_article_json_filepath = os.path.join(os.path.dirname(__file__), test_data_dir,
-#                                                   expected_article_json_filename)
-#
-#     # Test
-#     validate_extract_article_command_line_script(test_html_filepath, expected_article_json_filepath,
-#                                                  content_digest=True)
-#
-#
-# def test_extract_article_command_line_script_node_indexes():
-#     # Set input file path to test HTML file
-#     test_data_dir = "data"
-#     test_html_filename = "list_items_full_page.html"
-#     test_html_filepath = os.path.join(os.path.dirname(__file__), test_data_dir, test_html_filename)
-#     # Set path for expected article JSON file
-#     expected_article_json_filename = "list_items_simple_article_from_full_page_node_indexes.json"
-#     expected_article_json_filepath = os.path.join(os.path.dirname(__file__), test_data_dir,
-#                                                   expected_article_json_filename)
-#
-#     # Test
-#     validate_extract_article_command_line_script(test_html_filepath, expected_article_json_filepath,
-#                                                  node_indexes=True)
-#
+# Test correct wrapping
+def test_ensure_correct_div_wrapping():
+    """Do not wrap in a <div> if this is already a <div>."""
+    check_exact_html_output("""
+        <div>
+            <p>
+                Some example text here.
+            </p>
+        </div>""",
+    """<div><p>Some example text here.</p></div>""")
+
