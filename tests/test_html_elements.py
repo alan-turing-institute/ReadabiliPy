@@ -1,33 +1,35 @@
 """Tests for HTML elements."""
 from pytest import mark
-from ReadabiliPy import readability
+from ReadabiliPy import readability, text_manipulation
 
 
 def check_html_output_contains_text(test_fragment, expected_output=None):
     """Check that expected output is present when parsing HTML fragment."""
-    article_json = readability.parse(test_fragment)
     if expected_output is None:
         expected_output = test_fragment
+    article_json = readability.parse(test_fragment)
     content = str(article_json["plain_content"])
-    # Check that each line of expected output is present
-    for line in expected_output.split("\n"):
-        assert line.strip() in content
+    # Check that expected output is present after simplifying the HTML
+    normalised_expected_output = text_manipulation.simplify_html(
+        expected_output)
+    normalised_content = text_manipulation.simplify_html(content)
+    assert normalised_expected_output in normalised_content
 
 
 def check_html_has_no_output(test_fragment):
     """Check that no output is present when parsing HTML fragment."""
     article_json = readability.parse(test_fragment)
     # Check that there is no output
-    assert article_json["plain_content"] is None
+    assert article_json["plain_content"] is None or article_json["plain_content"] == "<div></div>"
 
 
 def check_html_output_does_not_contain_tag(test_fragment, vetoed_tag):
     """Check that vetoed tag is not present when parsing HTML fragment."""
     article_json = readability.parse(test_fragment)
-    # Check that neither <tag nor </tag> appear in the output
+    # Check that neither <tag> nor </tag> appear in the output
     content = str(article_json["plain_content"])
     if content is not None:
-        for element in ["<{}".format(vetoed_tag), "</{}>".format(vetoed_tag)]:
+        for element in ["<{}>".format(vetoed_tag), "</{}>".format(vetoed_tag)]:
             assert element not in content
 
 
@@ -45,7 +47,6 @@ def test_html_whitelist_article():
     """)
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_whitelist_aside():
     """An aside is a tangentially related section, used for pull-quotes."""
     check_html_output_contains_text("""
@@ -55,7 +56,7 @@ def test_html_whitelist_aside():
         </p>
         <aside>
             <p>Aenean libero neque</p>
-        </aside>    
+        </aside>
         <p>Pellentesque non sapien nec arcu facilisis gravida.</p>
     """)
 
@@ -92,61 +93,54 @@ def test_html_whitelist_caption():
                     <th>H</th>
                     <th>T</th>
                 </tr>
-                <tr>
-                    <th>H</th>
-                    <td>HH</td>
-                    <td>TH</td>
-                </tr>
-                <tr>
-                    <th>T</th>
-                    <td>HT</td>
-                    <td>TT</td>
-                </tr>
             </tbody>
         </table>
-    """)
+    """, "<caption>Table 1. This shows the possible results of flipping two coins.</caption>")
 
 
-def test_html_whitelist_colgroup():
-    """The colgroup element groups col elements inside its parent table."""
+def test_html_whitelist_colspan():
+    """The colspan attribute allows cells to span multiple columns."""
     check_html_output_contains_text("""
         <table>
-        <colgroup>
-            <col span="2" style="background-color:red"/>
-            <col style="background-color:yellow"/>
-        </colgroup>
-        <tr>
-            <th>ISBN</th>
-            <th>Title</th>
-            <th>Price</th>
-        </tr>
+            <tr>
+                <th>Month</th>
+                <th>Savings</th>
+            </tr>
+            <tr>
+                <td>January</td>
+                <td>100</td>
+            </tr>
+            <tr>
+                <td>February</td>
+                <td>80</td>
+            </tr>
+            <tr>
+                <td colspan="2">Sum: 180</td>
+            </tr>
         </table>
-    """, """
-        <colgroup>
-            <col span="2"/>
-            <col/>
-        </colgroup>
-    """)
+    """, '<td colspan="2">Sum: 180</td>')
 
 
-def test_html_whitelist_col():
-    """The col element describes one or more columns in a table."""
+def test_html_whitelist_rowspan():
+    """The rowspan attribute allows cells to span multiple rows."""
     check_html_output_contains_text("""
-        <table>
-        <colgroup>
-            <col span="2" style="background-color:red"/>
-            <col style="background-color:yellow"/>
-        </colgroup>
+    <table>
         <tr>
-            <th>ISBN</th>
-            <th>Title</th>
-            <th>Price</th>
+            <th>Month</th>
+            <th>Savings</th>
+            <th>Savings for holiday!</th>
         </tr>
-        </table>
-    """, """
-        <col span="2"/>
-        <col/>
-    """)
+        <tr>
+            <td>January</td>
+            <td>100</td>
+            <td rowspan="2">50</td>
+        </tr>
+        <tr>
+            <td>February</td>
+            <td>80</td>
+        </tr>
+    </table>
+    """, '<td rowspan="2">50</td>')
 
 
 def test_html_whitelist_div():
@@ -154,9 +148,9 @@ def test_html_whitelist_div():
     check_html_output_contains_text("""
         <p>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean
-            libero neque, ullamcorper quis tristique id pretium dapibus turpis. 
+            libero neque, ullamcorper quis tristique id pretium dapibus turpis.
         </p>
-        <div lang="en-GB">
+        <div>
             <p>Here is an example of using div for stylistic reasons.</p>
             <p>
                 It marks several paragraphs which are in a different language
@@ -212,6 +206,11 @@ def test_html_whitelist_figure():
         <p>Further details are given in this paragraph.</p>
     """, """
         <figure id="figref">
+            <figcaption>Listing 1. Code description.</figcaption>
+            <pre>
+                Some formatted code lives here
+            </pre>
+        </figure>
     """)
 
 
@@ -231,12 +230,11 @@ def test_html_whitelist_figcaption():
     """)
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_whitelist_footer():
     """The footer element is the footer for its nearest ancestor section."""
     check_html_output_contains_text("""
         <p>
-            A dolor sit amet, consectetur adipisicing elit, sed do eiusmod 
+            A dolor sit amet, consectetur adipisicing elit, sed do eiusmod
             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
             minim veniam, quis nostrud exercitation ullamco laboris nisi ut
             aliquip ex ea commodo consequat.
@@ -245,7 +243,6 @@ def test_html_whitelist_footer():
     """)
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_whitelist_h1():
     """The h1 element is often used for titles."""
     check_html_output_contains_text("""
@@ -361,28 +358,30 @@ def test_html_whitelist_section():
     """)
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_whitelist_table():
     """The table element represents data with more than one dimension."""
     check_html_output_contains_text("""
         <table>
-        <tr>
-            <td>Table contents</td>
-        </tr>
+        <tbody>
+            <tr>
+                <td>Table contents</td>
+            </tr>
+        </tbody>
         </table>
-    """, "<table><tr><td>Content</td></tr></table>")
+    """, "<table><tbody><tr><td>Table contents</td></tr></tbody></table>")
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_whitelist_tbody():
     """The tbody element represents a block of rows inside its parent table."""
     check_html_output_contains_text("""
         <table>
         <tbody>
-            <td>Table body content</td>
+            <tr>
+                <td>Table body content</td>
+            </tr>
         </tbody>
         </table>
-    """, "<tbody><td>Content</td></tbody>")
+    """, "<tbody><tr><td>Table body content</td></tr></tbody>")
 
 
 def test_html_whitelist_thead():
@@ -411,28 +410,26 @@ def test_html_whitelist_tfoot():
     """, "<tfoot><tr><td>Sum of column</td></tr></tfoot>")
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_whitelist_tr():
     """The tr element represents a row in a table."""
     check_html_output_contains_text("""
         <table>
         <tr>
-            <td>Content</td>
+            <td>Table row content</td>
         </tr>
         </table>
-    """, "<tr><td>Content</td></tr>")
+    """, "<tr><td>Table row content</td></tr>")
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_whitelist_td():
     """The td element represents a cell in a table."""
     check_html_output_contains_text("""
         <table>
         <tr>
-            <td>Cell content</td>
+            <td>Table cell content</td>
         </tr>
         </table>
-    """, "<td>Cell content</td>")
+    """, "<td>Table cell content</td>")
 
 
 def test_html_whitelist_th():
@@ -484,7 +481,6 @@ def test_html_blacklist_fieldset():
     """)
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_blacklist_form():
     """The form element is a user-interactive area of a document."""
     check_html_has_no_output("""
@@ -509,7 +505,6 @@ def test_html_blacklist_input():
     """)
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_blacklist_label():
     """The label element defines the label for another element."""
     check_html_has_no_output("""
@@ -517,7 +512,6 @@ def test_html_blacklist_label():
     """)
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_blacklist_legend():
     """The legend element has a caption for its parent fieldset."""
     check_html_output_does_not_contain_tag("""
@@ -528,7 +522,6 @@ def test_html_blacklist_legend():
     """, "legend")
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_blacklist_meter():
     """The meter element represents a measurement within a known range."""
     check_html_has_no_output("""
@@ -564,7 +557,6 @@ def test_html_blacklist_option():
     """, "option")
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_blacklist_output():
     """The output element is the result of a calculation or a user action."""
     check_html_output_does_not_contain_tag("""
@@ -682,7 +674,6 @@ def test_html_blacklist_source():
     """, "source")
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_blacklist_audio():
     """The audio element is a media element containing audio data."""
     check_html_output_does_not_contain_tag("""
@@ -694,7 +685,6 @@ def test_html_blacklist_audio():
     """, "audio")
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_blacklist_track():
     """The track element specifies subtitles or other text for media."""
     check_html_output_does_not_contain_tag("""
@@ -709,7 +699,6 @@ def test_html_blacklist_track():
     """, "track")
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_blacklist_video():
     """The video element is a media element containing video data."""
     check_html_output_does_not_contain_tag("""
@@ -772,7 +761,6 @@ def test_html_blacklist_param():
     """, "param")
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_blacklist_svg():
     """The svg element contains an embedded SVG graphic."""
     check_html_output_does_not_contain_tag("""
@@ -787,7 +775,6 @@ def test_html_blacklist_svg():
     """, "svg")
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_blacklist_details():
     """The details element is an expandable widget with additional context."""
     check_html_output_does_not_contain_tag("""
@@ -806,7 +793,6 @@ def test_html_blacklist_details():
     """, "details")
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_blacklist_dialog():
     """The dialog element is a user-interactive area for performing."""
     check_html_output_does_not_contain_tag("""
@@ -816,7 +802,6 @@ def test_html_blacklist_dialog():
     """, "dialog")
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_blacklist_summary():
     """The summary element provides a summary for its details element."""
     check_html_output_does_not_contain_tag("""
@@ -876,7 +861,6 @@ def test_html_blacklist_script():
     """, "script")
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_blacklist_template():
     """The template element provides HTML fragments for use by scripts."""
     check_html_output_does_not_contain_tag("""
@@ -926,15 +910,6 @@ def test_html_blacklist_link():
     """, "link")
 
 
-def test_html_blacklist_time():
-    """The time element has a time and a machine-readable datetime."""
-    check_html_output_does_not_contain_tag("""
-        <p>
-            We open at <time datetime="2018-11-21 10:00">10:00 tomorrow</time>.
-        </p>
-    """, "time")
-
-
 def test_html_blacklist_style():
     """The style element embeds style information in the document."""
     check_html_output_does_not_contain_tag("""
@@ -946,7 +921,6 @@ def test_html_blacklist_style():
     """, "style")
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_blacklist_nav():
     """The nav element represents a section with navigation links."""
     check_html_output_does_not_contain_tag("""
@@ -966,7 +940,6 @@ def test_html_blacklist_br():
     """, "br")
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_blacklist_hr():
     """The hr element represents a thematic break in text content."""
     check_html_output_does_not_contain_tag("""
@@ -981,40 +954,65 @@ def test_html_blacklist_hr():
 
 
 # Special HTML elements
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_special_q():
     """The q element contains quoted text."""
-    check_html_output_contains_text("""
-        <p>Some text <q>this bit is quoted</q> and now back to normal</p>
-    """, '<p>Some text "this bit is quoted" and now back to normal</p>')
+    check_html_output_contains_text(
+        "<p>Some text <q>this bit is quoted</q> and now back to normal</p>",
+        '<p>Some text "this bit is quoted" and now back to normal</p>'
+    )
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_special_sub():
     """The sub element contains subscript text."""
-    check_html_output_contains_text("""
-        <p>This text contains <sub>subscript</sub> text.</p>
-    """, '<p>This text contains _subscript text.</p>')
+    check_html_output_contains_text(
+        "<p>This text contains <sub>subscript</sub> text.</p>",
+        "<p>This text contains _subscript text.</p>"
+    )
 
 
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
 def test_html_special_sup():
     """The sup element contains superscript text."""
-    check_html_output_contains_text("""
-        <p>This text contains <sup>superscript</sup> text.</p>
-    """, '<p>This text contains ^superscript text.</p>')
+    check_html_output_contains_text(
+        "<p>This text contains <sup>superscript</sup> text.</p>",
+        "<p>This text contains ^superscript text.</p>"
+    )
 
 
 # Remaining HTML elements - use a parametrized test here for simplicity
 @mark.parametrize("element", ["a", "abbr", "address", "b", "bdi", "bdo",
                               "cite", "code", "del", "dfn", "em", "i", "ins",
-                              "kbs", "mark", "rb", "ruby", "rp", "rt", "rtc",
-                              "s", "samp", "small", "span", "strong", "u",
-                              "var", "wbr"])
-@mark.skip(reason="broken until ReadabiliPy/issues/21 is solved")
+                              "kbs", "mark", "marquee", "rb", "ruby", "rp",
+                              "rt", "rtc", "s", "samp", "small", "span",
+                              "strong", "time", "u", "var", "wbr"])
 def test_html_remaining_element(element):
     """Simple standalone elements which can contain text.
        Check that the inner text is kept and the tag is discarded."""
     fragment = "<{0}>Lorem ipsum dolor sit amet</{0}>".format(element)
     check_html_output_contains_text(fragment, "Lorem ipsum dolor sit amet")
     check_html_output_does_not_contain_tag(fragment, element)
+
+
+# Test bare text behaviours
+def test_html_bare_text():
+    """Bare text should be wrapped in <p> tags."""
+    check_html_output_contains_text(
+        "Bare text here",
+        "<p>Bare text here</p>"
+    )
+
+
+def test_html_bare_text_linebreaks():
+    """Line breaks in bare text should be removed."""
+    check_html_output_contains_text("""
+        Bare text with
+        some linebreaks here
+    """, "<p>Bare text with some linebreaks here</p>")
+
+
+def test_html_bare_text_double_br():
+    """Double <br> in bare text should trigger a new paragraph."""
+    check_html_output_contains_text("""
+        Bare text with
+        <br/><br/>
+        some linebreaks here
+    """, "<p>Bare text with</p><p>some linebreaks here</p>")

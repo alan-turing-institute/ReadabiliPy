@@ -1,28 +1,38 @@
-from bs4 import BeautifulSoup
-from bs4.element import Comment, NavigableString
 import hashlib
 import json
 import os
-from subprocess import check_call
 import tempfile
 import unicodedata
+from subprocess import check_call
+from bs4 import BeautifulSoup
+from bs4.element import Comment, NavigableString
+from .plain_html import parse_to_tree
+from .text_manipulation import normalise_text
 
 
-def parse(html, content_digests=False, node_indexes=False):
-    temp_dir = tempfile.gettempdir()
-    # Write input HTML to temporary file so it is available to the node.js script
-    html_path = os.path.join(temp_dir, "full.html");
-    with open(html_path, 'w') as f:
-        f.write(html)
+def parse(html, content_digests=False, node_indexes=False, use_readability=False):
+    if use_readability:
+        temp_dir = tempfile.gettempdir()
+        # Write input HTML to temporary file so it is available to the node.js script
+        html_path = os.path.join(temp_dir, "full.html")
+        with open(html_path, 'w') as f:
+            f.write(html)
 
-    # Call Mozilla's Readability.js Readability.parse() function via node, writing output to a temporary file
-    article_json_path = os.path.join(temp_dir, "article.json")
-    parse_script_path = os.path.join(os.path.dirname(__file__), "ExtractArticle.js")
-    check_call(["node", parse_script_path, "-i", html_path, "-o", article_json_path])
+        # Call Mozilla's Readability.js Readability.parse() function via node, writing output to a temporary file
+        article_json_path = os.path.join(temp_dir, "article.json")
+        parse_script_path = os.path.join(
+            os.path.dirname(__file__), "ExtractArticle.js")
+        check_call(["node", parse_script_path, "-i",
+                    html_path, "-o", article_json_path])
 
-    # Read output of call to Readability.parse() from JSON file and return as Python dictionary
-    with open(article_json_path) as f:
-        readability_json = json.loads(f.read())
+        # Read output of call to Readability.parse() from JSON file and return as Python dictionary
+        with open(article_json_path) as f:
+            input_json = json.loads(f.read())
+
+    else:
+        input_json = {
+            "content": str(parse_to_tree(html))
+        }
 
     # Only keep the subset of Readability.js fields we are using (and therefore testing for accuracy of extraction)
     # TODO: Add tests for additional fields and include them when we look at packaging this wrapper up for PyPI
@@ -35,37 +45,38 @@ def parse(html, content_digests=False, node_indexes=False):
         "plain_text": None
     }
     # Populate article fields from readability fields where present
-    if readability_json:
-        if "title" in readability_json and readability_json["title"] is not "":
-            article_json["title"] = readability_json["title"]
-        if "byline" in readability_json and readability_json["byline"] is not "":
-            article_json["byline"] = readability_json["byline"]
-        if "content" in readability_json and readability_json["content"] is not "":
-            article_json["content"] = readability_json["content"]
-            article_json["plain_content"] = \
-                plain_content(article_json["content"], content_digests, node_indexes)
-            article_json["plain_text"] = \
-                extract_paragraphs_as_plain_text(article_json["plain_content"])
+    if input_json:
+        if "title" in input_json and input_json["title"] is not "":
+            article_json["title"] = input_json["title"]
+        if "byline" in input_json and input_json["byline"] is not "":
+            article_json["byline"] = input_json["byline"]
+        if "content" in input_json and input_json["content"] is not "":
+            article_json["content"] = input_json["content"]
+            article_json["plain_content"] = plain_content(
+                article_json["content"], content_digests, node_indexes)
+            article_json["plain_text"] = extract_text_blocks_as_plain_text(
+                article_json["plain_content"])
 
     return article_json
 
 
-def extract_paragraphs_as_plain_text(paragraph_html):
+def extract_text_blocks_as_plain_text(paragraph_html):
     # Load article as DOM
     soup = BeautifulSoup(paragraph_html, 'html.parser')
-    # Select all unordered lists
+    # Select all lists
     lists = soup.find_all(['ul', 'ol'])
     # Prefix text in all list items with "* " and make lists paragraphs
     for l in lists:
-        plain_items = "".join(list(filter(None, [plain_text_leaf_node(li)["text"] for li in l.find_all('li')])))
+        plain_items = "".join(list(
+            filter(None, [plain_text_leaf_node(li)["text"] for li in l.find_all('li')])))
         l.string = plain_items
         l.name = "p"
-    # Select all paragraphs
-    paragraphs = soup.find_all('p')
-    paragraphs = [plain_text_leaf_node(p) for p in paragraphs]
+    # Select all text blocks
+    text_blocks = [s.parent for s in soup.find_all(string=True)]
+    text_blocks = [plain_text_leaf_node(block) for block in text_blocks]
     # Drop empty paragraphs
-    paragraphs = list(filter(lambda p: p["text"] is not None, paragraphs))
-    return paragraphs
+    text_blocks = list(filter(lambda p: p["text"] is not None, text_blocks))
+    return text_blocks
 
 
 def plain_text_leaf_node(element):
@@ -102,7 +113,8 @@ def plain_content(readability_content, content_digests, node_indexes):
 
 def plain_elements(elements, content_digests, node_indexes):
     # Get plain content versions of all elements
-    elements = [plain_element(element, content_digests, node_indexes) for element in elements]
+    elements = [plain_element(element, content_digests, node_indexes)
+                for element in elements]
     if content_digests:
         # Add content digest attrbiute to nodes
         elements = [add_content_digest(element) for element in elements]
@@ -125,7 +137,8 @@ def plain_element(element, content_digests, node_indexes):
         element = type(element)(plain_text)
     else:
         # If not a leaf node or leaf type call recursively on child nodes, replacing
-        element.contents = plain_elements(element.contents, content_digests, node_indexes)
+        element.contents = plain_elements(
+            element.contents, content_digests, node_indexes)
     return element
 
 
@@ -133,7 +146,7 @@ def leaf_nodes():
     return ['p', 'li']
 
 
-def leaf_types ():
+def leaf_types():
     return [NavigableString, Comment]
 
 
@@ -150,7 +163,8 @@ def add_node_indexes(element, node_index="0"):
             # Can't add attributes to leaf string types
             if type(child) not in leaf_types():
                 local_idx = local_idx + 1
-                child_index = "{stem}.{local}".format(stem=node_index, local=local_idx)
+                child_index = "{stem}.{local}".format(
+                    stem=node_index, local=local_idx)
                 add_node_indexes(child, node_index=child_index)
     return element
 
@@ -181,16 +195,9 @@ def content_digest(element):
         else:
             # Build content digest from the "non-empty" digests of child nodes
             digest = hashlib.sha256()
-            child_digests = list(filter(lambda x: x != "", [content_digest(content) for content in contents]))
-            [digest.update(child.encode('utf-8')) for child in child_digests]
+            child_digests = list(
+                filter(lambda x: x != "", [content_digest(content) for content in contents]))
+            for child in child_digests:
+                digest.update(child.encode('utf-8'))
             digest = digest.hexdigest()
     return digest
-
-
-def normalise_text(text):
-    # Normalise the unicode representation
-    normal_form = "NFKC"
-    text = unicodedata.normalize(normal_form, text)
-    # Strip leading and training whitespace again (ensures things like non-breaking whitespaces are removed)
-    text = text.strip()
-    return text

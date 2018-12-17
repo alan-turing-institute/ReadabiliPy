@@ -1,6 +1,9 @@
 # PyCharm IDE stuff
 .idea/
 
+# OSX temporary files
+.DS_Store
+
 # ===== PYTHON STUFF ====
 # Byte-compiled / optimized / DLL files
 __pycache__/
