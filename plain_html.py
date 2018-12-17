@@ -298,10 +298,14 @@ def parse_to_tree(html):
     # Strip tag attributes
     strip_attributes(soup)
 
-    # Finally wrap the whole tree in a div
-    root = soup.new_tag("div")
-    # ... after stripping out enclosing elements that cannot live inside a div
+    # Finally ensure that the whole tree is wrapped in a div
+    # Strip out enclosing elements that cannot live inside a div
     while soup.contents and (soup.contents[0].name in ["html", "body"]):
         soup.contents[0].unwrap()
+    # If the outermost tag is a single div then return it
+    if len(soup.contents) == 1 and soup.contents[0].name == "div":
+        return soup
+    # ... otherwise wrap in a div and return that
+    root = soup.new_tag("div")
     root.append(soup)
     return root
