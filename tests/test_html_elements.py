@@ -1,36 +1,6 @@
 """Tests for HTML elements."""
 from pytest import mark
-from ReadabiliPy import readability, text_manipulation
-
-
-def check_html_output_contains_text(test_fragment, expected_output=None):
-    """Check that expected output is present when parsing HTML fragment."""
-    if expected_output is None:
-        expected_output = test_fragment
-    article_json = readability.parse(test_fragment)
-    content = str(article_json["plain_content"])
-    # Check that expected output is present after simplifying the HTML
-    normalised_output = text_manipulation.simplify_html(expected_output)
-    normalised_content = text_manipulation.simplify_html(content)
-    assert normalised_output in normalised_content
-
-
-def check_html_has_no_output(test_fragment):
-    """Check that no output is present when parsing HTML fragment."""
-    article_json = readability.parse(test_fragment)
-    # Check that there is no output
-    assert article_json["plain_content"] is None or article_json["plain_content"] == "<div></div>"
-
-
-def check_html_output_does_not_contain_tag(test_fragment, vetoed_tag):
-    """Check that vetoed tag is not present when parsing HTML fragment."""
-    article_json = readability.parse(test_fragment)
-    # Check that neither <tag> nor </tag> appear in the output
-    content = str(article_json["plain_content"])
-    if content is not None:
-        for element in ["<{}>".format(vetoed_tag), "</{}>".format(vetoed_tag)]:
-            assert element not in content
-
+from .checks import check_html_output_contains_text, check_html_has_no_output, check_html_output_does_not_contain_tag
 
 # Whitelisted HTML elements
 def test_html_whitelist_article():
