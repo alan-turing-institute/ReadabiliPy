@@ -12,7 +12,7 @@ def elements_to_delete():
                            'output', 'progress', 'select', 'textarea']
     html5_image_elements = ['area', 'img', 'map', 'picture', 'source']
     html5_media_elements = ['audio', 'track', 'video']
-    html5_embedded_elements = ['embed', 'math', 'object', 'param', 'svg']
+    html5_embedded_elements = ['embed', 'iframe', 'math', 'object', 'param', 'svg']
     html5_interactive_elements = ['details', 'dialog', 'summary']
     html5_scripting_elements = ['canvas', 'noscript', 'script', 'template']
     html5_data_elements = ['data', 'link']

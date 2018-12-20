@@ -1,45 +1,7 @@
 """Test readability.py on sample articles"""
-import json
-import os
-from ReadabiliPy import readability, text_manipulation
+from .checks import check_exact_html_output, check_extract_article, check_extract_paragraphs_as_plain_text
 
-# ===== TEST END TO END ARTICLE EXTRACTION =====
-
-
-def check_extract_article(test_filename, expected_filename, content_digests=False, node_indexes=False):
-    test_data_dir = "data"
-    # Read HTML test file
-    test_filepath = os.path.join(os.path.dirname(
-        __file__), test_data_dir, test_filename)
-    with open(test_filepath) as h:
-        html = h.read()
-
-    # Extract simplified article HTML
-    article_json = readability.parse(html, content_digests, node_indexes)
-    print(article_json)
-
-    # Get expected simplified article HTML
-    expected_filepath = os.path.join(os.path.dirname(__file__),
-                                     test_data_dir, expected_filename)
-    with open(expected_filepath) as h:
-        expected_article_json = json.loads(h.read())
-
-    # Test full JSON matches (checks for unexpected fields in either actual or expected JSON)
-    assert article_json == expected_article_json
-
-
-def check_exact_html_output(test_fragment, expected_output=None):
-    """Check that expected output is present when parsing HTML fragment."""
-    if expected_output is None:
-        expected_output = test_fragment
-    article_json = readability.parse(test_fragment)
-    content = str(article_json["plain_content"])
-    # Check that expected output is present after simplifying the HTML
-    normalised_output = text_manipulation.simplify_html(expected_output)
-    normalised_content = text_manipulation.simplify_html(content)
-    assert normalised_output == normalised_content
-
-
+# Test end-to-end article extraction
 def test_extract_article_full_page():
     check_extract_article(
         "addictinginfo.com-1_full_page.html",
@@ -123,30 +85,7 @@ def test_extract_article_full_page_content_digest_node_indexes():
     )
 
 
-# ==== TEST PLAIN TEXT EXTRACTION =====
-def check_extract_paragraphs_as_plain_text(test_filename, expected_filename):
-    test_data_dir = "data"
-    # Read readable article test file
-    test_filepath = os.path.join(os.path.dirname(__file__),
-                                 test_data_dir, test_filename)
-    with open(test_filepath) as h:
-        article = json.loads(h.read())
-
-    # Extract plain text paragraphs
-    paragraphs = readability.extract_text_blocks_as_plain_text(
-        article["plain_content"])
-
-    # Get expected plain text paragraphs
-    expected_filepath = os.path.join(os.path.dirname(__file__),
-                                     test_data_dir, expected_filename)
-    with open(expected_filepath) as h:
-        expected_paragraphs = json.loads(h.read())
-
-    # Test
-    print(paragraphs)
-    assert paragraphs == expected_paragraphs
-
-
+# Test plain text extraction
 def test_extract_paragraphs_as_plain_text():
     check_extract_paragraphs_as_plain_text(
         "addictinginfo.com-1_simple_article_from_full_article.json",

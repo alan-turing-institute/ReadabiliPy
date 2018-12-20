@@ -1,4 +1,4 @@
-"""Tests for HTML elements."""
+"""Tests for plain_html functions."""
 from bs4 import BeautifulSoup
 from ReadabiliPy import plain_html
 
