@@ -19,8 +19,7 @@ def check_extract_article(test_filename, expected_filename, content_digests=Fals
     """Test end-to-end article extraction. Ensure that HTML from file matches JSON from file after parsing is applied."""
     test_data_dir = "data"
     # Read HTML test file
-    test_filepath = os.path.join(os.path.dirname(
-        __file__), test_data_dir, test_filename)
+    test_filepath = os.path.join(os.path.dirname(__file__), test_data_dir, test_filename)
     with open(test_filepath) as h:
         html = h.read()
 
@@ -28,8 +27,7 @@ def check_extract_article(test_filename, expected_filename, content_digests=Fals
     article_json = readability.parse(html, content_digests, node_indexes)
 
     # Get expected simplified article HTML
-    expected_filepath = os.path.join(os.path.dirname(__file__),
-                                     test_data_dir, expected_filename)
+    expected_filepath = os.path.join(os.path.dirname(__file__), test_data_dir, expected_filename)
     with open(expected_filepath) as h:
         expected_article_json = json.loads(h.read())
 
@@ -40,8 +38,7 @@ def check_extract_article(test_filename, expected_filename, content_digests=Fals
 def check_extract_paragraphs_as_plain_text(test_filename, expected_filename):
     test_data_dir = "data"
     # Read readable article test file
-    test_filepath = os.path.join(os.path.dirname(__file__),
-                                 test_data_dir, test_filename)
+    test_filepath = os.path.join(os.path.dirname(__file__), test_data_dir, test_filename)
     with open(test_filepath) as h:
         article = json.loads(h.read())
 
