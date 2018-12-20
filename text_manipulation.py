@@ -21,6 +21,7 @@ def normalise_whitespace(text):
 def normalise_text(text):
     """Normalise unicode and whitespace."""
     # Normalise unicode first to try and standardise whitespace characters as much as possible before normalising them
+    text = strip_control_characters(text)
     text = normalise_unicode(text)
     text = normalise_whitespace(text)
     return text
@@ -32,3 +33,17 @@ def simplify_html(text):
     text = normalise_text(text)
     text = text.replace(" <", "<").replace("> ", ">")
     return text
+
+
+def strip_control_characters(text):
+    """Strip out unicode control characters which might break the parsing."""
+    # Unicode control characters
+    #   [Cc]: Other, Control [includes new lines]
+    #   [Cf]: Other, Format
+    #   [Cn]: Other, Not Assigned
+    #   [Co]: Other, Private Use
+    #   [Cs]: Other, Surrogate
+    control_chars = set(['Cf','Cn','Co','Cs'])
+
+    # Remove non-printing control characters
+    return "".join(["" if unicodedata.category(char) in control_chars else char for char in text])
