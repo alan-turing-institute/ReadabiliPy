@@ -124,3 +124,13 @@ def test_ensure_correct_punctuation_joining(punctuation):
             </p>
         </div>""".format(punctuation),
     """<div><p>Some text like this{0} with punctuation.</p></div>""".format(punctuation))
+
+
+# Test comments inside tags
+def test_comments_inside_tags():
+    """Ensure that comments inside tags are removed."""
+    check_exact_html_output("""
+        <p>Some <!-- --> text <!-- with a comment --> here.<!----></p>
+        """,
+    """<div><p>Some text here.</p></div>""")
+
