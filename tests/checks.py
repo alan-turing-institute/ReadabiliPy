@@ -9,10 +9,9 @@ def check_exact_html_output(test_fragment, expected_output=None):
     article_json = readability.parse(test_fragment)
     content = str(article_json["plain_content"])
     # Check that expected output is present after simplifying the HTML
-    normalised_output = text_manipulation.simplify_html(expected_output)
-    normalised_content = text_manipulation.simplify_html(content)
-    print(normalised_content)
-    assert normalised_output == normalised_content
+    normalised_expectation = text_manipulation.simplify_html(expected_output)
+    normalised_result = text_manipulation.simplify_html(content)
+    assert normalised_expectation == normalised_result
 
 
 def check_extract_article(test_filename, expected_filename, content_digests=False, node_indexes=False):
@@ -63,9 +62,9 @@ def check_html_output_contains_text(test_fragment, expected_output=None):
     article_json = readability.parse(test_fragment)
     content = str(article_json["plain_content"])
     # Check that expected output is present after simplifying the HTML
-    normalised_output = text_manipulation.simplify_html(expected_output)
-    normalised_content = text_manipulation.simplify_html(content)
-    assert normalised_output in normalised_content
+    normalised_expectation = text_manipulation.simplify_html(expected_output)
+    normalised_result = text_manipulation.simplify_html(content)
+    assert normalised_expectation in normalised_result
 
 
 def check_html_has_no_output(test_fragment):

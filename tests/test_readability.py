@@ -1,4 +1,5 @@
 """Test readability.py on sample articles"""
+from pytest import mark
 from .checks import check_exact_html_output, check_extract_article, check_extract_paragraphs_as_plain_text
 
 # Test end-to-end article extraction
@@ -110,6 +111,19 @@ def test_ensure_correct_div_wrapping():
             </p>
         </div>""",
     """<div><p>Some example text here.</p></div>""")
+
+
+# Test whitespace around tags
+@mark.parametrize('punctuation', ['.', ',', '!', ':', ';', '?'])
+def test_ensure_correct_punctuation_joining(punctuation):
+    """Do not join with ' ' if the following character is a punctuation mark."""
+    check_exact_html_output("""
+        <div>
+            <p>
+                Some text <a href="example.com">like this</a>{0} with punctuation.
+            </p>
+        </div>""".format(punctuation),
+    """<div><p>Some text like this{0} with punctuation.</p></div>""".format(punctuation))
 
 
 # Test comments inside tags
