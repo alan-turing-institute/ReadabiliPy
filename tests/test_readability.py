@@ -111,3 +111,12 @@ def test_ensure_correct_div_wrapping():
         </div>""",
     """<div><p>Some example text here.</p></div>""")
 
+
+# Test comments inside tags
+def test_comments_inside_tags():
+    """Ensure that comments inside tags are removed."""
+    check_exact_html_output("""
+        <p>Some <!-- --> text <!-- with a comment --> here.<!----></p>
+        """,
+    """<div><p>Some text here.</p></div>""")
+
