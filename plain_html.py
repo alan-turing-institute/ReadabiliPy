@@ -248,6 +248,9 @@ def process_unknown_elements(soup):
 
 def parse_to_tree(html):
     """Turn input HTML into a cleaned parsed tree."""
+    # Insert space into non-spaced comments so that html5lib can interpret them correctly
+    html = html.replace("<!---->", "<!-- -->")
+
     # Convert the HTML into a Soup parse tree
     soup = BeautifulSoup(html, "html5lib")
 
