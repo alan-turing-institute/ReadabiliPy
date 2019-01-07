@@ -168,8 +168,8 @@ def consolidate_text(soup):
     for element in soup.find_all(string=True):
         # If the previous element is the same type then extract the current string and append to previous
         if type(element.previous_sibling) is type(element):
-            # Join with no spaces if this is a smart quotation mark
-            if str(element.previous_sibling)[-1] in ['“', '‘'] or str(element)[0] in ['”', '’']:
+            # Join with no spaces if this is a smart quotation mark or the next character is a punctuation mark
+            if str(element.previous_sibling)[-1] in ['“', '‘'] or str(element)[0] in ['”', '’', '.', ',', '!', ':', ';', '?']:
                 text = "".join([str(element.previous_sibling), str(element)])
             else:
                 text = " ".join([str(element.previous_sibling), str(element)])
