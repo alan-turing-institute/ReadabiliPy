@@ -111,3 +111,15 @@ def test_ensure_correct_div_wrapping():
         </div>""",
     """<div><p>Some example text here.</p></div>""")
 
+
+# Test whitespace around tags
+def test_ensure_correct_punctuation_joining():
+    """Do not join with ' ' if the following character is a punctuation mark."""
+    check_exact_html_output("""
+        <div>
+            <p>
+                Some text <a href="example.com">like this</a>, with commas.
+            </p>
+        </div>""",
+    """<div><p>Some text like this, with commas.</p></div>""")
+
