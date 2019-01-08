@@ -66,6 +66,16 @@ def test_ensure_correct_bracket_quote_joining(matched_pair):
 def test_comments_inside_tags():
     """Ensure that comments inside tags are removed."""
     check_exact_html_output("""
-        <p>Some <!-- --> text <!-- with a comment --> here <!--or here-->.<!----></p>
+        <p>Some <!-- --> text <!-- with a comment --> here<!--or here-->.<!----></p>
         """,
     """<div><p>Some text here.</p></div>""")
+
+
+# Test tags inside words
+def test_tags_inside_words():
+    """Ensure that words with tags inside them are kept together when the tags are stripped."""
+    check_exact_html_output(
+        """a<a href="http://example.com">i</a>sle""",
+        "<div><p>aisle</p></div>"
+    )
+

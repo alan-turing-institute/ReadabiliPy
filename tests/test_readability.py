@@ -15,7 +15,6 @@ def test_extract_article_full_article():
         "addictinginfo.com-1_simple_article_from_full_article.json"
     )
 
-
 def test_extract_article_non_article():
     check_extract_article(
         "non_article_full_page.html",
@@ -98,15 +97,3 @@ def test_extract_paragraphs_as_plain_text_node_indexes():
         "list_items_simple_article_from_full_page_node_indexes.json",
         "list_items_plain_text_paragraph_node_indexes.json"
     )
-
-
-# Test correct wrapping
-def test_ensure_correct_div_wrapping():
-    """Do not wrap in a <div> if this is already a <div>."""
-    check_exact_html_output("""
-        <div>
-            <p>
-                Some example text here.
-            </p>
-        </div>""",
-    """<div><p>Some example text here.</p></div>""")

@@ -959,29 +959,3 @@ def test_html_remaining_element(element):
     fragment = "<{0}>Lorem ipsum dolor sit amet</{0}>".format(element)
     check_html_output_contains_text(fragment, "Lorem ipsum dolor sit amet")
     check_html_output_does_not_contain_tag(fragment, element)
-
-
-# Test bare text behaviours
-def test_html_bare_text():
-    """Bare text should be wrapped in <p> tags."""
-    check_html_output_contains_text(
-        "Bare text here",
-        "<p>Bare text here</p>"
-    )
-
-
-def test_html_bare_text_linebreaks():
-    """Line breaks in bare text should be removed."""
-    check_html_output_contains_text("""
-        Bare text with
-        some linebreaks here
-    """, "<p>Bare text with some linebreaks here</p>")
-
-
-def test_html_bare_text_double_br():
-    """Double <br> in bare text should trigger a new paragraph."""
-    check_html_output_contains_text("""
-        Bare text with
-        <br/><br/>
-        some linebreaks here
-    """, "<p>Bare text with</p><p>some linebreaks here</p>")
