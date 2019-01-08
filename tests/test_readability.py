@@ -130,7 +130,7 @@ def test_ensure_correct_punctuation_joining(punctuation):
 def test_comments_inside_tags():
     """Ensure that comments inside tags are removed."""
     check_exact_html_output("""
-        <p>Some <!-- --> text <!-- with a comment --> here.<!----></p>
+        <p>Some <!-- --> text <!-- with a comment --> here <!--or here-->.<!----></p>
         """,
     """<div><p>Some text here.</p></div>""")
 
