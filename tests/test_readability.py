@@ -1,5 +1,5 @@
 """Test readability.py on sample articles"""
-from .checks import check_exact_html_output, check_extract_article, check_extract_paragraphs_as_plain_text
+from .checks import check_extract_article, check_extract_paragraphs_as_plain_text
 
 # Test end-to-end article extraction
 def test_extract_article_full_page():

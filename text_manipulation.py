@@ -21,7 +21,7 @@ def normalise_whitespace(text):
 
 
 def normalise_text(text):
-    """Normalise unicode."""
+    """Normalise unicode and whitespace."""
     # Normalise unicode first to try and standardise whitespace characters as much as possible before normalising them
     text = strip_control_characters(text)
     text = normalise_unicode(text)
