@@ -1,6 +1,6 @@
 """Turn input HTML into a cleaned parsed tree."""
 from bs4 import BeautifulSoup, CData, Comment, Doctype
-from .text_manipulation import normalise_text, matched_punctuation_marks, terminal_punctuation_marks
+from .text_manipulation import normalise_text
 
 
 def elements_to_delete():
