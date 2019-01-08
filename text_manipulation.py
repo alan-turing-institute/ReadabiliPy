@@ -2,6 +2,8 @@
 import unicodedata
 import regex
 
+matched_punctuation_marks = [('“', '”'), ('‘', '’'), ('(', ')'), ('[', ']'), ('{', '}')]
+terminal_punctuation_marks = ['.', ',', '!', ':', ';', '?']
 
 def normalise_unicode(text):
     """Normalise unicode such that things that are visually equivalent map to the same unicode string where possible."""

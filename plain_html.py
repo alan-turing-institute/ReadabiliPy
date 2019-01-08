@@ -1,9 +1,8 @@
 """Turn input HTML into a cleaned parsed tree."""
 from bs4 import BeautifulSoup, CData, Comment, Doctype
-from .text_manipulation import normalise_text
+from .text_manipulation import normalise_text, matched_punctuation_marks, terminal_punctuation_marks
 
 BREAK_INDICATOR = "|BREAK_HERE|"
-
 
 def elements_to_delete():
     """Elements that will be deleted together with their contents."""
@@ -169,9 +168,10 @@ def consolidate_text(soup):
         # If the previous element is the same type then extract the current string and append to previous
         if type(element.previous_sibling) is type(element):
             # Join with no spaces if the previous character is a opening smart quotation mark or bracket
-            join_before = ('“', '‘', '(', '[', '{')
+            join_before = [p[0] for p in matched_punctuation_marks] #('“', '‘', '(', '[', '{')
             # ... or if the next character is puncutation or a closing smart quotation mark or bracket
-            join_after = ('”', '’', ')', ']', '}', '.', ',', '!', ':', ';', '?')
+            join_after = [p[1] for p in matched_punctuation_marks] + terminal_punctuation_marks
+            #('”', '’', ')', ']', '}', '.', ',', '!', ':', ';', '?')
             if str(element.previous_sibling)[-1] in join_before or str(element)[0] in join_after:
                 text = "".join([str(element.previous_sibling), str(element)])
             else:
