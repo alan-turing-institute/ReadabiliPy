@@ -288,7 +288,7 @@ def parse_to_tree(html):
     # Recursively replace any elements which have no children or only zero-length children
     recursively_prune_elements(soup)
 
-    # Remove empty string elements - without this linebreaks might not be correctly identified
+    # Remove empty string elements
     remove_empty_strings_and_elements(soup)
 
     # Finally ensure that the whole tree is wrapped in a div
