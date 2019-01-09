@@ -31,14 +31,16 @@ This package also augments the output of Readability.js to also return a list of
   - All text in the `plain_content` and `plain_text` fields is encoded as unicode normalised using the "NFKC" normal form. This normal form is used to try and ensure as much as possible that things that appear visually the same are encoded with the same unicode representation (the K part) and characters are represented as a single composite character where possible (the C part).
    - An optional `content_digests` flag can be passed to the Python wrapper. When this is set to `True`, each HTML element in the `plain_content` field has a `data-content-digest` attribute, which holds the SHA-256 hash of its plain text content. For "leaf" nodes (containing only plain text in the output), this is the SHA-256 hash of their plain text content. For nodes containing other nodes, this is the SHA-256 hash of the concatenated SHA-256 hashes of their child nodes.
    - An optional `node_indexes` flag can be passed to the Python wrapper. When this is set to `True`, each HTML element in the `plain_content` field has a `data-node-indexes` attribute, which holds a hierarchical index describing the location of element within the `plain_content` HTML structure.
+   - An optional `use_readability` flag can be passed to the Python wrapper. When this is set to `True`, Mozilla's `Readability.js` will be used as the parser. If it is set to `False` then the pure-python parser in `plain_html.py` will be used instead.
 
 - `extract_article.py`: A Python script that uses `readability.parse()` to extract the augmented readable article data.
-  - Usage: `python extract_article.py -i <input_file> -o <output_file> [-c] [-n]`
+  - Usage: `python extract_article.py -i <input_file> -o <output_file> [-c] [-n] [-p]`
   - All arguments have long and short form versions.
     - `-i` / `--input-file`: The path to an input file containing full or partial HTML as text.
     - `-o` / `--output-file`: The path to the file the output article JSON data should be written to.
     - `-c` / `--content-digests` (optional): If this flag is provided, then `ReadabiliPy.readability.parse()` is called with `content_digests=True`
     - `-n` / `--node-indexes` (optional): If this flag is provided, then `ReadabiliPy.readability.parse()` is called with `node_indexes=True`
+    - `-p` / `--use-python-parser` (optional): If this flag is provided then `ReadabiliPy.readability.parse()` is called with `use_readability=False`
 
 
 ## Installation
