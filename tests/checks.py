@@ -2,6 +2,11 @@ import json
 import os
 from ReadabiliPy import readability, text_manipulation
 
+def s_decode(_string):
+    for entity in [r"\u00a9", r"\u2013", r"\u2014", r"\u2018", r"\u2019", r"\u201c", r"\u201d", r"\u00b7", r"\u00ab", r"\u00bb"]:
+        _string = _string.replace(entity, entity.encode().decode('unicode-escape'))
+    return _string
+
 def check_exact_html_output(test_fragment, expected_output=None):
     """Check that expected output is present when parsing HTML fragment."""
     if expected_output is None:
@@ -11,7 +16,21 @@ def check_exact_html_output(test_fragment, expected_output=None):
     # Check that expected output is present after simplifying the HTML
     normalised_expectation = text_manipulation.simplify_html(expected_output)
     normalised_result = text_manipulation.simplify_html(content)
+    print(normalised_result)
     assert normalised_expectation == normalised_result
+
+
+def check_html_output_contains_text(test_fragment, expected_output=None):
+    """Check that expected output is present when parsing HTML fragment."""
+    if expected_output is None:
+        expected_output = test_fragment
+    article_json = readability.parse(test_fragment)
+    content = str(article_json["plain_content"])
+    # Check that expected output is present after simplifying the HTML
+    normalised_expectation = text_manipulation.simplify_html(expected_output)
+    normalised_result = text_manipulation.simplify_html(content)
+    print(normalised_result)
+    assert normalised_expectation in normalised_result
 
 
 def check_extract_article(test_filename, expected_filename, content_digests=False, node_indexes=False):
@@ -31,6 +50,7 @@ def check_extract_article(test_filename, expected_filename, content_digests=Fals
         expected_article_json = json.loads(h.read())
 
     # Test full JSON matches (checks for unexpected fields in either actual or expected JSON)
+    print(s_decode(json.dumps(article_json)))
     assert article_json == expected_article_json
 
 
@@ -52,25 +72,15 @@ def check_extract_paragraphs_as_plain_text(test_filename, expected_filename):
         expected_paragraphs = json.loads(h.read())
 
     # Test
+    print(paragraphs)
     assert paragraphs == expected_paragraphs
-
-
-def check_html_output_contains_text(test_fragment, expected_output=None):
-    """Check that expected output is present when parsing HTML fragment."""
-    if expected_output is None:
-        expected_output = test_fragment
-    article_json = readability.parse(test_fragment)
-    content = str(article_json["plain_content"])
-    # Check that expected output is present after simplifying the HTML
-    normalised_expectation = text_manipulation.simplify_html(expected_output)
-    normalised_result = text_manipulation.simplify_html(content)
-    assert normalised_expectation in normalised_result
 
 
 def check_html_has_no_output(test_fragment):
     """Check that no output is present when parsing HTML fragment."""
     article_json = readability.parse(test_fragment)
     # Check that there is no output
+    print(article_json["plain_content"])
     assert article_json["plain_content"] is None or article_json["plain_content"] == "<div></div>"
 
 

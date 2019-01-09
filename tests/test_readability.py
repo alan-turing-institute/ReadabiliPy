@@ -15,6 +15,7 @@ def test_extract_article_full_article():
         "addictinginfo.com-1_simple_article_from_full_article.json"
     )
 
+
 def test_extract_article_non_article():
     check_extract_article(
         "non_article_full_page.html",

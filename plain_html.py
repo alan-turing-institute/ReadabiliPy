@@ -2,6 +2,8 @@
 from bs4 import BeautifulSoup, CData, Comment, Doctype
 from .text_manipulation import normalise_text
 
+# Indicator which is used as a placeholder to mark paragraph breaks
+BREAK_INDICATOR = "|BREAK_HERE|"
 
 def elements_to_delete():
     """Elements that will be deleted together with their contents."""
@@ -139,7 +141,6 @@ def consolidate_text(soup):
             element.previous_sibling.replace_with(text)
             element.extract()
 
-
 def normalise_strings(soup):
     """Remove extraneous whitespace and fix unicode issues in all strings."""
     # Iterate over all strings in the tree (including bare strings outside tags)
@@ -165,10 +166,8 @@ def wrap_bare_text(soup):
             element.replace_with(p_element)
 
 
-def insert_paragraph_breaks(soup):
-    """Identify linebreaks and split strings into multiple elements where found."""
-    # Indicator which is used as a placeholder to mark paragraph breaks
-    BREAK_INDICATOR = "|BREAK_HERE|"
+def identify_and_replace_break_elements(soup):
+    """Identify <br> and <hr> and replace them with a break indicator where found."""
 
     # Find consecutive <br> elements and replace with a break marker
     for element in soup.find_all('br'):
@@ -192,6 +191,12 @@ def insert_paragraph_breaks(soup):
     for element in list(soup.find_all('hr')):
         element.replace_with(BREAK_INDICATOR)
 
+    # Consolidate the text again now that break indicators have disrupted the tree
+    consolidate_text(soup)
+
+
+def insert_paragraph_breaks(soup):
+    """Split strings into multiple elements wherever break indicator is found."""
     # Iterate through the tree, splitting string elements which contain BREAK_INDICATOR
     # Use a list rather than the generator, since we are altering the tree as we traverse it
     for element in list(soup.find_all(string=True)):
@@ -258,6 +263,9 @@ def parse_to_tree(html):
     # Process CDATA (currently we remove it)
     process_cdata(soup)
 
+    # Strip tag attributes apart from 'class' and 'style'
+    strip_attributes(soup)
+
     # Remove blacklisted elements
     remove_blacklist(soup)
 
@@ -269,27 +277,40 @@ def parse_to_tree(html):
 
     # Process unknown elements
     process_unknown_elements(soup)
+    # print("\n\n", "process_unknown_elements\n\n", soup, "\n\n", len(list(soup.descendants)), [(d, type(d)) for d in soup.descendants])
 
-    # Strip tag attributes apart from 'class' and 'style'
-    strip_attributes(soup)
-
-    # Consolidate text, joining any consecutive NavigableStrings together
+    # Consolidate text, joining any consecutive NavigableStrings together.
+    # Must come before any whitespace operations (eg. remove_empty_strings_and_elements or normalise_strings)
     consolidate_text(soup)
-
-    # Normalise all strings, removing whitespace and fixing unicode issues
-    normalise_strings(soup)
-
-    # Wrap any remaining bare text in a suitable block level element
-    wrap_bare_text(soup)
-
-    # Replace <br> and <hr> elements with paragraph breaks, wrapping in <p> tags where needed
-    insert_paragraph_breaks(soup)
-
-    # Recursively replace any elements which have no children or only zero-length children
-    recursively_prune_elements(soup)
+    # print("\n\n", "consolidate_text\n\n", soup, "\n\n", len(list(soup.descendants)), [(d, type(d)) for d in soup.descendants])
 
     # Remove empty string elements
     remove_empty_strings_and_elements(soup)
+    # print("\n\n", "remove_empty_strings_and_elements\n\n", soup, "\n\n", len(list(soup.descendants)), [(d, type(d)) for d in soup.descendants])
+
+    # Replace <br> and <hr> elements with paragraph break indicators
+    # Must come after remove_empty_strings_and_elements so that the break indicators will be correctly glued to adjacent text
+    identify_and_replace_break_elements(soup)
+    # print("\n\n", "identify_and_replace_break_elements\n\n", soup, "\n\n", len(list(soup.descendants)), [(d, type(d)) for d in soup.descendants])
+
+    # Normalise all strings, removing whitespace and fixing unicode issues
+    normalise_strings(soup)
+    # print("\n\n", "normalise_strings\n\n", soup, "\n\n", len(list(soup.descendants)), [(d, type(d)) for d in soup.descendants])
+
+    # Wrap any remaining bare text in a suitable block level element
+    # Must come after consolidate_text and identify_and_replace_break_elements
+    # otherwise there may be multiple strings inside a <p> tag which would create nested <p>s
+    wrap_bare_text(soup)
+    # print("\n\n", "wrap_bare_text\n\n", soup, "\n\n", len(list(soup.descendants)), [(d, type(d)) for d in soup.descendants])
+
+    # Replace <br> and <hr> elements with paragraph breaks, wrapping in <p> tags where needed
+    # Must come after wrap_bare_text to ensure that all break indicators have a valid parent
+    insert_paragraph_breaks(soup)
+    # print("\n\n", "insert_paragraph_breaks\n\n", soup, "\n\n", len(list(soup.descendants)), [(d, type(d)) for d in soup.descendants])
+
+    # Recursively replace any elements which have no children or only zero-length children
+    recursively_prune_elements(soup)
+    # print("\n\n", "recursively_prune_elements\n\n", soup, "\n\n", len(list(soup.descendants)), [(d, type(d)) for d in soup.descendants])
 
     # Finally ensure that the whole tree is wrapped in a div
     # Strip out enclosing elements that cannot live inside a div
@@ -298,6 +319,7 @@ def parse_to_tree(html):
     # If the outermost tag is a single div then return it
     if len(soup.contents) == 1 and soup.contents[0].name == "div":
         return soup
+
     # ... otherwise wrap in a div and return that
     root = soup.new_tag("div")
     root.append(soup)
