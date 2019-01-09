@@ -48,6 +48,21 @@ def test_html_space_separated_double_br_inside_div():
         <div>
     """, "<div><p>Text with</p><p>some linebreaks here</p></div>")
 
+def test_html_space_separated_double_br_inside_and_outside_div():
+    """First double <br> should trigger a new <p>, second several <p> inside the div, third a new <p>"""
+    check_exact_html_output("""
+        <div>
+            <p>Some <br/>
+            <br/>example text here.</p>
+        </div>
+        <div>
+        Text in a div. <br/>
+        <br/> A new div.
+        </div>
+        Bare text. <br/>
+        <br/> A new paragraph.
+        """,
+    """<div><div><p>Some</p><p>example text here.</p></div><div><p>Text in a div.</p><p>A new div.</p></div><p>Bare text.</p><p>A new paragraph.</p></div>""")
 
 # Test correct wrapping
 def test_ensure_correct_div_wrapping():
@@ -95,12 +110,25 @@ def test_consolidating_string_between_tags():
     """<div><p>Some</p><p>example text here.</p><p>More text in a span. Part of the same paragraph.</p><p>A new paragraph.</p></div>""")
 
 
-# def test_bare_text_wrapping():
-#     """First <span> should be removed. Second should give bare text that will be wrapped."""
-#     check_exact_html_output("""
-#         <div>
-#             <p>Some <br/><br/>example text here.</p>
-#             Bare text. <br/>
-#             <br/> A new paragraph.
-#         </div>""",
-#     """<div><p>Some example text here.</p><p>More text in a span. Part of the same paragraph.</p><p>A new paragraph.</p></div>""")
+def test_empty_element_removal():
+    """Empty elements should be removed."""
+    check_exact_html_output("""
+        <div>
+            <p>Text</p>
+            <p></p>
+            <span>Paragraphs</span>
+        </div>
+        Bare <span></span> t<a></a>ext
+        <div></div>
+    """,
+    """<div><div><p>Text</p><p>Paragraphs</p></div><p>Bare text</p></div>""")
+
+
+def test_single_br_with_semantic_space():
+    """Empty elements should be removed."""
+    check_exact_html_output("""
+        <div>
+            <p>This tag<br> will be removed but the space after it is important.</p>
+        </div>
+    """,
+    """<div><p>This tag will be removed but the space after it is important.</p></div>""")
