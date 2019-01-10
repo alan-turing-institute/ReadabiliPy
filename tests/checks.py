@@ -11,7 +11,20 @@ def check_exact_html_output(test_fragment, expected_output=None):
     # Check that expected output is present after simplifying the HTML
     normalised_expectation = text_manipulation.simplify_html(expected_output)
     normalised_result = text_manipulation.simplify_html(content)
+    print(normalised_result)
     assert normalised_expectation == normalised_result
+
+
+def check_html_output_contains_text(test_fragment, expected_output=None):
+    """Check that expected output is present when parsing HTML fragment."""
+    if expected_output is None:
+        expected_output = test_fragment
+    article_json = readability.parse(test_fragment)
+    content = str(article_json["plain_content"])
+    # Check that expected output is present after simplifying the HTML
+    normalised_expectation = text_manipulation.simplify_html(expected_output)
+    normalised_result = text_manipulation.simplify_html(content)
+    assert normalised_expectation in normalised_result
 
 
 def check_extract_article(test_filename, expected_filename, content_digests=False, node_indexes=False):
@@ -53,18 +66,6 @@ def check_extract_paragraphs_as_plain_text(test_filename, expected_filename):
 
     # Test
     assert paragraphs == expected_paragraphs
-
-
-def check_html_output_contains_text(test_fragment, expected_output=None):
-    """Check that expected output is present when parsing HTML fragment."""
-    if expected_output is None:
-        expected_output = test_fragment
-    article_json = readability.parse(test_fragment)
-    content = str(article_json["plain_content"])
-    # Check that expected output is present after simplifying the HTML
-    normalised_expectation = text_manipulation.simplify_html(expected_output)
-    normalised_result = text_manipulation.simplify_html(content)
-    assert normalised_expectation in normalised_result
 
 
 def check_html_has_no_output(test_fragment):

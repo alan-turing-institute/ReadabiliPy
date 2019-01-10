@@ -2,6 +2,8 @@
 import unicodedata
 import regex
 
+matched_punctuation_marks = [('“', '”'), ('‘', '’'), ('(', ')'), ('[', ']'), ('{', '}')]
+terminal_punctuation_marks = ['.', ',', '!', ':', ';', '?']
 
 def normalise_unicode(text):
     """Normalise unicode such that things that are visually equivalent map to the same unicode string where possible."""
@@ -43,7 +45,8 @@ def strip_control_characters(text):
     #   [Cn]: Other, Not Assigned
     #   [Co]: Other, Private Use
     #   [Cs]: Other, Surrogate
-    control_chars = set(['Cf','Cn','Co','Cs'])
+    control_chars = set(['Cc', 'Cf', 'Cn', 'Co', 'Cs'])
+    retained_chars = ['\t', '\n', '\r', '\f']
 
     # Remove non-printing control characters
-    return "".join(["" if unicodedata.category(char) in control_chars else char for char in text])
+    return "".join(["" if (unicodedata.category(char) in control_chars) and (char not in retained_chars) else char for char in text])
