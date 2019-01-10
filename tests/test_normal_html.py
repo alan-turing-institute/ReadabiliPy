@@ -65,7 +65,7 @@ def test_html_space_separated_double_br_inside_and_outside_div():
     """<div><div><p>Some</p><p>example text here.</p></div><div><p>Text in a div.</p><p>A new div.</p></div><p>Bare text.</p><p>A new paragraph.</p></div>""")
 
 # Test correct wrapping
-def test_ensure_correct_div_wrapping():
+def test_ensure_correct_outer_div_wrapping():
     """Do not wrap in a <div> if this is already a <div>."""
     check_exact_html_output("""
         <div>
@@ -76,15 +76,35 @@ def test_ensure_correct_div_wrapping():
     """<div><p>Some example text here.</p></div>""")
 
 
+def test_ensure_correct_paragraph_wrapping():
+    """Do not wrap bare text inside <div> with <p> tags."""
+    check_exact_html_output("""
+        <div>
+            Some example text here.
+        </div>""",
+    """<div>Some example text here.</div>""")
+
+
 # Test consecutive links
 def test_consecutive_links():
-    """Do not wrap in a <div> if this is already a <div>."""
+    """Check that whitespace is preserved between consecutive <a> links."""
     check_exact_html_output("""
         <blockquote>
-			<p>First paragraph <a href="https://example.com">first link</a> <a href="https://example.com">second link</a></p>
+			<p>First paragraph: <a href="https://example.com">first link</a> <a href="https://example.com">second link</a></p>
 			<p>Second paragraph: <a href="https://example.com">third link</a></p>
 		</blockquote>""",
-    "<div><blockquote><p>First paragraph first link second link</p><p>Second paragraph: third link</p></blockquote></div>")
+    "<div><blockquote><p>First paragraph: first link second link</p><p>Second paragraph: third link</p></blockquote></div>")
+
+
+def test_consecutive_links_with_spaces():
+    """Check that extra whitespace is remove inside <a> links even when they are consecutive."""
+    check_exact_html_output("""
+        <blockquote>
+			<p>First paragraph: <a href="https://example.com">first link </a> <a href="https://example.com"> second link</a></p>
+			<p>Second paragraph: <a href="https://example.com">third link </a></p>
+			<p>Third paragraph: <a href="https://example.com">first link </a><a href="https://example.com">second link</a></p>
+		</blockquote>""",
+    "<div><blockquote><p>First paragraph: first link second link</p><p>Second paragraph: third link</p><p>Third paragraph: first link second link</p></blockquote></div>")
 
 
 # Test text consolidation
@@ -132,3 +152,31 @@ def test_single_br_with_semantic_space():
         </div>
     """,
     """<div><p>This tag will be removed but the space after it is important.</p></div>""")
+
+
+def test_prune_div_with_one_populated_one_empty_span():
+    check_exact_html_output("""
+        <div>
+            <span>dfs</span>
+            <span></span>
+        </div>
+    """,
+    "<div>dfs</div>")
+
+
+def test_prune_div_with_one_empty_span():
+    check_exact_html_output("""
+        <div>
+            <span></span>
+        </div>
+    """,
+    "<div></div>")
+
+
+def test_prune_div_with_one_whitespace_paragraph():
+    check_exact_html_output("""
+    <div>
+        <p>        </p>
+    </div>
+    """,
+    "<div></div>")

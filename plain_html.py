@@ -218,6 +218,7 @@ def wrap_bare_text(soup):
     """Wrap any remaining bare text in <p> tags."""
     # Iterate over all strings in the tree
     for element in soup.find_all(string=True):
+        print("*", element, element.parent, element.parent.name, len(element.parent.contents), "*")
         # If this is the only child of a whitelisted block then do nothing
         if element.parent.name in block_level_whitelist() and len(element.parent.contents) == 1:
             pass
@@ -244,6 +245,7 @@ def recursively_prune_elements(soup):
     # Repeatedly apply single_replace() until no elements are being removed
     while single_replace():
         pass
+    # remove_empty_strings_and_elements()
 
 
 def parse_to_tree(html):
@@ -287,15 +289,15 @@ def parse_to_tree(html):
     # Re-consolidates strings at the end, so must come before normalise_strings
     insert_paragraph_breaks(soup)
 
-    # Normalise all strings, removing whitespace and fixing unicode issues
-    # Must come after consolidate_text and insert_paragraph_breaks which join
-    # strings with semantic whitespace
-    normalise_strings(soup)
-
     # Wrap any remaining bare text in a suitable block level element
     # Must come after consolidate_text and identify_and_replace_break_elements
     # otherwise there may be multiple strings inside a <p> tag which would create nested <p>s
     wrap_bare_text(soup)
+
+    # Normalise all strings, removing whitespace and fixing unicode issues
+    # Must come after consolidate_text and insert_paragraph_breaks which join
+    # strings with semantic whitespace
+    normalise_strings(soup)
 
     # Recursively replace any elements which have no children or only zero-length children
     recursively_prune_elements(soup)

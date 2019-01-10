@@ -11,6 +11,7 @@ def check_exact_html_output(test_fragment, expected_output=None):
     # Check that expected output is present after simplifying the HTML
     normalised_expectation = text_manipulation.simplify_html(expected_output)
     normalised_result = text_manipulation.simplify_html(content)
+    print(normalised_result)
     assert normalised_expectation == normalised_result
 
 
