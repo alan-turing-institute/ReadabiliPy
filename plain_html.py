@@ -215,11 +215,41 @@ def normalise_strings(soup):
 
 
 def wrap_bare_text(soup):
-    """Wrap any remaining bare text in <p> tags."""
+    """Wrap any remaining bare text in <p> tags.
+
+    We do this to ensure that there is a strong, unique correspondance between presentational paragraphs and DOM structure
+     - all presentational paragraphs should be the only content associated with their immediate parent
+     - all presentational paragraphs at the same conceptual level should be equally nested
+     - the string as displayed in the browser should be equivalent to the innerHTML of the parent (so that indexing is equivalent between presentation and source)
+
+    The following examples should not be allowed:
+
+     1. Two presentational elements at the same DOM level have non-equivalent index levels
+       <div index="1.1">
+         text
+         <p index="1.1.1">more text</p>
+       </div>
+
+     2. Index 1.1 might contain both strings
+       <div index="1.1">
+         <p index="1.1.1">more text</p>
+         text
+       </div>
+
+     3. Two presentational paragraphs are included in the same index
+       <div index="1.1">
+         text
+         <p index="1.1.1">more text</p>
+         yet more text
+       </div>
+    """
     # Iterate over all strings in the tree
     for element in soup.find_all(string=True):
         print("*", element, element.parent, element.parent.name, len(element.parent.contents), "*")
         # If this is the only child of a whitelisted block then do nothing
+        # if we add <p> tags here then:
+        # - this might not be allowed for all whitelisted elements
+        # - we are adding additional structure that was not present in the original document
         if element.parent.name in block_level_whitelist() and len(element.parent.contents) == 1:
             pass
         # ... otherwise wrap them in <p> tags

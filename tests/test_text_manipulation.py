@@ -28,31 +28,31 @@ def test_simplify_html():
 
 
 def test_strip_control_characters_non_printing_characters():
-    unnormalised_string = "A string with non-printing characters in​cluded\ufeff"
+    unnormalised_string = "A string with non-printing characters in​c\u200Bluded\ufeff"
     assert strip_control_characters(unnormalised_string) == "A string with non-printing characters included"
     assert normalise_text(unnormalised_string) == "A string with non-printing characters included"
 
 def test_strip_control_characters_cr():
-    unnormalised_string = "A string with new lines\rin​cluded"
+    unnormalised_string = "A string with new lines\rin​c\u200Bluded\ufeff"
     assert strip_control_characters(unnormalised_string) == "A string with new lines\rincluded"
     assert normalise_text(unnormalised_string) == "A string with new lines included"
 
 def test_strip_control_characters_lf():
-    unnormalised_string = "A string with new lines\nincluded"
+    unnormalised_string = "A string with new lines\ninc\u200Bluded\ufeff"
     assert strip_control_characters(unnormalised_string) == "A string with new lines\nincluded"
     assert normalise_text(unnormalised_string) == "A string with new lines included"
 
 def test_strip_control_characters_cr_lf():
-    unnormalised_string = "A string with new lines\r\nin​cluded"
+    unnormalised_string = "A string with new lines\r\nin​c\u200Bluded\ufeff"
     assert strip_control_characters(unnormalised_string) == "A string with new lines\r\nincluded"
     assert normalise_text(unnormalised_string) == "A string with new lines included"
 
 def test_strip_control_characters_ff():
-    unnormalised_string = "A string with form feed\fin​cluded"
+    unnormalised_string = "A string with form feed\fin​c\u200Bluded\ufeff"
     assert strip_control_characters(unnormalised_string) == "A string with form feed\fincluded"
     assert normalise_text(unnormalised_string) == "A string with form feed included"
 
 def test_strip_control_characters_tab():
-    unnormalised_string = "A string with tabs\tin​cluded"
+    unnormalised_string = "A string with tabs\tin​c\u200Bluded\ufeff"
     assert strip_control_characters(unnormalised_string) == "A string with tabs\tincluded"
     assert normalise_text(unnormalised_string) == "A string with tabs included"
