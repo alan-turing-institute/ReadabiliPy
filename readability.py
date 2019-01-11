@@ -5,7 +5,7 @@ import tempfile
 import unicodedata
 from subprocess import check_call
 from bs4 import BeautifulSoup
-from bs4.element import Comment, NavigableString
+from bs4.element import Comment, NavigableString, CData
 from .plain_html import parse_to_tree
 from .text_manipulation import normalise_text
 
@@ -116,14 +116,14 @@ def plain_elements(elements, content_digests, node_indexes):
     elements = [plain_element(element, content_digests, node_indexes)
                 for element in elements]
     if content_digests:
-        # Add content digest attrbiute to nodes
+        # Add content digest attribute to nodes
         elements = [add_content_digest(element) for element in elements]
     return elements
 
 
 def plain_element(element, content_digests, node_indexes):
     # For lists, we make each item plain text
-    if element.name in leaf_nodes():
+    if is_leaf(element):
         # For leaf node elements, extract the text content, discarding any HTML tags
         # 1. Get element contents as text
         plain_text = element.get_text()
@@ -131,10 +131,16 @@ def plain_element(element, content_digests, node_indexes):
         plain_text = normalise_text(plain_text)
         # 3. Update element content to be plain text
         element.string = plain_text
-    elif type(element) in leaf_types():
-        plain_text = element.string
-        plain_text = normalise_text(plain_text)
-        element = type(element)(plain_text)
+    elif is_text(element):
+        if is_non_printing(element):
+            # The simplified HTML may have come from Readability.js so might
+            # have non-printing text (e.g. Comment or CData). In this case, we
+            # keep the structure, but ensure that the string is empty.
+            element = type(element)("")
+        else:
+            plain_text = element.string
+            plain_text = normalise_text(plain_text)
+            element = type(element)(plain_text)
     else:
         # If not a leaf node or leaf type call recursively on child nodes, replacing
         element.contents = plain_elements(
@@ -142,41 +148,43 @@ def plain_element(element, content_digests, node_indexes):
     return element
 
 
-def leaf_nodes():
-    return ['p', 'li']
+def is_leaf(element):
+    return (element.name in ['p', 'li'])
 
 
-def leaf_types():
-    return [NavigableString, Comment]
+def is_text(element):
+    return isinstance(element, NavigableString)
+
+
+def is_non_printing(element):
+    return (type(element) in [Comment, CData])
 
 
 def add_node_indexes(element, node_index="0"):
-    if type(element) in leaf_types():
-        # Can't add attributes to leaf string types
+    if is_text(element):
+        # Can't add attributes to string types
         return element
     else:
         # Add index to current element
         element["data-node-index"] = node_index
         # Add index to child elements
-        local_idx = 0
-        for child in element.contents:
+        for local_idx, child in enumerate(
+                [c for c in element.contents if not is_text(c)], start=1):
             # Can't add attributes to leaf string types
-            if type(child) not in leaf_types():
-                local_idx = local_idx + 1
-                child_index = "{stem}.{local}".format(
-                    stem=node_index, local=local_idx)
-                add_node_indexes(child, node_index=child_index)
+            child_index = "{stem}.{local}".format(
+                stem=node_index, local=local_idx)
+            add_node_indexes(child, node_index=child_index)
     return element
 
 
 def add_content_digest(element):
-    if type(element) not in leaf_types():
+    if not is_text(element):
         element["data-content-digest"] = content_digest(element)
     return element
 
 
 def content_digest(element):
-    if type(element) in leaf_types():
+    if is_text(element):
         # Hash
         trimmed_string = element.string.strip()
         if trimmed_string == "":

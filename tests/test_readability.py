@@ -1,6 +1,5 @@
 """Test readability.py on sample articles"""
-from pytest import mark
-from .checks import check_exact_html_output, check_extract_article, check_extract_paragraphs_as_plain_text
+from .checks import check_extract_article, check_extract_paragraphs_as_plain_text
 
 # Test end-to-end article extraction
 def test_extract_article_full_page():
@@ -99,38 +98,3 @@ def test_extract_paragraphs_as_plain_text_node_indexes():
         "list_items_simple_article_from_full_page_node_indexes.json",
         "list_items_plain_text_paragraph_node_indexes.json"
     )
-
-
-# Test correct wrapping
-def test_ensure_correct_div_wrapping():
-    """Do not wrap in a <div> if this is already a <div>."""
-    check_exact_html_output("""
-        <div>
-            <p>
-                Some example text here.
-            </p>
-        </div>""",
-    """<div><p>Some example text here.</p></div>""")
-
-
-# Test whitespace around tags
-@mark.parametrize('punctuation', ['.', ',', '!', ':', ';', '?'])
-def test_ensure_correct_punctuation_joining(punctuation):
-    """Do not join with ' ' if the following character is a punctuation mark."""
-    check_exact_html_output("""
-        <div>
-            <p>
-                Some text <a href="example.com">like this</a>{0} with punctuation.
-            </p>
-        </div>""".format(punctuation),
-    """<div><p>Some text like this{0} with punctuation.</p></div>""".format(punctuation))
-
-
-# Test comments inside tags
-def test_comments_inside_tags():
-    """Ensure that comments inside tags are removed."""
-    check_exact_html_output("""
-        <p>Some <!-- --> text <!-- with a comment --> here <!--or here-->.<!----></p>
-        """,
-    """<div><p>Some text here.</p></div>""")
-
