@@ -1,6 +1,6 @@
 import json
 import os
-from ReadabiliPy import readability, text_manipulation
+from ..readabilipy import readability, text_manipulation
 
 def check_exact_html_output(test_fragment, expected_output=None):
     """Check that expected output is present when parsing HTML fragment."""

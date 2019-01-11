@@ -1,6 +1,6 @@
 """Tests for plain_html functions."""
 from bs4 import BeautifulSoup
-from ReadabiliPy import plain_html
+from ..readabilipy import plain_html
 
 def test_remove_metadata():
     html = """

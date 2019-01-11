@@ -1,7 +1,7 @@
 """Tests for weird HTML input."""
 from pytest import mark
 from .checks import check_exact_html_output
-from ReadabiliPy import text_manipulation
+from ..readabilipy import text_manipulation
 
 def test_non_printing_control_characters():
     """Non-printing characters should be removed."""

@@ -1,4 +1,4 @@
-from ReadabiliPy.text_manipulation import normalise_unicode, normalise_whitespace, normalise_text, simplify_html, strip_control_characters
+from ..readabilipy.text_manipulation import normalise_unicode, normalise_whitespace, normalise_text, simplify_html, strip_control_characters
 
 def test_unicode_normalisation():
     nfd_form = "Ame\u0301lie"
