@@ -1,6 +1,6 @@
 import argparse
 import json
-import readability
+from .readabilipy import parse_to_json
 
 
 def main():
@@ -22,8 +22,8 @@ def main():
     with open(args.input_file) as h:
         html = h.read()
 
-    article = readability.parse(html, content_digests=args.content_digests,
-                                node_indexes=args.node_indexes, use_readability=(not args.use_python_parser))
+    article = parse_to_json(html, content_digests=args.content_digests,
+                            node_indexes=args.node_indexes, use_readability=(not args.use_python_parser))
 
     with open(args.output_file, "w") as j:
         json.dump(article, j, ensure_ascii=False)
