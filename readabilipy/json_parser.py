@@ -76,7 +76,6 @@ def extract_text_blocks_as_plain_text(paragraph_html):
 def plain_text_leaf_node(element):
     # Extract all text, stripped of any child HTML elements and normalise it
     plain_text = normalise_text(element.get_text())
-    print(element.name, "->", plain_text)
     if plain_text != "" and element.name == "li":
         plain_text = "* {}, ".format(plain_text)
     if plain_text == "":
