@@ -1,6 +1,7 @@
 # from .checks import check_extract_article
 from bs4 import BeautifulSoup
-from ..readabilipy.json_parser import plain_element, extract_text_blocks_as_plain_text,  plain_text_leaf_node
+from ..readabilipy.json_parser import plain_element, plain_text_leaf_node, add_node_indexes
+from ..readabilipy.text_manipulation import simplify_html, normalise_text
 
 
 def test_plain_element_with_comments():
@@ -30,7 +31,7 @@ def test_content_digest_on_filled_and_empty_elements():
 
 
 def test_leaf_nodes_without_text():
-    """Leaf nodes with text should  'None'."""
+    """Leaf nodes with text should yield their text, while those without should yield None."""
     html = """
         <div>
             <p>Some text</p>
@@ -41,3 +42,18 @@ def test_leaf_nodes_without_text():
     soup = BeautifulSoup(html, 'html.parser')
     text_blocks = [plain_text_leaf_node(paragraph) for paragraph in soup.find_all("p")]
     assert text_blocks == [{'text': 'Some text'}, {'text': None}, {'text': 'Some more text'}]
+
+
+def test_node_index_assignment():
+    """Whitelisted elements should get an appropriate index but bares strings should not."""
+    html = """
+        <div>
+            <p>Some text</p>
+            <p></p>
+            Some bare text
+        </div>
+    """.strip()
+    soup = BeautifulSoup(html, 'html.parser')
+    normalised_strings = [normalise_text(str(add_node_indexes(elem))) for elem in soup.find_all("div")[0].children]
+    normalised_strings = [s for s in normalised_strings if s]
+    assert normalised_strings == ['<p data-node-index="0">Some text</p>', '<p data-node-index="0"></p>', 'Some bare text']
