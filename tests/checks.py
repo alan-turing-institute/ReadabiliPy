@@ -37,10 +37,8 @@ def check_extract_article(test_filename, expected_filename, content_digests=Fals
 
     # Extract simplified article HTML
     if use_readability_js:
-        print("using readability_js")
         article_json = parse_to_json(html, content_digests, node_indexes, use_readability=True)
     else:
-        print("not using readability_js")
         article_json = parse_to_json(html, content_digests, node_indexes)
 
     # Get expected simplified article HTML
@@ -49,18 +47,6 @@ def check_extract_article(test_filename, expected_filename, content_digests=Fals
         expected_article_json = json.loads(h.read())
 
     # Test full JSON matches (checks for unexpected fields in either actual or expected JSON)
-    # print(json.dumps(article_json))
-
-    for key in article_json.keys():
-        if article_json[key] != expected_article_json[key]:
-            # print(article_json[key])
-            if key == "content":
-                for idx, (i, j) in enumerate(zip(article_json[key], expected_article_json[key])):
-                    # print(i, j, i == j)
-                    if i != j:
-                        print(article_json[key][idx-10:idx+10], "vs.", expected_article_json[key][idx-10:idx+10])
-                        break
-
     assert article_json == expected_article_json
 
 
