@@ -245,7 +245,6 @@ def wrap_bare_text(soup):
     """
     # Iterate over all strings in the tree
     for element in soup.find_all(string=True):
-        print("*", element, element.parent, element.parent.name, len(element.parent.contents), "*")
         # If this is the only child of a whitelisted block then do nothing
         # if we add <p> tags here then:
         # - this might not be allowed for all whitelisted elements

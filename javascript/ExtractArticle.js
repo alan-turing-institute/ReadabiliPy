@@ -11,7 +11,7 @@ const JSDOM = require('jsdom').JSDOM
 // and so we need to do some hocus-pocus with 'vm' to import them on a separate scope
 // (identical) scope context.
 var vm = require("vm");
-var readabilityPath = path.join(__dirname, "Readability.js/Readability.js");
+var readabilityPath = path.join(__dirname, "Readability.js");
 
 var scopeContext = {};
 // We generally expect dump() and console.{whatever} to work, so make these available
