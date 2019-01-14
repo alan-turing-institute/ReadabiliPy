@@ -12,5 +12,18 @@ def test_plain_element_with_comments():
         </div>
     """.strip()
     soup = BeautifulSoup(html, 'html.parser')
-    elements = [plain_element(element, False, False) for element in soup.contents]
+    elements = [str(plain_element(element, False, False)) for element in soup.contents]
     assert elements == ["<div><p>Text</p><!----></div>"]
+
+
+def test_content_digest_on_filled_and_empty_elements():
+    """Filled strings should get a digest but empty strings should not."""
+    html = """
+        <div>
+            <p>Text</p>
+            <p></p>
+        </div>
+    """.strip()
+    soup = BeautifulSoup(html, 'html.parser')
+    elements = [str(plain_element(element, True, True)) for element in soup.contents]
+    assert elements == ['<div><p data-content-digest="71988c4d8e0803ba4519f0b2864c1331c14a1890bf8694e251379177bfedb5c3">Text</p><p data-content-digest=""></p></div>']
