@@ -18,6 +18,15 @@ def test_html_bare_text_linebreaks():
     """, "<p>Bare text with some linebreaks here</p>")
 
 
+def test_html_text_with_semantic_br():
+    """Single <br> is sometimes used as a word separator so should be replaced
+    with a space."""
+    check_exact_html_output(
+        """<a href="http://example.com">link</a><br />caption""",
+        "<div><p>link caption</p></div>"
+    )
+
+
 def test_html_bare_text_double_br():
     """Double <br> in bare text should trigger a new paragraph."""
     check_html_output_contains_text("""

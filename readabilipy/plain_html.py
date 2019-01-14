@@ -160,9 +160,9 @@ def insert_paragraph_breaks(soup):
             while (br_element_chain[-1].previous_sibling is not None) and (br_element_chain[-1].previous_sibling.name == 'br'):
                 br_element_chain.append(br_element_chain[-1].previous_sibling)
 
-            # If there's only one <br> then we strip it out
+            # If there's only one <br> then we replace it with a space
             if len(br_element_chain) == 1:
-                br_element_chain[0].decompose()
+                br_element_chain[0].replace_with(" ")
             # If there are multiple <br>s then replace them with BREAK_INDICATOR
             else:
                 br_element_chain[0].replace_with(BREAK_INDICATOR)
@@ -174,7 +174,7 @@ def insert_paragraph_breaks(soup):
     for element in list(soup.find_all('hr')):
         element.replace_with(BREAK_INDICATOR)
 
-    # Consolidate the text again now that break indicators have disrupted the tree
+    # Consolidate the text again now that we have added strings to the tree
     consolidate_text(soup)
 
     # Iterate through the tree, splitting string elements which contain BREAK_INDICATOR
