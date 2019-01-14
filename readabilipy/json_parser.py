@@ -2,7 +2,6 @@ import hashlib
 import json
 import os
 import tempfile
-import unicodedata
 from subprocess import check_call
 from bs4 import BeautifulSoup
 from bs4.element import Comment, NavigableString, CData
@@ -75,13 +74,9 @@ def extract_text_blocks_as_plain_text(paragraph_html):
 
 
 def plain_text_leaf_node(element):
-    # Extract all text, stripped of any child HTML elements
-    plain_text = element.get_text()
-    # Normalise unicode such that things that are visually equivalent map to the same
-    # unicode string where possible
-    normal_form = "NFKC"
-    plain_text = unicodedata.normalize(normal_form, plain_text)
-    plain_text = plain_text.strip()
+    # Extract all text, stripped of any child HTML elements and normalise it
+    plain_text = normalise_text(element.get_text())
+    print(element.name, "->", plain_text)
     if plain_text != "" and element.name == "li":
         plain_text = "* {}, ".format(plain_text)
     if plain_text == "":
