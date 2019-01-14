@@ -52,5 +52,5 @@ def test_remove_cdata():
         //]]>
     """.strip()
     parsed_html = str(plain_html.parse_to_tree(html))
-    result = "<div><div><p>Some text</p></div><p>//</p></div>"
-    assert text_manipulation.simplify_html(parsed_html) == result
+    expected_output = "<div><div><p>Some text</p></div><p>//</p></div>"
+    assert text_manipulation.simplify_html(parsed_html) == expected_output
