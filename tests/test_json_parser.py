@@ -58,6 +58,7 @@ def test_node_index_assignment():
     normalised_strings = [s for s in normalised_strings if s]
     assert normalised_strings == ['<p data-node-index="0">Some text</p>', '<p data-node-index="0"></p>', 'Some bare text']
 
+
 def test_content_digest_assignment():
     """No content digest hash should be assigned when no child elements exist."""
     html = """

@@ -73,16 +73,16 @@ def known_elements():
         + block_level_whitelist()
 
 
-def preprocess_cdata(html):
-    """Remove CData. We were a bit worried about potentially removing content here but satisfied ourselves it won't
-    be displayed by most browsers in most cases (see https://github.com/alan-turing-institute/ReadabiliPy/issues/32)"""
-    cdata_regex = re.compile(r'<!\[CDATA\[(.+?)\]\]>', re.DOTALL)
-    html = re.sub(cdata_regex, "", html)
-    return html
-
-
 def remove_metadata(soup):
-    """Remove comments and doctype. These are not rendered by browsers."""
+    """Remove comments, CData and doctype. These are not rendered by browsers.
+    The lxml-based parsers automatically convert CData to comments unless it is
+    inside <script> tags. CData will therefore be removed either as a comment
+    or as part of a <script> but if any other behaviour is desired, the HTML
+    will need to be pre-processed before giving it to the BeautifulSoup parser.
+
+    We were a bit worried about potentially removing content here but satisfied
+    ourselves it won't be displayed by most browsers in most cases
+    (see https://github.com/alan-turing-institute/ReadabiliPy/issues/32)"""
     for comment in soup.findAll(string=lambda text: any([isinstance(text, x) for x in [Comment, Doctype]])):
         comment.extract()
 
@@ -284,15 +284,10 @@ def parse_to_tree(html):
     # Insert space into non-spaced comments so that html5lib can interpret them correctly
     html = html.replace("<!---->", "<!-- -->")
 
-    # Pre-process CDATA (currently we remove it) since we are not able to
-    # identify them once the (lxml-based) parser has run, since this replaces
-    # CDATA elements with their text: https://lxml.de/api.html#cdata
-    html = preprocess_cdata(html)
-
     # Convert the HTML into a Soup parse tree
     soup = BeautifulSoup(html, "html5lib")
 
-    # Remove comments and DOCTYPE strings
+    # Remove comments, CDATA (which is converted to comments) and DOCTYPE
     remove_metadata(soup)
 
     # Strip tag attributes apart from 'class' and 'style'

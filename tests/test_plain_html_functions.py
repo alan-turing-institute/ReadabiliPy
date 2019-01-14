@@ -32,11 +32,25 @@ def test_remove_blacklist():
 
 
 def test_remove_cdata():
+    """Test all possible methods of CData inclusion. Note that in the final 
+    example the '//' prefixes have no effect (since we are not in a <script>)
+    tag and so we expect that the first will be displayed (tested in Chrome and
+    Safari)."""
     html = """
         <div>
-            <p>Some text</p>
+            <p>Some text <![CDATA[Text inside two tags]]></p>
+            <![CDATA[Text inside one tag]]>
         </div>
-        <![CDATA[Some example text]]>
+        <![CDATA[Text outside tags]]>
+        <script type="text/javascript">
+            //<![CDATA[
+            document.write("<");
+            //]]>
+        </script>
+        //<![CDATA[
+            invalid CDATA block
+        //]]>
     """.strip()
-    html = plain_html.preprocess_cdata(html)
-    assert text_manipulation.simplify_html(html) == """<div><p>Some text</p></div>"""
+    parsed_html = str(plain_html.parse_to_tree(html))
+    result = "<div><div><p>Some text</p></div><p>//</p></div>"
+    assert text_manipulation.simplify_html(parsed_html) == result
