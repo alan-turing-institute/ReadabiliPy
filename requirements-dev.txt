@@ -2,4 +2,5 @@ bs4
 html5lib
 pyflakes
 pytest
+pytest-cov
 regex
