@@ -1,7 +1,7 @@
 # from .checks import check_extract_article
 from bs4 import BeautifulSoup
-from ..readabilipy.json_parser import plain_element, plain_text_leaf_node, add_node_indexes
-from ..readabilipy.text_manipulation import simplify_html, normalise_text
+from ..readabilipy.json_parser import plain_element, plain_text_leaf_node, add_node_indexes, content_digest
+from ..readabilipy.text_manipulation import normalise_text
 
 
 def test_plain_element_with_comments():
@@ -57,3 +57,18 @@ def test_node_index_assignment():
     normalised_strings = [normalise_text(str(add_node_indexes(elem))) for elem in soup.find_all("div")[0].children]
     normalised_strings = [s for s in normalised_strings if s]
     assert normalised_strings == ['<p data-node-index="0">Some text</p>', '<p data-node-index="0"></p>', 'Some bare text']
+
+def test_content_digest_assignment():
+    """No content digest hash should be assigned when no child elements exist."""
+    html = """
+        <div>
+            <p>Some text</p>
+            <p></p>
+            Some bare text
+        </div>
+    """.strip()
+    soup = BeautifulSoup(html, 'html.parser')
+    digests = [content_digest(elem) for elem in soup.find_all()]
+    assert digests == ['5271913f47bd4cbfda56ff8c0cddfc481d6bc4fe99725906068fbb6144bfeab4',
+                       '4c2e9e6da31a64c70623619c449a040968cdbea85945bf384fa30ed2d5d24fa3',
+                       '']
