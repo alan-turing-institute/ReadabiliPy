@@ -1,6 +1,7 @@
 """Turn input HTML into a cleaned parsed tree."""
-from bs4 import BeautifulSoup, CData, Comment, Doctype
+from bs4 import BeautifulSoup, Comment, Doctype
 from .text_manipulation import normalise_text
+import re
 
 def elements_to_delete():
     """Elements that will be deleted together with their contents."""
@@ -72,17 +73,18 @@ def known_elements():
         + block_level_whitelist()
 
 
+def preprocess_cdata(html):
+    """Remove CData. We were a bit worried about potentially removing content here but satisfied ourselves it won't
+    be displayed by most browsers in most cases (see https://github.com/alan-turing-institute/ReadabiliPy/issues/32)"""
+    cdata_regex = re.compile(r'<!\[CDATA\[(.+?)\]\]>', re.DOTALL)
+    html = re.sub(cdata_regex, "", html)
+    return html
+
+
 def remove_metadata(soup):
     """Remove comments and doctype. These are not rendered by browsers."""
     for comment in soup.findAll(string=lambda text: any([isinstance(text, x) for x in [Comment, Doctype]])):
         comment.extract()
-
-
-def process_cdata(soup):
-    """Remove CData. We were a bit worried about potentially removing content here but satisfied ourselves it won't
-    be displayed by most browsers in most cases (see https://github.com/alan-turing-institute/ReadabiliPy/issues/32)"""
-    for cdata in soup.findAll(string=lambda text: isinstance(text, CData)):
-        cdata.extract()
 
 
 def strip_attributes(soup):
@@ -282,14 +284,16 @@ def parse_to_tree(html):
     # Insert space into non-spaced comments so that html5lib can interpret them correctly
     html = html.replace("<!---->", "<!-- -->")
 
+    # Pre-process CDATA (currently we remove it) since we are not able to
+    # identify them once the (lxml-based) parser has run, since this replaces
+    # CDATA elements with their text: https://lxml.de/api.html#cdata
+    html = preprocess_cdata(html)
+
     # Convert the HTML into a Soup parse tree
     soup = BeautifulSoup(html, "html5lib")
 
     # Remove comments and DOCTYPE strings
     remove_metadata(soup)
-
-    # Process CDATA (currently we remove it)
-    process_cdata(soup)
 
     # Strip tag attributes apart from 'class' and 'style'
     strip_attributes(soup)

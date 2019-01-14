@@ -1,6 +1,6 @@
 """Tests for plain_html functions."""
 from bs4 import BeautifulSoup
-from ..readabilipy import plain_html
+from ..readabilipy import plain_html, text_manipulation
 
 def test_remove_metadata():
     html = """
@@ -29,3 +29,14 @@ def test_remove_blacklist():
     soup = BeautifulSoup(html, "html5lib")
     plain_html.remove_blacklist(soup)
     assert "button" not in str(soup)
+
+
+def test_remove_cdata():
+    html = """
+        <div>
+            <p>Some text</p>
+        </div>
+        <![CDATA[Some example text]]>
+    """.strip()
+    html = plain_html.preprocess_cdata(html)
+    assert text_manipulation.simplify_html(html) == """<div><p>Some text</p></div>"""
