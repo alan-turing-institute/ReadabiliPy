@@ -1,7 +1,6 @@
 """Turn input HTML into a cleaned parsed tree."""
 from bs4 import BeautifulSoup, Comment, Doctype
 from .text_manipulation import normalise_text
-import re
 
 def elements_to_delete():
     """Elements that will be deleted together with their contents."""
