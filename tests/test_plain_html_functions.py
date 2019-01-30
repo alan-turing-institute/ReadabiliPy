@@ -2,6 +2,7 @@
 from bs4 import BeautifulSoup
 from ..readabilipy import plain_html, text_manipulation
 
+
 def test_remove_metadata():
     html = """
         <!DOCTYPE html>
@@ -32,7 +33,7 @@ def test_remove_blacklist():
 
 
 def test_remove_cdata():
-    """Test all possible methods of CData inclusion. Note that in the final 
+    """Test all possible methods of CData inclusion. Note that in the final
     example the '//' prefixes have no effect (since we are not in a <script>)
     tag and so we expect that the first will be displayed (tested in Chrome and
     Safari)."""

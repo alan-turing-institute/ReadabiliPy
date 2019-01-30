@@ -3,6 +3,7 @@ import os
 from ..readabilipy import parse_to_json, text_manipulation
 from ..readabilipy.json_parser import extract_text_blocks_as_plain_text
 
+
 def check_exact_html_output(test_fragment, expected_output=None):
     """Check that expected output is present when parsing HTML fragment."""
     if expected_output is None:
@@ -85,5 +86,3 @@ def check_html_output_does_not_contain_tag(test_fragment, vetoed_tag):
     if content is not None:
         for element in ["<{}>".format(vetoed_tag), "</{}>".format(vetoed_tag)]:
             assert element not in content
-
-

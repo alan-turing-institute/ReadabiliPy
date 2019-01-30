@@ -1,5 +1,6 @@
-bs4
+beautifulsoup4
 html5lib
+pycodestyle
 pyflakes
 pytest
 pytest-cov
