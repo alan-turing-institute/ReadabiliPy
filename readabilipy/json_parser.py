@@ -43,11 +43,11 @@ def parse_to_json(html, content_digests=False, node_indexes=False, use_readabili
     }
     # Populate article fields from readability fields where present
     if input_json:
-        if "title" in input_json and input_json["title"] is not "":
+        if "title" in input_json and input_json["title"]:
             article_json["title"] = input_json["title"]
-        if "byline" in input_json and input_json["byline"] is not "":
+        if "byline" in input_json and input_json["byline"]:
             article_json["byline"] = input_json["byline"]
-        if "content" in input_json and input_json["content"] is not "":
+        if "content" in input_json and input_json["content"]:
             article_json["content"] = input_json["content"]
             article_json["plain_content"] = plain_content(article_json["content"], content_digests, node_indexes)
             article_json["plain_text"] = extract_text_blocks_as_plain_text(article_json["plain_content"])
