@@ -2,6 +2,7 @@
 from bs4 import BeautifulSoup, Comment, Doctype
 from .text_manipulation import normalise_text
 
+
 def elements_to_delete():
     """Elements that will be deleted together with their contents."""
     html5_form_elements = ['button', 'datalist', 'fieldset', 'form', 'input',

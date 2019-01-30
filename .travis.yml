@@ -20,4 +20,6 @@ script:
   # Run all pytest unit tests
   - python -m pytest -v tests --cov readabilipy --cov-report term-missing
   # Run pyflakes for error detection
-  - pyflakes .
+  - pyflakes *.py readabilipy tests
+  # Check PEP8 compliance (ignoring long lines)
+  - pycodestyle --statistics --ignore=E501 --count *.py readabilipy tests

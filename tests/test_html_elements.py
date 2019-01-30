@@ -2,6 +2,7 @@
 from pytest import mark
 from .checks import check_html_output_contains_text, check_html_has_no_output, check_html_output_does_not_contain_tag
 
+
 # Whitelisted HTML elements
 def test_html_whitelist_article():
     """An article is a self-contained composition in a document."""
