@@ -109,10 +109,12 @@ def test_ensure_correct_element_flattening_multiple_paragraphs():
                         <p>First paragraph contents.</p>
                     </div>
                     <div class="formatted">
-                        <p>Second paragraph contents.</p>
+                        <div class="aside">
+                            <p>Second paragraph contents.</p>
+                        </div>
                     </div>
                 </div>
-            </div>""", """<div><div><p>First paragraph contents.</p></div><div><p>Second paragraph contents.</p></div></div>""")
+            </div>""", """<div><p>First paragraph contents.</p><p>Second paragraph contents.</p></div>""")
 
 
 def test_ensure_correct_paragraph_wrapping():

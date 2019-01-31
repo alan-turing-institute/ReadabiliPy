@@ -47,6 +47,24 @@ def check_extract_article(test_filename, expected_filename, content_digests=Fals
     with open(expected_filepath) as h:
         expected_article_json = json.loads(h.read())
 
+    # Check title extraction
+    if 'title' in expected_article_json:
+        assert article_json['title'] == expected_article_json['title']
+    # Check byline extraction
+    if 'byline' in expected_article_json:
+        assert article_json['byline'] == expected_article_json['byline']
+    # Check publication datetime extraction
+    if 'publication_datetime' in expected_article_json:
+        assert article_json['publication_datetime'] == expected_article_json['publication_datetime']
+    # Check content extraction
+    if 'content' in expected_article_json:
+        assert article_json['content'] == expected_article_json['content']
+    # Check plain content extraction
+    if 'plain_content' in expected_article_json:
+        assert article_json['plain_content'] == expected_article_json['plain_content']
+    # Check plain text extraction
+    if 'plain_text' in expected_article_json:
+        assert article_json['plain_text'] == expected_article_json['plain_text']
     # Test full JSON matches (checks for unexpected fields in either actual or expected JSON)
     assert article_json == expected_article_json
 

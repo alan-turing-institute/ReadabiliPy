@@ -21,11 +21,12 @@ def test_html_whitelist_aside():
     """An aside is a tangentially related section, used for pull-quotes."""
     check_html_output_contains_text("""
         <p>
-           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean
-           libero neque, ullamcorper quis tristique.
+           Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+           Aenean libero neque, ullamcorper quis tristique.
         </p>
         <aside>
             <p>Aenean libero neque</p>
+            <p>Ullamcorper quis tristique</p>
         </aside>
         <p>Pellentesque non sapien nec arcu facilisis gravida.</p>
     """)
@@ -241,6 +242,7 @@ def test_html_whitelist_header():
     check_html_output_contains_text("""
         <header>
             <p>Byline might live here for example.</p>
+            <p>With more text here.</p>
         </header>
         <p>
             A dolor sit amet, consectetur adipisicing elit, sed do eiusmod
@@ -332,13 +334,28 @@ def test_html_whitelist_table():
     """The table element represents data with more than one dimension."""
     check_html_output_contains_text("""
         <table>
+        <thead>
+            <tr>
+                <th>Header A</th>
+                <th>Header B</th>
+            </tr>
+            <tr>
+                <th>Header C</th>
+                <th>Header D</th>
+            </tr>
+        </thead>
         <tbody>
             <tr>
-                <td>Table contents</td>
+                <td>Cell A</td>
+                <td>Cell B</td>
+            </tr>
+            <tr>
+                <td>Cell C</td>
+                <td>Cell D</td>
             </tr>
         </tbody>
         </table>
-    """, "<table><tbody><tr><td>Table contents</td></tr></tbody></table>")
+    """, "<table><thead><tr><th>Header A</th><th>Header B</th></tr><tr><th>Header C</th><th>Header D</th></tr></thead><tbody><tr><td>Cell A</td><td>Cell B</td></tr><tr><td>Cell C</td><td>Cell D</td></tr></tbody></table>")
 
 
 def test_html_whitelist_tbody():
@@ -347,11 +364,16 @@ def test_html_whitelist_tbody():
         <table>
         <tbody>
             <tr>
-                <td>Table body content</td>
+                <td>Cell A</td>
+                <td>Cell B</td>
+            </tr>
+            <tr>
+                <td>Cell C</td>
+                <td>Cell D</td>
             </tr>
         </tbody>
         </table>
-    """, "<tbody><tr><td>Table body content</td></tr></tbody>")
+    """, "<tbody><tr><td>Cell A</td><td>Cell B</td></tr><tr><td>Cell C</td><td>Cell D</td></tr></tbody>")
 
 
 def test_html_whitelist_thead():
@@ -360,11 +382,16 @@ def test_html_whitelist_thead():
         <table>
         <thead>
             <tr>
-                <th>Header</th>
+                <th>Header A</th>
+                <th>Header B</th>
+            </tr>
+            <tr>
+                <th>Header C</th>
+                <th>Header D</th>
             </tr>
         </thead>
         </table>
-    """, "<thead><tr><th>Header</th></tr></thead>")
+    """, "<thead><tr><th>Header A</th><th>Header B</th></tr><tr><th>Header C</th><th>Header D</th></tr></thead>")
 
 
 def test_html_whitelist_tfoot():
@@ -373,11 +400,16 @@ def test_html_whitelist_tfoot():
         <table>
         <tfoot>
             <tr>
-                <td>Sum of column</td>
+                <td>Sum of column A</td>
+                <td>Sum of column B</td>
+            </tr>
+            <tr>
+                <td>Final sum of column A</td>
+                <td>Final sum of column B</td>
             </tr>
         </tfoot>
         </table>
-    """, "<tfoot><tr><td>Sum of column</td></tr></tfoot>")
+    """, "<tfoot><tr><td>Sum of column A</td><td>Sum of column B</td></tr><tr><td>Final sum of column A</td><td>Final sum of column B</td></tr></tfoot>")
 
 
 def test_html_whitelist_tr():
@@ -385,10 +417,11 @@ def test_html_whitelist_tr():
     check_html_output_contains_text("""
         <table>
         <tr>
-            <td>Table row content</td>
+            <td>Table row 1</td>
+            <td>Table row 2</td>
         </tr>
         </table>
-    """, "<tr><td>Table row content</td></tr>")
+    """, "<tr><td>Table row 1</td><td>Table row 2</td></tr>")
 
 
 def test_html_whitelist_td():
