@@ -1,5 +1,5 @@
 """Turn input HTML into a cleaned parsed tree."""
-from bs4 import BeautifulSoup, Comment, Doctype
+from bs4 import BeautifulSoup, NavigableString, Comment, Doctype
 from .text_manipulation import normalise_text
 
 
@@ -268,6 +268,11 @@ def recursively_prune_elements(soup):
         for element in soup.find_all(lambda elem: len(list(elem.children)) == 0):
             element.decompose()
             n_removed += 1
+        # Unwrap elements with exactly one child that is not a string
+        for element in soup.find_all(lambda elem: len(list(elem.children)) == 1):
+            if not isinstance(list(element.children)[0], NavigableString):
+                element.unwrap()
+                n_removed += 1
         # Remove elements with only zero-length children
         for element in soup.find_all(lambda elem: sum([len(c) for c in elem.children]) == 0):
             element.decompose()
@@ -276,7 +281,6 @@ def recursively_prune_elements(soup):
     # Repeatedly apply single_replace() until no elements are being removed
     while single_replace():
         pass
-    # remove_empty_strings_and_elements()
 
 
 def parse_to_tree(html):

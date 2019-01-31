@@ -86,6 +86,35 @@ def test_ensure_correct_outer_div_wrapping():
         </div>""", """<div><p>Some example text here.</p></div>""")
 
 
+def test_ensure_correct_element_flattening_single_paragraph():
+    """Flatten extraneous elements if these are not providing semantic meaning."""
+    check_exact_html_output("""
+            <div class="wrapper">
+                <div class="article">
+                    <div id="advert"></div>
+                    <div class="formatted">
+                        <p>First paragraph contents.</p>
+                    </div>
+                </div>
+            </div>""", """<div><p>First paragraph contents.</p></div>""")
+
+
+def test_ensure_correct_element_flattening_multiple_paragraphs():
+    """Flatten extraneous elements if these are not providing semantic meaning."""
+    check_exact_html_output("""
+            <div class="wrapper">
+                <div class="article">
+                    <div id="advert"></div>
+                    <div class="formatted">
+                        <p>First paragraph contents.</p>
+                    </div>
+                    <div class="formatted">
+                        <p>Second paragraph contents.</p>
+                    </div>
+                </div>
+            </div>""", """<div><div><p>First paragraph contents.</p></div><div><p>Second paragraph contents.</p></div></div>""")
+
+
 def test_ensure_correct_paragraph_wrapping():
     """Do not wrap bare text inside <div> with <p> tags."""
     check_exact_html_output("""
