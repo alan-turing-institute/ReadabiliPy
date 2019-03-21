@@ -362,8 +362,8 @@ def extract_title(html):
             "title": "text"
         },
         {
-            "path": ["header", "h1"], # note: attributes are for the bottom level tag in path
-            "attrs": [{"class": "entry-title"}, None], # try specific attrs before trying any tag of type (by setting attr to None)
+            "path": ["header", "h1"], # note: attributes are for the bottom level tag in path (h1 here)
+            "attrs": [None],
             "title": "text"
         },
         {
@@ -380,7 +380,7 @@ def extract_title(html):
 
             if len(tag_dict["path"]) > 1:
                 soup_tag = soup.find(tag_dict["path"][0])
-                i = 0
+                i = 1
                 for level in tag_dict["path"][1:]:
                     i+=1
                     if soup_tag:
