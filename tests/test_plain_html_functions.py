@@ -58,19 +58,28 @@ def test_remove_cdata():
 
 
 def test_extract_title():
-    html = """
+    htmls = ["""
         <html>
         <head>
-            <meta name="fb_title" content="The Note: Nervous laughter in Washington, when it should be quiet for the holidays" />
+            <meta name="fb_title" content="Example title" />
         </head>
         <body>
-            <button type="button">Click Me!</button>
-            <p>Hello</p>
             <p>Hello world</p>
         <body>
         </html>
+    """,
     """
-    soup = BeautifulSoup(html, "html5lib")
-    output = plain_html.extract_title(html)
-    expected_output = "The Note: Nervous laughter in Washington, when it should be quiet for the holidays"
-    assert output == expected_output
+        <html>
+        <head>
+        </head>
+        <body>
+            <header><h1>Example title</h1></header>
+            <p>Hello world</p>
+        <body>
+        </html>
+    """]
+    for html in htmls:
+        soup = BeautifulSoup(html, "html5lib")
+        output = plain_html.extract_title(html)
+        expected_output = "Example title"
+        assert output == expected_output
