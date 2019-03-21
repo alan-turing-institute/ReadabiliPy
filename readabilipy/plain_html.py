@@ -349,16 +349,26 @@ def extract_title(html):
     # Convert the HTML into a Soup parse tree
     soup = BeautifulSoup(html, "html5lib")
 
-    # List of possible title tag dictionaries
+    # List of possible title tag dictionaries; these should be ranked by likelihood
     tags = [
         {
             "path": ["meta"],
-            "attrs": [{"name": "fb_title"}, {"property": "og:title"}],
+            "attrs": [{"property": "og:title"}, {"itemprop": "headline"}, {"name": "fb_title"}, {"name": "sailthru.author"}, {"name": "dcterms.title"}, {"name": "title"}],
             "title": "content"
         },
         {
-            "path": ["header", "h1"],
-            "attrs": [None], # try specific attrs before trying any tag of type (by setting attr to None)
+            "path": ["h1"],
+            "attrs": [{"class": "title"}, {"class": "entry-title"}, {"itemprop": "headline"}, {"class": "post__byline-name-hyphenated"}],
+            "title": "text"
+        },
+        {
+            "path": ["header", "h1"], # note: attributes are for the bottom level tag in path
+            "attrs": [{"class": "entry-title"}, None], # try specific attrs before trying any tag of type (by setting attr to None)
+            "title": "text"
+        },
+        {
+            "path": ["h2"],
+            "attrs": [{"itemprop": "headline"}],
             "title": "text"
         }
     ]
@@ -384,6 +394,7 @@ def extract_title(html):
             if tag_dict["title"] == "text":
                 if soup_tag and soup_tag.text:
                     title = soup_tag.text
+                    break
             else:
                 if soup_tag and soup_tag.has_attr(tag_dict["title"]):
                     title = soup_tag[tag_dict["title"]]
