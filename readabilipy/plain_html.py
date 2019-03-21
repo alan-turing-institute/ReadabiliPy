@@ -352,12 +352,12 @@ def extract_title(html):
     # List of possible title tag dictionaries
     tags = [
         {
-            "type": "meta",
+            "path": ["meta"],
             "attrs": [{"name": "fb_title"}, {"property": "og:title"}],
             "title": "content"
         },
         {
-            "type": "h1",
+            "path": ["header", "h1"],
             "attrs": [None], # try specific attrs before trying any tag of type (by setting attr to None)
             "title": "text"
         }
@@ -365,8 +365,22 @@ def extract_title(html):
 
     title = ""
     for tag_dict in tags:
+
         for attr_set in tag_dict["attrs"]:
-            soup_tag = soup.find(tag_dict["type"], attr_set)
+
+            if len(tag_dict["path"]) > 1:
+                soup_tag = soup.find(tag_dict["path"][0])
+                i = 0
+                for level in tag_dict["path"][1:]:
+                    i+=1
+                    if soup_tag:
+                        if i == len(tag_dict["path"]):
+                            soup_tag = soup_tag.find(tag_dict["path"], attr_set)
+                        else:
+                            soup_tag = soup_tag.find(tag_dict["path"])
+            else:
+                soup_tag = soup.find(tag_dict["path"][0], attr_set)
+
             if tag_dict["title"] == "text":
                 if soup_tag and soup_tag.text:
                     title = soup_tag.text
