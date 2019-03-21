@@ -342,3 +342,24 @@ def parse_to_tree(html):
     root = soup.new_tag("div")
     root.append(soup)
     return root
+
+def extract_title(html):
+    """Return the article title from the article HTML"""
+
+    # Convert the HTML into a Soup parse tree
+    soup = BeautifulSoup(html, "html5lib")
+
+    # List of possible title tag dictionaries
+    tags = [
+        {
+            "type": "meta",
+            "attrs": {"name":"fb_title"},
+            "title": "content"
+        }
+    ]
+
+    for tag_dict in tags:
+
+        title = soup.find(tag_dict["type"], tag_dict["attrs"])[tag_dict["title"]]
+
+    return title

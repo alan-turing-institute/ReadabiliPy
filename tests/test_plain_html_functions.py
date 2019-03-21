@@ -55,3 +55,22 @@ def test_remove_cdata():
     parsed_html = str(plain_html.parse_to_tree(html))
     expected_output = "<div><div><p>Some text</p></div><p>//</p></div>"
     assert text_manipulation.simplify_html(parsed_html) == expected_output
+
+
+def test_extract_title():
+    html = """
+        <html>
+        <head>
+            <meta name="fb_title" content="The Note: Nervous laughter in Washington, when it should be quiet for the holidays" />
+        </head>
+        <body>
+            <button type="button">Click Me!</button>
+            <p>Hello</p>
+            <p>Hello world</p>
+        <body>
+        </html>
+    """
+    soup = BeautifulSoup(html, "html5lib")
+    output = plain_html.extract_title(html)
+    expected_output = "The Note: Nervous laughter in Washington, when it should be quiet for the holidays"
+    assert output == expected_output
