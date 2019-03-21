@@ -77,6 +77,16 @@ def test_extract_title():
             <p>Hello world</p>
         <body>
         </html>
+    """,
+    """
+        <html>
+        <head>
+        </head>
+        <body>
+            <h2 class="title">Example title</h2>
+            <p>Hello world</p>
+        <body>
+        </html>
     """]
     for html in htmls:
         soup = BeautifulSoup(html, "html5lib")

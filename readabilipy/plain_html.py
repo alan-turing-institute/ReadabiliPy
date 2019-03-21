@@ -349,55 +349,50 @@ def extract_title(html):
     # Convert the HTML into a Soup parse tree
     soup = BeautifulSoup(html, "html5lib")
 
-    # List of possible title tag dictionaries; these should be ranked by likelihood
+    # List of dictionaries for each top level HTML tag that could contain a title; these should be ranked by likelihood
     tags = [
         {
-            "path": ["meta"],
+            "paths": [["meta"]],
             "attrs": [{"property": "og:title"}, {"itemprop": "headline"}, {"name": "fb_title"}, {"name": "sailthru.author"}, {"name": "dcterms.title"}, {"name": "title"}],
             "title": "content"
         },
         {
-            "path": ["h1"],
+            "paths": [["h1"], ["h2"]], # multiple top level HTML tags
             "attrs": [{"class": "title"}, {"class": "entry-title"}, {"itemprop": "headline"}, {"class": "post__byline-name-hyphenated"}],
             "title": "text"
         },
         {
-            "path": ["header", "h1"], # note: attributes are for the bottom level tag in path (h1 here)
+            "paths": [["header", "h1"]], # multi-level HTML tag (header/h1) note: attributes are for the bottom level tag in path (h1 here)
             "attrs": [None],
-            "title": "text"
-        },
-        {
-            "path": ["h2"],
-            "attrs": [{"itemprop": "headline"}],
             "title": "text"
         }
     ]
 
-    title = ""
+    title = None
     for tag_dict in tags:
+        if title == None: # terminate loop if we find the title at any stage
+            for path in tag_dict["paths"]:
+                if title == None: # terminate loop if we find the title at any stage
+                    for attr_set in tag_dict["attrs"]:
 
-        for attr_set in tag_dict["attrs"]:
-
-            if len(tag_dict["path"]) > 1:
-                soup_tag = soup.find(tag_dict["path"][0])
-                i = 1
-                for level in tag_dict["path"][1:]:
-                    i+=1
-                    if soup_tag:
-                        if i == len(tag_dict["path"]):
-                            soup_tag = soup_tag.find(tag_dict["path"], attr_set)
+                        if len(path) > 1:
+                            soup_tag = soup.find(path[0])
+                            i = 1
+                            for level in path[1:]:
+                                i+=1
+                                if soup_tag:
+                                    if i == len(path):
+                                        soup_tag = soup_tag.find(path, attr_set)
+                                    else:
+                                        soup_tag = soup_tag.find(path)
                         else:
-                            soup_tag = soup_tag.find(tag_dict["path"])
-            else:
-                soup_tag = soup.find(tag_dict["path"][0], attr_set)
+                            soup_tag = soup.find(path[0], attr_set)
 
-            if tag_dict["title"] == "text":
-                if soup_tag and soup_tag.text:
-                    title = soup_tag.text
-                    break
-            else:
-                if soup_tag and soup_tag.has_attr(tag_dict["title"]):
-                    title = soup_tag[tag_dict["title"]]
-                    break
+                        if tag_dict["title"] == "text":
+                            if soup_tag and soup_tag.text:
+                                title = soup_tag.text
+                        else:
+                            if soup_tag and soup_tag.has_attr(tag_dict["title"]):
+                                title = soup_tag[tag_dict["title"]]
 
     return title
