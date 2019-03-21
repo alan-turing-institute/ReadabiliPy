@@ -353,13 +353,16 @@ def extract_title(html):
     tags = [
         {
             "type": "meta",
-            "attrs": {"name":"fb_title"},
+            "attrs": [{"name": "fb_title"}, {"property": "og:title"}],
             "title": "content"
         }
     ]
 
     for tag_dict in tags:
-
-        title = soup.find(tag_dict["type"], tag_dict["attrs"])[tag_dict["title"]]
+        for attr_set in tag_dict["attrs"]:
+            soup_tag = soup.find(tag_dict["type"], attr_set)
+            if soup_tag and soup_tag.has_attr(tag_dict["title"]):
+                title = soup_tag[tag_dict["title"]]
+                break
 
     return title
