@@ -1,7 +1,7 @@
 """Turn input HTML into a cleaned parsed tree."""
 from bs4 import BeautifulSoup, Comment, Doctype
 from .text_manipulation import normalise_text
-
+import re
 
 def elements_to_delete():
     """Elements that will be deleted together with their contents."""
@@ -394,5 +394,8 @@ def extract_title(html):
                         else:
                             if soup_tag and soup_tag.has_attr(tag_dict["title"]):
                                 title = soup_tag[tag_dict["title"]]
-
+    if title:
+        title = re.sub(r"\s+", " ", title)
+        title = re.sub(r"^\s", "", title)
+        title = re.sub(r"\s$", "", title)
     return title
