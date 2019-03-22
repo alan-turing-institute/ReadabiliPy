@@ -88,16 +88,22 @@ def test_extract_title():
         <body>
         </html>
     """]
-    another_html = """<h1 class="entry-title">
+    addicting_info_htmls = ["""
+    <h1 class="entry-title">
 		<a href="http://addictinginfo.com/2018/10/15/trump-denies-charitable-donation-he-promised-if-elizabeth-warren-releases-dna-results-and-its-on-video/"
 		 title="Permalink to Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And It&#8217;s On Video"
 		 rel="bookmark">Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And
 			It&#8217;s On Video</a>
-	</h1>"""
+	</h1>
+    """,
+    """
+    <meta property="og:title" content="Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And It&#8217;s On Video" />
+    """]
     for html in htmls:
         output = plain_html.extract_title(html)
         expected_output = "Example title"
         assert output == expected_output
-    output = plain_html.extract_title(another_html)
-    expected_output = "Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And It’s On Video"
-    assert output == expected_output
+    for html in addicting_info_htmls:
+        output = plain_html.extract_title(html)
+        expected_output = "Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And It’s On Video"
+        assert output == expected_output
