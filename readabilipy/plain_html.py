@@ -345,41 +345,21 @@ def parse_to_tree(html):
     return root
 
 
-def extract_title(html):
-    """Return the article title from the article HTML"""
+def extract_element(html, extraction_paths):
+    """Return the relevant element (title, date or byline) from article HTML"""
 
     # Convert the HTML into a Soup parse tree
     soup = BeautifulSoup(html, "html5lib")
 
-    # List of dictionaries for each top level HTML tag that could contain a title
-    # These should be ordered by likelihood, so we search for common title tags first
-    tags = [
-        {
-            "paths": [["meta"]],
-            "attrs": [{"property": "og:title"}, {"itemprop": "headline"}, {"name": "fb_title"}, {"name": "sailthru.author"}, {"name": "dcterms.title"}, {"name": "title"}],
-            "title": "content"
-        },
-        {
-            "paths": [["h1"], ["h2"]],  # multiple top level HTML tags
-            "attrs": [{"class": "title"}, {"class": "entry-title"}, {"itemprop": "headline"}, {"class": "post__byline-name-hyphenated"}],
-            "title": "text"
-        },
-        {
-            "paths": [["header", "h1"]],  # multi-level HTML tag (header/h1)
-            "attrs": [None],  # note: attributes are for the bottom level tag in path (h1 here)
-            "title": "text"
-        }
-    ]
+    element = None
+    for tag_dict in extraction_paths:
 
-    title = None
-    for tag_dict in tags:
-
-        # Overwrite the title var if not already found
-        if title is None:
+        # Overwrite the element var if not already found
+        if element is None:
 
             for path in tag_dict["paths"]:
 
-                if title is None:
+                if element is None:
 
                     for attr_set in tag_dict["attrs"]:
 
@@ -398,18 +378,43 @@ def extract_title(html):
                         else:
                             soup_tag = soup.find(path[0], attr_set)
 
-                        # Handle the title being text in the HTML or an attr (e.g. content)
-                        if tag_dict["title"] == "text":
+                        # Handle the element being text in the HTML or an attr (e.g. content)
+                        if tag_dict["element"] == "text":
                             if soup_tag and soup_tag.text:
-                                title = soup_tag.text
+                                element = soup_tag.text
                         else:
-                            if soup_tag and soup_tag.has_attr(tag_dict["title"]):
-                                title = soup_tag[tag_dict["title"]]
+                            if soup_tag and soup_tag.has_attr(tag_dict["element"]):
+                                element = soup_tag[tag_dict["element"]]
 
-    # Strip unwanted spaces from the title
-    if title:
-        title = re.sub(r"\s+", " ", title)
-        title = re.sub(r"^\s", "", title)
-        title = re.sub(r"\s$", "", title)
+    # Strip unwanted spaces from the element
+    if element:
+        element = re.sub(r"\s+", " ", element)
+        element = re.sub(r"^\s", "", element)
+        element = re.sub(r"\s$", "", element)
 
-    return title
+    return element
+
+def extract_title(html):
+    """Return the article title from the article HTML"""
+
+    # List of dictionaries for each top level HTML tag that could contain a title
+    # These should be ordered by likelihood, so we search for common title tags first
+    extraction_paths = [
+        {
+            "paths": [["meta"]],
+            "attrs": [{"property": "og:title"}, {"itemprop": "headline"}, {"name": "fb_title"}, {"name": "sailthru.author"}, {"name": "dcterms.title"}, {"name": "title"}],
+            "element": "content"
+        },
+        {
+            "paths": [["h1"], ["h2"]],  # multiple top level HTML tags
+            "attrs": [{"class": "title"}, {"class": "entry-title"}, {"itemprop": "headline"}, {"class": "post__byline-name-hyphenated"}],
+            "element": "text"
+        },
+        {
+            "paths": [["header", "h1"]],  # multi-level HTML tag (header/h1)
+            "attrs": [None],  # note: attributes are for the bottom level tag in path (h1 here)
+            "element": "text"
+        }
+    ]
+
+    return extract_element(html, extraction_paths)
