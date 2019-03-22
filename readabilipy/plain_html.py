@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup, Comment, Doctype
 from .text_manipulation import normalise_text
 import re
 
+
 def elements_to_delete():
     """Elements that will be deleted together with their contents."""
     html5_form_elements = ['button', 'datalist', 'fieldset', 'form', 'input',
@@ -343,6 +344,7 @@ def parse_to_tree(html):
     root.append(soup)
     return root
 
+
 def extract_title(html):
     """Return the article title from the article HTML"""
 
@@ -358,13 +360,13 @@ def extract_title(html):
             "title": "content"
         },
         {
-            "paths": [["h1"], ["h2"]], # multiple top level HTML tags
+            "paths": [["h1"], ["h2"]],  # multiple top level HTML tags
             "attrs": [{"class": "title"}, {"class": "entry-title"}, {"itemprop": "headline"}, {"class": "post__byline-name-hyphenated"}],
             "title": "text"
         },
         {
-            "paths": [["header", "h1"]], # multi-level HTML tag (header/h1)
-            "attrs": [None], # note: attributes are for the bottom level tag in path (h1 here)
+            "paths": [["header", "h1"]],  # multi-level HTML tag (header/h1)
+            "attrs": [None],  # note: attributes are for the bottom level tag in path (h1 here)
             "title": "text"
         }
     ]
@@ -373,11 +375,11 @@ def extract_title(html):
     for tag_dict in tags:
 
         # Overwrite the title var if not already found
-        if title == None:
+        if title is None:
 
             for path in tag_dict["paths"]:
 
-                if title == None:
+                if title is None:
 
                     for attr_set in tag_dict["attrs"]:
 
@@ -387,7 +389,7 @@ def extract_title(html):
                             soup_tag = soup.find(path[0])
                             i = 1
                             for level in path[1:]:
-                                i+=1
+                                i += 1
                                 if soup_tag:
                                     if i == len(path):
                                         soup_tag = soup_tag.find(path, attr_set)
