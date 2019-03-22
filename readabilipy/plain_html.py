@@ -349,7 +349,8 @@ def extract_title(html):
     # Convert the HTML into a Soup parse tree
     soup = BeautifulSoup(html, "html5lib")
 
-    # List of dictionaries for each top level HTML tag that could contain a title; these should be ranked by likelihood
+    # List of dictionaries for each top level HTML tag that could contain a title
+    # These should be ordered by likelihood, so we search for common title tags first
     tags = [
         {
             "paths": [["meta"]],
@@ -362,20 +363,27 @@ def extract_title(html):
             "title": "text"
         },
         {
-            "paths": [["header", "h1"]], # multi-level HTML tag (header/h1) note: attributes are for the bottom level tag in path (h1 here)
-            "attrs": [None],
+            "paths": [["header", "h1"]], # multi-level HTML tag (header/h1)
+            "attrs": [None], # note: attributes are for the bottom level tag in path (h1 here)
             "title": "text"
         }
     ]
 
     title = None
     for tag_dict in tags:
-        if title == None: # terminate loop if we find the title at any stage
+
+        # Overwrite the title var if not already found
+        if title == None:
+
             for path in tag_dict["paths"]:
-                if title == None: # terminate loop if we find the title at any stage
+
+                if title == None:
+
                     for attr_set in tag_dict["attrs"]:
 
                         if len(path) > 1:
+                            # Call find() for each element in the soup from path
+                            # Only for the lowest level element do we filter by attribute
                             soup_tag = soup.find(path[0])
                             i = 1
                             for level in path[1:]:
@@ -388,14 +396,18 @@ def extract_title(html):
                         else:
                             soup_tag = soup.find(path[0], attr_set)
 
+                        # Handle the title being text in the HTML or an attr (e.g. content)
                         if tag_dict["title"] == "text":
                             if soup_tag and soup_tag.text:
                                 title = soup_tag.text
                         else:
                             if soup_tag and soup_tag.has_attr(tag_dict["title"]):
                                 title = soup_tag[tag_dict["title"]]
+
+    # Strip unwanted spaces from the title
     if title:
         title = re.sub(r"\s+", " ", title)
         title = re.sub(r"^\s", "", title)
         title = re.sub(r"\s$", "", title)
+
     return title
