@@ -5,7 +5,6 @@ def extract_title(html):
     """Return the article title from the article HTML"""
 
     # List of dictionaries for each top level HTML tag that could contain a title
-    # These should be ordered by likelihood, so we search for common title tags first
     extraction_paths = [
         {
             "paths": [["meta"]],

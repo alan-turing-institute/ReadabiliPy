@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import re
+from ..text_manipulation import normalise_whitespace
 
 
 def extract_element(html, extraction_paths):
@@ -50,10 +51,8 @@ def extract_element(html, extraction_paths):
                                         element = soup_tag[tag_dict["element"]]
                                         goToNextTag = False
 
-    # Strip unwanted spaces from the element
+    # Remove unwanted whitespace from the element
     if element:
-        element = re.sub(r"\s+", " ", element)
-        element = re.sub(r"^\s", "", element)
-        element = re.sub(r"\s$", "", element)
+        element = normalise_whitespace(element)
 
     return element
