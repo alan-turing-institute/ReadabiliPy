@@ -116,6 +116,10 @@ def test_extract_date():
     htmls = [
         """
             <meta name="Last-Modified" content="2018-12-21T06:30:21" />
+        """,
+        """
+            <time>2018-12-21T06:30:22</time>
+            <time datetime="2018-12-21T06:30:21"></time>
         """
     ]
     expected_output = "2018-12-21T06:30:21"
