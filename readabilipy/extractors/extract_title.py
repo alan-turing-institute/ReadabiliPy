@@ -4,7 +4,7 @@ from .extract_element import extract_element
 def extract_title(html):
     """Return the article title from the article HTML"""
 
-    # List of dictionaries for each top level HTML tag that could contain a title
+    # List of dictionaries for HTML tags that could contain a title
     extraction_paths = [
         {
             "paths": [["meta"]],
@@ -13,7 +13,7 @@ def extract_title(html):
         },
         {
             "paths": [["header", "h1"]],  # two-level HTML tag (header/h1)
-            "attrs": [None],  # note: attributes are for the bottom level tag in path (h1 here)
+            "attrs": [None],  # note: attributes are for the bottom level tag in path (h1 here), where None, any element matching the path will be extracted
             "element": "text"
         },
         {

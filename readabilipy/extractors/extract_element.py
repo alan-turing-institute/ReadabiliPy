@@ -1,5 +1,4 @@
 from bs4 import BeautifulSoup
-import re
 from ..text_manipulation import normalise_whitespace
 
 
@@ -37,10 +36,10 @@ def extract_element(html, extraction_paths):
                             elements.append(normalise_whitespace(soup_tag[tag_dict["element"]]))
 
     if len(elements) == 0:
-        return None
+        return None  # Return None when no extraction path elements in the HTML
     else:
         # Returns the most common element, but returns the first in the list by default when equally common
-        if len(elements) == len(set(elements)): # if all elements unique
+        if len(elements) == len(set(elements)):  # if all elements unique
             return elements[0]
         else:
             return max(set(elements), key=elements.count)
