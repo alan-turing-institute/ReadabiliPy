@@ -9,50 +9,39 @@ def extract_element(html, extraction_paths):
     # Convert the HTML into a Soup parse tree
     soup = BeautifulSoup(html, "html5lib")
 
-    element = None
+    elements = []
     for tag_dict in extraction_paths:
 
-        # Overwrite the element var if not already found
-        if element is None:
+        for path in tag_dict["paths"]:
 
-            for path in tag_dict["paths"]:
+            for attr_set in tag_dict["attrs"]:
 
-                if element is None:
+                if len(path) > 1:
+                    # Call find() for each element in the soup from path
+                    # Only for the lowest level element do we filter by attribute
+                    soup_tags_level_one = soup.find_all(path[0])
+                    i = 1
+                    soup_tags = []
+                    for soup_tag in soup_tags_level_one:
+                        for level in path[1:]:
+                            i += 1
+                            if i == len(path):
+                                soup_tags.append(soup_tag.find(level, attr_set))
+                            else:
+                                soup_tag = soup_tag.find(level)
+                else:
+                    soup_tags = soup.find_all(path[0], attr_set)
 
-                    for attr_set in tag_dict["attrs"]:
+                # Handle the element being text in the HTML or an attr (e.g. content)
+                for soup_tag in soup_tags:
+                    if tag_dict["element"] == "text":
+                        if soup_tag and soup_tag.text:
+                            elements.append(normalise_whitespace(soup_tag.text))
+                    else:
+                        if soup_tag and soup_tag.has_attr(tag_dict["element"]):
+                            elements.append(normalise_whitespace(soup_tag[tag_dict["element"]]))
 
-                        if len(path) > 1:
-                            # Call find() for each element in the soup from path
-                            # Only for the lowest level element do we filter by attribute
-                            soup_tag = soup.find(path[0])
-                            i = 1
-                            soup_tags = []
-                            for level in path[1:]:
-                                i += 1
-                                if soup_tag:
-                                    if i == len(path):
-                                        soup_tags.append(soup_tag.find(path, attr_set))
-                                    else:
-                                        soup_tags.append(soup_tag.find(path))
-                        else:
-                            soup_tags = soup.find_all(path[0], attr_set)
-
-                        # Handle the element being text in the HTML or an attr (e.g. content)
-                        # If soup_tag was not found, element does not get set
-                        goToNextTag = True
-                        for soup_tag in soup_tags:
-                            if goToNextTag:
-                                if tag_dict["element"] == "text":
-                                    if soup_tag and soup_tag.text:
-                                        element = soup_tag.text
-                                        goToNextTag = False
-                                else:
-                                    if soup_tag and soup_tag.has_attr(tag_dict["element"]):
-                                        element = soup_tag[tag_dict["element"]]
-                                        goToNextTag = False
-
-    # Remove unwanted whitespace from the element
-    if element:
-        element = normalise_whitespace(element)
-
-    return element
+    if len(elements) == 0:
+        return None
+    else:
+        return elements[0]

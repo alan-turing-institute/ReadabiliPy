@@ -28,7 +28,9 @@ def test_extract_title():
             <head>
             </head>
             <body>
-                <h2 class="title">Example title</h2>
+                <h2 class="title">Incorrect example title</h2>
+                <h1 class="title">Wrong title</h1>
+                <header><h1>Example title</h1></header>
                 <p>Hello world</p>
             <body>
             </html>

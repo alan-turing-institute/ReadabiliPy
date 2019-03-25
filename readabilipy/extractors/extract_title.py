@@ -12,15 +12,16 @@ def extract_title(html):
             "element": "content"
         },
         {
-            "paths": [["h1"], ["h2"]],  # multiple top level HTML tags
-            "attrs": [{"class": "title"}, {"class": "entry-title"}, {"itemprop": "headline"}, {"class": "post__byline-name-hyphenated"}],
-            "element": "text"
-        },
-        {
             "paths": [["header", "h1"]],  # multi-level HTML tag (header/h1)
             "attrs": [None],  # note: attributes are for the bottom level tag in path (h1 here)
             "element": "text"
+        },
+        {
+            "paths": [["h1"], ["h2"]],  # multiple top level HTML tags
+            "attrs": [{"class": "title"}, {"class": "entry-title"}, {"itemprop": "headline"}, {"class": "post__byline-name-hyphenated"}],
+            "element": "text"
         }
+
     ]
 
     return extract_element(html, extraction_paths)
