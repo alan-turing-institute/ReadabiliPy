@@ -12,7 +12,7 @@ def extract_title(html):
             "element": "content"
         },
         {
-            "paths": [["header", "h1"]],  # multi-level HTML tag (header/h1)
+            "paths": [["header", "h1"]],  # two-level HTML tag (header/h1)
             "attrs": [None],  # note: attributes are for the bottom level tag in path (h1 here)
             "element": "text"
         },

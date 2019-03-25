@@ -16,19 +16,14 @@ def extract_element(html, extraction_paths):
 
             for attr_set in tag_dict["attrs"]:
 
-                if len(path) > 1:
-                    # Call find() for each element in the soup from path
+                if len(path) == 2:
+                    # Call find_all() for each element in the soup from path
                     # Only for the lowest level element do we filter by attribute
                     soup_tags_level_one = soup.find_all(path[0])
-                    i = 1
                     soup_tags = []
                     for soup_tag in soup_tags_level_one:
-                        for level in path[1:]:
-                            i += 1
-                            if i == len(path):
-                                soup_tags.append(soup_tag.find(level, attr_set))
-                            else:
-                                soup_tag = soup_tag.find(level)
+                        soup_tags = soup_tags + soup_tag.find_all(path[1], attr_set)
+
                 else:
                     soup_tags = soup.find_all(path[0], attr_set)
 
