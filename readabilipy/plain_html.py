@@ -379,6 +379,7 @@ def extract_element(html, extraction_paths):
                             soup_tag = soup.find(path[0], attr_set)
 
                         # Handle the element being text in the HTML or an attr (e.g. content)
+                        # If soup_tag was not found, element does not get set
                         if tag_dict["element"] == "text":
                             if soup_tag and soup_tag.text:
                                 element = soup_tag.text
@@ -386,7 +387,7 @@ def extract_element(html, extraction_paths):
                             if soup_tag and soup_tag.has_attr(tag_dict["element"]):
                                 element = soup_tag[tag_dict["element"]]
 
-    # Strip unwanted spaces from the element
+    # Strip unwanted whitespace from the element
     if element:
         element = re.sub(r"\s+", " ", element)
         element = re.sub(r"^\s", "", element)
@@ -399,6 +400,7 @@ def extract_title(html):
 
     # List of dictionaries for each top level HTML tag that could contain a title
     # These should be ordered by likelihood, so we search for common title tags first
+    # Less specific tags should also be searched last
     extraction_paths = [
         {
             "paths": [["meta"]],
@@ -413,6 +415,77 @@ def extract_title(html):
         {
             "paths": [["header", "h1"]],  # multi-level HTML tag (header/h1)
             "attrs": [None],  # note: attributes are for the bottom level tag in path (h1 here)
+            "element": "text"
+        }
+    ]
+
+    return extract_element(html, extraction_paths)
+
+def extract_date(html):
+    """Return the article date from the article HTML"""
+
+    # List of dictionaries for each top level HTML tag that could contain a date
+    # These should be ordered by likelihood, so we search for common date tags first
+    # Less specific tags should also be searched last
+    extraction_paths = [
+        {
+            "paths": [["meta"]],
+            "attrs": [{"name": "Last-Modified"}, {"name": "dcterms.created"}, {"name": "published"}, {"name": "published_time_telegram"}, {"property": "article:published"}, {"property": "article:published_time"}, {"property": "og:article:published_time"}, {"property": "og:article:pubdate"}, {"itemprop": "datePublished"}],
+            "element": "content"
+        },
+        {
+            "paths": [["time"]],
+            "attrs": [{"class": "entry-date"}, {"class": "post-entry-time"}, {"class": "post-date updated"}, {"class": "post__date"}, {"itemprop": "datePublished"}, None], # does this none make sense?
+            "element": "datetime"
+        },
+        {
+            "paths": [["time"]],
+            "attrs": [None],
+            "element": "text"
+        },
+        {
+            "paths": [["time"]],
+            "attrs": [{"class": "post__date"}],
+            "element": "content"
+        },
+        {
+            "paths": [["div", "time"]],
+            "attrs": [{"class": "visually-hidden"}],
+            "element": "text"
+        },
+        {
+            "paths": [["div", "time"]],
+            "attrs": [None],
+            "element": "datetime"
+        },
+        {
+            "paths": [["span"]],
+            "attrs": [{"class": "timestamp "}],
+            "element": "data-epoch-time" # TODO: allow multiple elements so we can combine span
+        },
+        {
+            "paths": [["span"]],
+            "attrs": [{"class": "article-element__meta-item"}, {"class": "updated"}, {"class": "entry-date"}],
+            "element": "text"
+        },
+        {
+            "paths": [["span"]],
+            "attrs": [{"class": "date published time"}],
+            "element": "title"
+        },
+        {
+            "paths": [["p"]],
+            "attrs": [{"itemprop": "datePublished"}],
+            "element": "text"
+        },
+        {
+            "paths": [["div"]],
+            "attrs": [{"class": "keyvals"}],
+            "element": "data-content_published_date"
+        },
+        {
+            "paths": [["div"]],
+            "attrs": [{"class": "publish-date"}],
             "element": "text"
         }
     ]

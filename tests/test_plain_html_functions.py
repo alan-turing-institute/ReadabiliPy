@@ -103,11 +103,22 @@ def test_extract_title():
             <meta property="og:title" content="Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And It&#8217;s On Video" />
         """
     ]
+    expected_output = "Example title"
     for html in htmls:
         output = plain_html.extract_title(html)
-        expected_output = "Example title"
         assert output == expected_output
+    expected_output = "Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And It’s On Video"
     for html in addicting_info_htmls:
         output = plain_html.extract_title(html)
-        expected_output = "Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And It’s On Video"
+        assert output == expected_output
+
+def test_extract_date():
+    htmls = [
+        """
+            <meta name="Last-Modified" content="2018-12-21T06:30:21" />
+        """
+    ]
+    expected_output = "2018-12-21T06:30:21"
+    for html in htmls:
+        output = plain_html.extract_date(html)
         assert output == expected_output
