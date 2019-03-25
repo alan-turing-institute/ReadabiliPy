@@ -44,4 +44,8 @@ def extract_element(html, extraction_paths):
     if len(elements) == 0:
         return None
     else:
-        return elements[0]
+        # Returns the most common element, but returns the first in the list by default when equally common
+        if len(elements) == len(set(elements)): # if all elements unique
+            return elements[0]
+        else:
+            return max(set(elements), key=elements.count)
