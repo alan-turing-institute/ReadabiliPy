@@ -1,7 +1,6 @@
 """Turn input HTML into a cleaned parsed tree."""
 from bs4 import BeautifulSoup, Comment, Doctype
 from .text_manipulation import normalise_text
-import re
 
 
 def elements_to_delete():
@@ -343,85 +342,3 @@ def parse_to_tree(html):
     root = soup.new_tag("div")
     root.append(soup)
     return root
-
-
-def extract_element(html, extraction_paths):
-    """Return the relevant element (title, date or byline) from article HTML"""
-
-    # Convert the HTML into a Soup parse tree
-    soup = BeautifulSoup(html, "html5lib")
-
-    element = None
-    for tag_dict in extraction_paths:
-
-        # Overwrite the element var if not already found
-        if element is None:
-
-            for path in tag_dict["paths"]:
-
-                if element is None:
-
-                    for attr_set in tag_dict["attrs"]:
-
-                        if len(path) > 1:
-                            # Call find() for each element in the soup from path
-                            # Only for the lowest level element do we filter by attribute
-                            soup_tag = soup.find(path[0])
-                            i = 1
-                            soup_tags = []
-                            for level in path[1:]:
-                                i += 1
-                                if soup_tag:
-                                    if i == len(path):
-                                        soup_tags.append(soup_tag.find(path, attr_set))
-                                    else:
-                                        soup_tags.append(soup_tag.find(path))
-                        else:
-                            soup_tags = soup.find_all(path[0], attr_set)
-
-                        # Handle the element being text in the HTML or an attr (e.g. content)
-                        # If soup_tag was not found, element does not get set
-                        goToNextTag = True
-                        for soup_tag in soup_tags:
-                            if goToNextTag:
-                                if tag_dict["element"] == "text":
-                                    if soup_tag and soup_tag.text:
-                                        element = soup_tag.text
-                                        goToNextTag = False
-                                else:
-                                    if soup_tag and soup_tag.has_attr(tag_dict["element"]):
-                                        element = soup_tag[tag_dict["element"]]
-                                        goToNextTag = False
-
-    # Strip unwanted spaces from the element
-    if element:
-        element = re.sub(r"\s+", " ", element)
-        element = re.sub(r"^\s", "", element)
-        element = re.sub(r"\s$", "", element)
-
-    return element
-
-def extract_title(html):
-    """Return the article title from the article HTML"""
-
-    # List of dictionaries for each top level HTML tag that could contain a title
-    # These should be ordered by likelihood, so we search for common title tags first
-    extraction_paths = [
-        {
-            "paths": [["meta"]],
-            "attrs": [{"property": "og:title"}, {"itemprop": "headline"}, {"name": "fb_title"}, {"name": "sailthru.author"}, {"name": "dcterms.title"}, {"name": "title"}],
-            "element": "content"
-        },
-        {
-            "paths": [["h1"], ["h2"]],  # multiple top level HTML tags
-            "attrs": [{"class": "title"}, {"class": "entry-title"}, {"itemprop": "headline"}, {"class": "post__byline-name-hyphenated"}],
-            "element": "text"
-        },
-        {
-            "paths": [["header", "h1"]],  # multi-level HTML tag (header/h1)
-            "attrs": [None],  # note: attributes are for the bottom level tag in path (h1 here)
-            "element": "text"
-        }
-    ]
-
-    return extract_element(html, extraction_paths)
