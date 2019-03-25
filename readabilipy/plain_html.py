@@ -384,14 +384,18 @@ def extract_element(html, extraction_paths):
                         goToNextTag = True
                         for soup_tag in soup_tags:
                             if goToNextTag:
-                                if tag_dict["element"] == "text":
-                                    if soup_tag and soup_tag.text:
-                                        element = soup_tag.text
-                                        goToNextTag = False
-                                else:
-                                    if soup_tag and soup_tag.has_attr(tag_dict["element"]):
-                                        element = soup_tag[tag_dict["element"]]
-                                        goToNextTag = False
+                                goToNextElementAttr = True
+                                for element_attr in tag_dict["element_attrs"]:
+                                    if element_attr == "text":
+                                        if soup_tag and soup_tag.text:
+                                            element = soup_tag.text
+                                            goToNextTag = False
+                                            goToNextElementAttr = False
+                                    else:
+                                        if soup_tag and soup_tag.has_attr(element_attr):
+                                            element = soup_tag[element_attr]
+                                            goToNextTag = False
+                                            goToNextElementAttr = False
 
     # Strip unwanted whitespace from the element
     if element:
@@ -405,23 +409,22 @@ def extract_title(html):
     """Return the article title from the article HTML"""
 
     # List of dictionaries for each top level HTML tag that could contain a title
-    # These should be ordered by likelihood, so we search for common title tags first
-    # Less specific tags should also be searched last
+    # These should be ordered by likelihood and specificity
     extraction_paths = [
         {
             "paths": [["meta"]],
             "attrs": [{"property": "og:title"}, {"itemprop": "headline"}, {"name": "fb_title"}, {"name": "sailthru.author"}, {"name": "dcterms.title"}, {"name": "title"}],
-            "element": "content"
-        },
-        {
-            "paths": [["h1"], ["h2"]],  # multiple top level HTML tags
-            "attrs": [{"class": "title"}, {"class": "entry-title"}, {"itemprop": "headline"}, {"class": "post__byline-name-hyphenated"}],
-            "element": "text"
+            "element_attrs": ["content"]
         },
         {
             "paths": [["header", "h1"]],  # multi-level HTML tag (header/h1)
             "attrs": [None],  # note: attributes are for the bottom level tag in path (h1 here)
-            "element": "text"
+            "element_attrs": ["text"]
+        },
+        {
+            "paths": [["h1"], ["h2"]],  # multiple top level HTML tags
+            "attrs": [{"class": "title"}, {"class": "entry-title"}, {"itemprop": "headline"}, {"class": "post__byline-name-hyphenated"}],
+            "element_attrs": ["text"]
         }
     ]
 
@@ -431,68 +434,52 @@ def extract_date(html):
     """Return the article date from the article HTML"""
 
     # List of dictionaries for each top level HTML tag that could contain a date
-    # These should be ordered by likelihood, so we search for common date tags first
-    # Less specific tags should also be searched last
+    # These should be ordered by likelihood and specificity
     extraction_paths = [
         {
             "paths": [["meta"]],
             "attrs": [{"name": "Last-Modified"}, {"name": "dcterms.created"}, {"name": "published"}, {"name": "published_time_telegram"}, {"property": "article:published"}, {"property": "article:published_time"}, {"property": "og:article:published_time"}, {"property": "og:article:pubdate"}, {"itemprop": "datePublished"}],
-            "element": "content"
-        },
-        {
-            "paths": [["time"]],
-            "attrs": [{"class": "entry-date"}, {"class": "post-entry-time"}, {"class": "post-date updated"}, {"class": "post__date"}, {"itemprop": "datePublished"}, None], # does this none make sense?
-            "element": "datetime"
-        },
-        {
-            "paths": [["time"]],
-            "attrs": [None],
-            "element": "text"
-        },
-        {
-            "paths": [["time"]],
-            "attrs": [{"class": "post__date"}],
-            "element": "content"
+            "element_attrs": ["content"]
         },
         {
             "paths": [["div", "time"]],
             "attrs": [{"class": "visually-hidden"}],
-            "element": "text"
+            "element_attrs": ["datetime", "text"]
         },
         {
-            "paths": [["div", "time"]],
-            "attrs": [None],
-            "element": "datetime"
+            "paths": [["time"]],
+            "attrs": [{"class": "entry-date"}, {"class": "post-entry-time"}, {"class": "post-date updated"}, {"class": "post__date"}, {"itemprop": "datePublished"}, None],
+            "element_attrs": ["datetime", "content", "text"]
         },
         {
             "paths": [["span"]],
             "attrs": [{"class": "timestamp "}],
-            "element": "data-epoch-time" # TODO: allow multiple elements so we can combine span
+            "element_attrs": ["data-epoch-time", "text"]
         },
         {
             "paths": [["span"]],
             "attrs": [{"class": "article-element__meta-item"}, {"class": "updated"}, {"class": "entry-date"}],
-            "element": "text"
+            "element_attrs": []
         },
         {
             "paths": [["span"]],
             "attrs": [{"class": "date published time"}],
-            "element": "title"
+            "element_attrs": ["title"]
         },
         {
             "paths": [["p"]],
             "attrs": [{"itemprop": "datePublished"}],
-            "element": "text"
+            "element_attrs": ["text"]
         },
         {
             "paths": [["div"]],
             "attrs": [{"class": "keyvals"}],
-            "element": "data-content_published_date"
+            "element_attrs": ["data-content_published_date"]
         },
         {
             "paths": [["div"]],
             "attrs": [{"class": "publish-date"}],
-            "element": "text"
+            "element_attrs": ["text"]
         }
     ]
 
