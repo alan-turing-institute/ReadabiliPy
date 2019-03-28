@@ -4,24 +4,23 @@ from .extract_element import extract_element
 def extract_title(html):
     """Return the article title from the article HTML"""
 
-    # List of dictionaries for HTML tags that could contain a title
-    extraction_paths = [
-        {
-            "paths": [["meta"]],
-            "attrs": [{"property": "og:title"}, {"itemprop": "headline"}, {"name": "fb_title"}, {"name": "sailthru.title"}, {"name": "dcterms.title"}, {"name": "title"}],
-            "element": "content"
-        },
-        {
-            "paths": [["header", "h1"]],  # two-level HTML tag (header/h1)
-            "attrs": [None],  # note: attributes are for the bottom level tag in path (h1 here), where None, any element matching the path will be extracted
-            "element": "text"
-        },
-        {
-            "paths": [["h1"], ["h2"]],  # multiple top level HTML tags
-            "attrs": [{"class": "title"}, {"class": "entry-title"}, {"itemprop": "headline"}, {"class": "post__byline-name-hyphenated"}],
-            "element": "text"
-        }
-
+    # List of xpaths for HTML tags that could contain a title
+    # Tuple scores reflect confidence in these xpaths and the preference used for extraction
+    xpaths = [
+        ('//meta[@property="og:title"]/@content', 45),
+        ('//meta[@itemprop="headline"]/@content', 1),
+        ('//meta[@name="fb_title"]/@content', 1),
+        ('//meta[@name="sailthru.title"]/@content', 1),
+        ('//meta[@name="dcterms.title"]/@content', 1),
+        ('//meta[@name="title"]/@content', 1),
+        ('//header[@class="entry-header"]/h1[@class="entry-title"]/text()', 1),
+        ('//header/h1/text()', 1),
+        ('//h1[@class="title"]/text()', 1),
+        ('//h1[@class="entry-title"]/text()', 3),
+        ('//h1[@itemprop="headline"]/text()', 2),
+        ('//h1[@class="post__title"]/text()', 1),
+        ('//h2[@itemprop="headline"]/text()', 2),
+        ('//div[@class="postarea"]/h2/a/text()', 1)
     ]
 
-    return extract_element(html, extraction_paths)
+    return extract_element(html, xpaths)

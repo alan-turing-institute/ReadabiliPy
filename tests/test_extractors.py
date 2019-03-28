@@ -30,8 +30,7 @@ def test_extract_title():
             <head>
             </head>
             <body>
-                <h2 class="title">Example title</h2>
-                <h1 class="title">Example title</h1>
+                <h2 itemprop="headline">Example title</h2>
                 <header><h1>Incorrect title</h1></header>
                 <p>Hello world</p>
             <body>
