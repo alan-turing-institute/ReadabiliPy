@@ -8,7 +8,7 @@ def extract_title(html):
     # Tuple scores reflect confidence in these xpaths and the preference used for extraction
     xpaths = [
         ('//meta[@property="og:title"]/@content', 45),
-        ('//meta[@itemprop="headline"]/@content', 1),
+        ('//meta[contains(@itemprop, "headline")]/@content', 2),
         ('//meta[@name="fb_title"]/@content', 1),
         ('//meta[@name="sailthru.title"]/@content', 1),
         ('//meta[@name="dcterms.title"]/@content', 1),
