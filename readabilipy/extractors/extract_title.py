@@ -8,7 +8,7 @@ def extract_title(html):
     extraction_paths = [
         {
             "paths": [["meta"]],
-            "attrs": [{"property": "og:title"}, {"itemprop": "headline"}, {"name": "fb_title"}, {"name": "sailthru.author"}, {"name": "dcterms.title"}, {"name": "title"}],
+            "attrs": [{"property": "og:title"}, {"itemprop": "headline"}, {"name": "fb_title"}, {"name": "sailthru.title"}, {"name": "dcterms.title"}, {"name": "title"}],
             "element": "content"
         },
         {
