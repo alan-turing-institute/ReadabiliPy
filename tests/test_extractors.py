@@ -1,4 +1,5 @@
 from ..readabilipy.extractors.extract_title import extract_title
+from ..readabilipy.extractors.extract_date import extract_date
 
 
 def test_extract_title():
@@ -57,4 +58,16 @@ def test_extract_title():
     for html in addicting_info_htmls:
         output = extract_title(html)
         expected_output = "Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And It’s On Video"
+        assert output == expected_output
+
+
+def test_extract_date():
+    htmls = [
+        """
+            <meta name="Last-Modified" content="2018-12-21 06:30:21" />
+        """
+    ]
+    expected_output = "2018-12-21T06:30:21"
+    for html in htmls:
+        output = extract_date(html)
         assert output == expected_output
