@@ -86,7 +86,7 @@ def extract_date(html):
     # List of xpaths for HTML tags that could contain a date
     # Tuple scores reflect confidence in these xpaths and the preference used for extraction
     xpaths = [
-        ('//meta[@property="article:published_time"]/@content', 24),
+        ('//meta[@property="article:published_time"]/@content', 24), #  Unlike with title, makes sense to have extremely high confidence in popular date tags
         ('//meta[@name="Last-Modified"]/@content', 1),
         ('//meta[@name="dcterms.created"]/@content', 1),
         ('//meta[@name="published"]/@content', 1),

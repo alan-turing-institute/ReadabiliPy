@@ -65,9 +65,14 @@ def test_extract_date():
     htmls = [
         """
             <meta name="Last-Modified" content="2018-12-21 06:30:21" />
+        """,
+        """
+            <p itemprop="datePublished">12/21/2018</p>
         """
     ]
-    expected_output = "2018-12-21T06:30:21"
+    expected_outputs = ["2018-12-21T06:30:21", "2018-12-21T00:00:00"]
+    i = -1
     for html in htmls:
+        i += 1
         output = extract_date(html)
-        assert output == expected_output
+        assert output == expected_outputs[i]
