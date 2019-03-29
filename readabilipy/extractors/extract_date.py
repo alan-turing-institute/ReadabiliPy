@@ -82,7 +82,7 @@ def extract_datetime_string(date_string, date_format=None, timezone=False, use_a
 
 
 def extract_date(html):
-    """Return the article title from the article HTML"""
+    """Return the article date from the article HTML"""
 
     # List of xpaths for HTML tags that could contain a date
     # Tuple scores reflect confidence in these xpaths and the preference used for extraction
@@ -145,13 +145,19 @@ def extract_date(html):
         ('[Published] hh:mm A [EST] MMM DD, YYYY', 2)
     ]
 
-    # Take the date_string that matches the most specific format
+    # See if a date of any of these formats can be found
+    # Put them in a list because shorter versions of long date formats may also match
     dates = []
     for format, score in formats:
         date_in_this_format = extract_datetime_string(date_string, date_format=format)
         if date_in_this_format:
             dates.append((date_in_this_format, score))
 
+    # If we can't get the date with these formats, get without using format
     if len(dates) == 0:
+        date_in_this_format = extract_datetime_string(date_string)
+        if date_in_this_format:
+            return date_in_this_format
         return None
+    # Return the date_string that matches the most specific format
     return max(dates, key=lambda item: item[1])[0]
