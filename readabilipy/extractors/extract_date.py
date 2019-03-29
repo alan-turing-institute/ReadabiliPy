@@ -128,27 +128,29 @@ def extract_date(html):
     # Convert the date_string to a consistent format
     # Tuple scores reflect preference of format, more specific formats should be prioritised
     formats = [
-        ('YYYY-MM-DD hh:mm:ss', 3),
-        ('YYYY-MM-DD', 2),
-        ('ddd MMM DD YYYY hh:mm:ss', 3),
-        ('ddd MMM D YYYY HH:mm:ss', 3),
+        ('YYYY-MM-DD hh:mm:ss', 2),
+        ('YYYY-MM-DD', 1),
+        ('ddd MMM DD YYYY hh:mm:ss', 2),
+        ('ddd MMM D YYYY HH:mm:ss', 2),
+        ('ddd MMM DD YYYY', 1),
         ('DD/MM/YY', 1),
-        ('h:m A MM/DD/YYYY', 1),
-        ('unix_milliseconds', 1),
+        ('h:m A MM/DD/YYYY', 2),
+        ('MM/DD/YYYY', 1),
+        ('unix_milliseconds', 2),
         ('MMM DD YYYY', 1),
         ('MMM D, YYYY', 1),
         ('MMMM DD, YYYY', 1),
-        ('MMMM D, YYYY', 2),
-        ('[Published] hh:mm A [EST] MMM DD, YYYY', 3)
+        ('MMMM D, YYYY', 1),
+        ('[Published] hh:mm A [EST] MMM DD, YYYY', 2)
     ]
 
     # Take the date_string that matches the most specific format
-    date_strings = defaultdict(int)
+    dates = []
     for format, score in formats:
         date_in_this_format = extract_datetime_string(date_string, date_format=format)
         if date_in_this_format:
-            date_strings[date_in_this_format] += score
+            dates.append((date_in_this_format, score))
 
-    if not date_strings:
+    if len(dates) == 0:
         return None
-    return max(date_strings, key=date_strings.get)
+    return max(dates, key=lambda item: item[1])[0]
