@@ -2,7 +2,6 @@ from .extract_element import extract_element
 import arrow
 import pendulum
 import re
-from collections import defaultdict
 
 
 def pendulum_datetime_extract(date_string, date_format=None):
@@ -48,6 +47,7 @@ def arrow_datetime_extract(date_string, date_format=None):
             datetime = None
     return datetime
 
+
 def extract_datetime_string(date_string, date_format=None, timezone=False, use_arrow=False):
     # Replace lower-case AM and PM with upper-case equivalents since pendulum
     # can only interpret upper-case
@@ -80,13 +80,14 @@ def extract_datetime_string(date_string, date_format=None, timezone=False, use_a
         out_string = None
     return out_string
 
+
 def extract_date(html):
     """Return the article title from the article HTML"""
 
     # List of xpaths for HTML tags that could contain a date
     # Tuple scores reflect confidence in these xpaths and the preference used for extraction
     xpaths = [
-        ('//meta[@property="article:published_time"]/@content', 24), #  Unlike with title, makes sense to have extremely high confidence in popular date tags
+        ('//meta[@property="article:published_time"]/@content', 24),  # Unlike with title, makes sense to have extremely high confidence in popular date tags
         ('//meta[@name="Last-Modified"]/@content', 1),
         ('//meta[@name="dcterms.created"]/@content', 1),
         ('//meta[@name="published"]/@content', 1),

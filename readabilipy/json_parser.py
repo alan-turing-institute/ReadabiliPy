@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 from bs4.element import Comment, NavigableString, CData
 from .plain_html import parse_to_tree
 from .extractors.extract_title import extract_title
+from .extractors.extract_date import extract_date
 from .text_manipulation import normalise_text
 
 
@@ -30,6 +31,7 @@ def parse_to_json(html, content_digests=False, node_indexes=False, use_readabili
     else:
         input_json = {
             "title": extract_title(html),
+            "date": extract_date(html),
             "content": str(parse_to_tree(html))
         }
 
@@ -39,6 +41,7 @@ def parse_to_json(html, content_digests=False, node_indexes=False, use_readabili
     article_json = {
         "title": None,
         "byline": None,
+        "date": None,
         "content": None,
         "plain_content": None,
         "plain_text": None
@@ -49,6 +52,8 @@ def parse_to_json(html, content_digests=False, node_indexes=False, use_readabili
             article_json["title"] = input_json["title"]
         if "byline" in input_json and input_json["byline"]:
             article_json["byline"] = input_json["byline"]
+        if "date" in input_json and input_json["date"]:
+            article_json["date"] = input_json["date"]
         if "content" in input_json and input_json["content"]:
             article_json["content"] = input_json["content"]
             article_json["plain_content"] = plain_content(article_json["content"], content_digests, node_indexes)
