@@ -18,7 +18,6 @@ def extract_element(html, xpaths, return_all_unique=False):
             element = normalise_whitespace(found_element)
             if element:
                 extracted_strings[element] += score
-                print(element)
     # Return highest scoring element
     if not extracted_strings:
         return None
