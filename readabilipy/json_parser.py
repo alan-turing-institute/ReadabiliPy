@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 from bs4.element import Comment, NavigableString, CData
 from .plain_html import parse_to_tree
 from .extractors.extract_title import extract_title
+from .extractors.extract_byline import extract_byline
 from .text_manipulation import normalise_text
 
 
@@ -30,6 +31,7 @@ def parse_to_json(html, content_digests=False, node_indexes=False, use_readabili
     else:
         input_json = {
             "title": extract_title(html),
+            "byline": extract_byline(html),
             "content": str(parse_to_tree(html))
         }
 

@@ -45,8 +45,8 @@ def extract_byline(html):
         ('//span[contains(@class, "author-card__details__name")]/text()', 1),
         ('//span[contains(@itemprop, "author")]', 1),
         ('//span[contains(@class, "author vcard"  )]/span/text()', 1),
-        ('//span[@itemprop="name"]/text()', 1),
-        ('//span[@itemprop="name"]/a/text()', 1),
+        # ('//span[@itemprop="name"]/text()', 1),
+        # ('//span[@itemprop="name"]/a/text()', 1),
         ('//span[@itemprop="author"]/meta[@itemprop="name"]/@content', 3),
         ('//span[@itemprop="author"]/a/span[@itemprop="name"]/text()', 1),
         ('//span[@itemprop="author"]/span[@itemprop="name"]/text()', 1),
@@ -72,6 +72,9 @@ def extract_byline(html):
             byline_words = byline.split()
             if len(byline_words) > 3:
                 extracted_bylines.remove(byline)
+        # Some sites include urls in the same xpaths others use for byline
+        if "https://" in byline:
+            extracted_bylines.remove(byline)
 
     # Return comma separated authors
     byline_string = ", ".join(extracted_bylines)
