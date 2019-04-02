@@ -59,12 +59,18 @@ def extract_byline(html):
         ('substring-after(//div[@class="container"]/div[@class="row"]/div[@class="col-md-8"]/p[contains(text(), "Submitted")]/text(), "by ")', 1)
     ]
 
-    author_names = extract_element(html, xpaths, return_all_unique=True)
+    extracted_bylines = extract_element(html, xpaths, return_all_unique=True)
 
-    for name in author_names:
-        if len(name.split()) > 3: #  Names shouldn't have more than 3 words
-            author_names.remove(name)
+    for byline in extracted_bylines:
+        # Assume comma/and separated bylines are multi-author
+        if ', ' not in byline and 'and' not in byline and 'AND' not in byline:
+            #  Bylines shouldn't have more than 3 words for a single author name
+            byline_words = byline.split()
+            if len(byline_words) > 3:
+                extracted_bylines.remove(byline)
 
-    byline_string = ", ".join(author_names)
-
+    # Return comma separated authors
+    byline_string = ", ".join(extracted_bylines)
+    if len(extracted_bylines) == 0:
+        return None
     return byline_string

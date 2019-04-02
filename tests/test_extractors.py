@@ -69,7 +69,7 @@ def test_extract_byline():
             <meta name="author" content="Ed Chalstrey and James Robinson" />
         """,
         """
-            <span itemprop="author"><meta itemprop="name" content="Ed Chalstrey and James Robinson" /></span>
+            <span itemprop="author"><meta itemprop="name" content="Ed Chalstrey, James Robinson" /></span>
         """
     ]
 
@@ -79,7 +79,7 @@ def test_extract_byline():
 
     htmls.append(html)
 
-    expected_outputs = ["Ed Chalstrey and James Robinson", "Ed Chalstrey and James Robinson", "Nicole Perlroth, Scott Shane"]
+    expected_outputs = ["Ed Chalstrey and James Robinson", "Ed Chalstrey, James Robinson", "Nicole Perlroth, Scott Shane"]
 
     for html, expected_output in tuple(zip(htmls, expected_outputs)):
         output = extract_byline(html)
