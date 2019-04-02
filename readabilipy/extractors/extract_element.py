@@ -1,5 +1,6 @@
 from collections import defaultdict
 import lxml.html
+import lxml.etree
 from ..text_manipulation import normalise_whitespace
 
 
@@ -15,9 +16,11 @@ def extract_element(html, xpaths, return_all_unique=False):
     # Get all elements specified and concatenate scores
     for extraction_xpath, score in xpaths:
         for found_element in lxml_html.xpath(extraction_xpath):
-            element = normalise_whitespace(found_element)
-            if element:
-                extracted_strings[element] += score
+            # Only proceed for xpaths that get text, not a html element
+            if type(found_element) == lxml.etree._ElementUnicodeResult:
+                element = normalise_whitespace(found_element)
+                if element:
+                    extracted_strings[element] += score
     # Return highest scoring element
     if not extracted_strings:
         return None
