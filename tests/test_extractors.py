@@ -1,4 +1,5 @@
 from ..readabilipy.extractors.extract_title import extract_title
+from ..readabilipy.extractors.extract_byline import extract_byline
 
 
 def test_extract_title():
@@ -57,4 +58,18 @@ def test_extract_title():
     for html in addicting_info_htmls:
         output = extract_title(html)
         expected_output = "Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And It’s On Video"
+        assert output == expected_output
+
+
+def test_extract_byline():
+
+    htmls = [
+        """
+            <meta name="author" content="Ed Chalstrey" />
+        """
+    ]
+
+    for html in htmls:
+        output = extract_byline(html)
+        expected_output = "Ed Chalstrey"
         assert output == expected_output
