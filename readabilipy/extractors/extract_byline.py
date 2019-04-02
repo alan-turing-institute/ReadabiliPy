@@ -61,6 +61,10 @@ def extract_byline(html):
 
     extracted_bylines = extract_element(html, xpaths, return_all_unique=True)
 
+    if not extracted_bylines:
+        return None
+    if len(extracted_bylines) == 0:
+        return None
     for byline in extracted_bylines:
         # Assume comma/and separated bylines are multi-author
         if ', ' not in byline and 'and' not in byline and 'AND' not in byline:
@@ -71,6 +75,4 @@ def extract_byline(html):
 
     # Return comma separated authors
     byline_string = ", ".join(extracted_bylines)
-    if len(extracted_bylines) == 0:
-        return None
     return byline_string
