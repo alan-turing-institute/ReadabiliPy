@@ -59,4 +59,12 @@ def extract_byline(html):
         ('substring-after(//div[@class="container"]/div[@class="row"]/div[@class="col-md-8"]/p[contains(text(), "Submitted")]/text(), "by ")', 1)
     ]
 
-    return extract_element(html, xpaths)
+    author_names = extract_element(html, xpaths, return_all_unique=True)
+
+    for name in author_names:
+        if len(name.split()) > 3: #  Names shouldn't have more than 3 words
+            author_names.remove(name)
+
+    byline_string = ", ".join(author_names)
+
+    return byline_string

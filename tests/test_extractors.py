@@ -1,5 +1,6 @@
 from ..readabilipy.extractors.extract_title import extract_title
 from ..readabilipy.extractors.extract_byline import extract_byline
+import os
 
 
 def test_extract_title():
@@ -69,7 +70,14 @@ def test_extract_byline():
         """
     ]
 
-    for html in htmls:
+    test_filepath = os.path.join(os.path.dirname(__file__), "data", "nytimes-multiple-bylines.html")
+    with open(test_filepath) as h:
+        html = h.read()
+
+    htmls.append(html)
+
+    expected_outputs = ["Ed Chalstrey", "Nicole Perlroth, Scott Shane"]
+
+    for html, expected_output in tuple(zip(htmls, expected_outputs)):
         output = extract_byline(html)
-        expected_output = "Ed Chalstrey"
         assert output == expected_output

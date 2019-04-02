@@ -3,7 +3,7 @@ import lxml.html
 from ..text_manipulation import normalise_whitespace
 
 
-def extract_element(html, xpaths):
+def extract_element(html, xpaths, return_all_unique=False):
     """Return the relevant element (title, date or byline) from article HTML
         xpaths should be a list of tuples, each with the xpath and a reliability score
     """
@@ -18,8 +18,10 @@ def extract_element(html, xpaths):
             element = normalise_whitespace(found_element)
             if element:
                 extracted_strings[element] += score
-
+                print(element)
     # Return highest scoring element
     if not extracted_strings:
         return None
-    return max(extracted_strings, key=extracted_strings.get)
+    if return_all_unique:  # In this case return a list of all unique elements
+        return list(extracted_strings.keys())
+    return max(extracted_strings, key=extracted_strings.get)  # In this case just highest scoring
