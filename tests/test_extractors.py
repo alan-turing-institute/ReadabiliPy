@@ -49,7 +49,8 @@ def test_extract_title():
             <meta property="og:title" content="Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And It&#8217;s On Video" />
         """
     ]
-    expected_outputs = ["Example title", "Example title", "Example title", "Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And It’s On Video", "Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And It’s On Video"]
+    expected_outputs = ["Example title"] * 3
+    expected_outputs.extend(["Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And It’s On Video"] * 2)
     for html, expected_output in zip(htmls, expected_outputs):
         output = extract_title(html)
         assert output == expected_output
