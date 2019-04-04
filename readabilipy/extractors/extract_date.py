@@ -65,6 +65,7 @@ def extract_datetime_string(date_string, date_format=None, timezone=False, use_a
 
     # First try pendulum as it seems to have fewer bugs
     # Source: http://blog.eustace.io/please-stop-using-arrow.html
+    print(date_string)
     datetime = pendulum_datetime_extract(date_string, date_format)
     if not datetime and use_arrow:
         # then try arrow as it can extract dates from within longer non-date strings
@@ -127,8 +128,8 @@ def extract_date(html):
     # Get the date
     date_string = extract_element(html, xpaths)
 
-    # Proceed only if a date is found in the html
-    if not date_string:
+    # Proceed only if a date is found in the html. Ignore anything pulled with < 2 characters, which cannot be handled by Pendulum
+    if not date_string or len(date_string) < 2:
         return None
 
     # Convert the date_string to a consistent format
