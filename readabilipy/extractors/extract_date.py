@@ -65,7 +65,6 @@ def extract_datetime_string(date_string, date_format=None, timezone=False, use_a
 
     # First try pendulum as it seems to have fewer bugs
     # Source: http://blog.eustace.io/please-stop-using-arrow.html
-    print(date_string)
     datetime = pendulum_datetime_extract(date_string, date_format)
     if not datetime and use_arrow:
         # then try arrow as it can extract dates from within longer non-date strings
