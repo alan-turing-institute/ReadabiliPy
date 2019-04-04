@@ -47,10 +47,15 @@ def test_extract_title():
         """,
         """
             <meta property="og:title" content="Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And It&#8217;s On Video" />
+        """,
+        """
+            <h1 class="entry-title">Pamela Geller in Breitbart News: Dueling Billboards from CAIR, AFDI in Times Square</h1>
+            <meta property="og:title" content="Pamela Geller in Breitbart News: Dueling Billboards from CAIR, AFDI in Times Square - Geller Report" />
         """
     ]
     expected_outputs = ["Example title"] * 3
     expected_outputs.extend(["Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And It’s On Video"] * 2)
+    expected_outputs.append("Pamela Geller in Breitbart News: Dueling Billboards from CAIR, AFDI in Times Square")
     for html, expected_output in zip(htmls, expected_outputs):
         output = extract_title(html)
         assert output == expected_output
