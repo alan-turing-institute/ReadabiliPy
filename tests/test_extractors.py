@@ -68,9 +68,12 @@ def test_extract_date():
         """,
         """
             <p itemprop="datePublished">12/21/2018</p>
+        """,
+        """
+            <h1>No dates here</h1>
         """
     ]
-    expected_outputs = ["2018-12-21T06:30:21", "2018-12-21T00:00:00"]
+    expected_outputs = ["2018-12-21T06:30:21", "2018-12-21T00:00:00", None]
     for html, expected_output in zip(htmls, expected_outputs):
         output = extract_date(html)
         assert output == expected_output

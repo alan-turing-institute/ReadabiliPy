@@ -127,6 +127,10 @@ def extract_date(html):
     # Get the date
     date_string = extract_element(html, xpaths)
 
+    # Proceed only if a date is found in the html
+    if not date_string:
+        return None
+
     # Convert the date_string to a consistent format
     # Tuple scores reflect preference of format, more specific formats should be prioritised
     formats = [
