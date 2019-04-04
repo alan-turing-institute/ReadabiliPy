@@ -1,5 +1,6 @@
-from .extract_element import extract_element
 import arrow
+from collections import defaultdict
+from .extract_element import extract_element
 import pendulum
 import re
 
@@ -142,22 +143,19 @@ def extract_date(html):
         ('MMM D, YYYY', 1),
         ('MMMM DD, YYYY', 1),
         ('MMMM D, YYYY', 1),
-        ('[Published] hh:mm A [EST] MMM DD, YYYY', 2)
+        ('[Published] hh:mm A [EST] MMM DD, YYYY', 2),
+        (None, 1)
     ]
 
-    # See if a date of any of these formats can be found
-    # Put them in a list because shorter versions of long date formats may also match
-    dates = []
+    # See if a date of any of these formats can be found, including no specific format
+    # Put them in a dict because shorter versions of long date formats may also match
+    extracted_dates = defaultdict(int)
     for format, score in formats:
         date_in_this_format = extract_datetime_string(date_string, date_format=format)
         if date_in_this_format:
-            dates.append((date_in_this_format, score))
+            extracted_dates[date_in_this_format] += score
 
-    # If we can't get the date with these formats, get without using format
-    if len(dates) == 0:
-        date_in_this_format = extract_datetime_string(date_string)
-        if date_in_this_format:
-            return date_in_this_format
+    if not extracted_dates:
         return None
-    # Return the date_string that matches the most specific format
-    return max(dates, key=lambda item: item[1])[0]
+    # Return the date_string with highest score
+    return max(extracted_dates, key=extracted_dates.get)

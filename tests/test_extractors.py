@@ -71,6 +71,6 @@ def test_extract_date():
         """
     ]
     expected_outputs = ["2018-12-21T06:30:21", "2018-12-21T00:00:00"]
-    for html, expected_output in tuple(zip(htmls, expected_outputs)):
+    for html, expected_output in zip(htmls, expected_outputs):
         output = extract_date(html)
         assert output == expected_output
