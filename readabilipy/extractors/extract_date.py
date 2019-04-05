@@ -134,10 +134,10 @@ def extract_date(html):
     # Convert the date_string to a consistent format
     # Tuple scores reflect preference of format, more specific formats should be prioritised
     formats = [
-        ('YYYY-MM-DD hh:mm:ss', 2),
+        ('YYYY-MM-DD hh:mm:ss', 6),
         ('YYYY-MM-DD', 1),
-        ('ddd MMM DD YYYY hh:mm:ss', 2),
-        ('ddd MMM D YYYY HH:mm:ss', 2),
+        ('ddd MMM DD YYYY hh:mm:ss', 6),
+        ('ddd MMM D YYYY HH:mm:ss', 6),
         ('ddd MMM DD YYYY', 1),
         ('DD/MM/YY', 1),
         ('h:m A MM/DD/YYYY', 2),
@@ -148,7 +148,7 @@ def extract_date(html):
         ('MMMM DD, YYYY', 1),
         ('MMMM D, YYYY', 1),
         ('[Published] hh:mm A [EST] MMM DD, YYYY', 2),
-        (None, 1)
+        (None, 2)
     ]
 
     # See if a date of any of these formats can be found, including no specific format
