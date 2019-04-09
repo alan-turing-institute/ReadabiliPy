@@ -3,7 +3,7 @@ import lxml.html
 from ..text_manipulation import normalise_whitespace
 
 
-def extract_element(html, xpaths):
+def extract_element(html, xpaths, delete_longer=True):
     """Return the relevant element (title, date or byline) from article HTML
         xpaths should be a list of tuples, each with the xpath and a reliability score
     """
@@ -25,8 +25,12 @@ def extract_element(html, xpaths):
     for element in extracted_strings:
         for element2 in extracted_strings:
             if element in element2 and element != element2:  # if an element is a shorter version of a longer one
-                extracted_strings[element] += extracted_strings[element2]  # combine scores
-                delete_these.append(element2)  # then assign the larger element for deletion
+                if delete_longer:
+                    extracted_strings[element] += extracted_strings[element2]  # combine scores
+                    delete_these.append(element2)  # then assign the larger element for deletion
+                else:
+                    extracted_strings[element2] += extracted_strings[element]  # combine scores
+                    delete_these.append(element)  # then assign the shorter element for deletion
     for del_str in delete_these:
         if del_str in extracted_strings:
             del extracted_strings[del_str]

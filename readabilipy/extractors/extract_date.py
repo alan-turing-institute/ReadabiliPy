@@ -125,7 +125,7 @@ def extract_date(html):
     ]
 
     # Get the date
-    date_string = extract_element(html, xpaths)
+    date_string = extract_element(html, xpaths, delete_longer=False)
     print(date_string)
     # Proceed only if a date is found in the html. Ignore anything pulled with < 2 characters, which cannot be handled by Pendulum
     if not date_string or len(date_string) < 2:
