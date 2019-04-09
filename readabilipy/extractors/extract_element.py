@@ -14,12 +14,21 @@ def extract_element(html, xpaths, delete_longer=True):
 
     # Get all elements specified and concatenate scores
     for extraction_xpath, score in xpaths:
-        for found_element in lxml_html.xpath(extraction_xpath):
-            if isinstance(found_element, lxml.etree._ElementUnicodeResult):
-                element = normalise_whitespace(found_element)
+        found_elements = lxml_html.xpath(extraction_xpath)
+        if found_elements:
+            # If just one found
+            if isinstance(found_elements, lxml.etree._ElementUnicodeResult):
+                element = normalise_whitespace(found_elements)
                 if element:
                     extracted_strings[element] += score
-
+            # If a list of elements found:
+            else:
+                for found_element in found_elements:
+                    if isinstance(found_element, lxml.etree._ElementUnicodeResult):
+                        element = normalise_whitespace(found_element)
+                        if element:
+                            extracted_strings[element] += score
+                            
     # Consider elements where one is just a longer version of another to be the same and concatenate scores
     delete_these = []
     for element in extracted_strings:

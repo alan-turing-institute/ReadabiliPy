@@ -135,31 +135,28 @@ def extract_date(html):
     # Convert the date_string to a consistent format
     # Tuple scores reflect preference of format, more specific formats should be prioritised
     formats = [
-        ('YYYY-MM-DD hh:mm:ss', 6),
-        ('YYYY-MM-DD', 1),
-        ('ddd MMM DD YYYY hh:mm:ss', 6),
-        ('ddd MMM D YYYY HH:mm:ss', 6),
-        ('ddd MMM DD YYYY', 1),
-        ('DD/MM/YY', 1),
-        ('h:m A MM/DD/YYYY', 2),
-        ('MM/DD/YYYY', 1),
-        ('unix_milliseconds', 2),
-        ('MMM DD YYYY', 1),
-        ('MMM D, YYYY', 1),
-        ('MMMM DD, YYYY', 1),
-        ('MMMM D, YYYY', 1),
-        ('[Published] hh:mm A [EST] MMM DD, YYYY', 2),
-        (None, 2)
+        ('YYYY-MM-DD hh:mm:ss', 6, False),
+        ('YYYY-MM-DD', 1, False),
+        ('ddd MMM DD YYYY hh:mm:ss', 6, False),
+        ('ddd MMM D YYYY HH:mm:ss', 6, False),
+        ('ddd MMM DD YYYY', 1, False),
+        ('DD/MM/YY', 1, False),
+        ('h:m A MM/DD/YYYY', 2, False),
+        ('MM/DD/YYYY', 1, True),
+        ('MMM DD YYYY', 1, True),
+        ('MMM D, YYYY', 1, True),
+        ('MMMM DD, YYYY', 1, True),
+        ('MMMM D, YYYY', 1, True),
+        ('[Published] hh:mm A [EST] MMM DD, YYYY', 2, True),
+        ('unix_milliseconds', 2, False),
+        (None, 2, False)
     ]
 
     # See if a date of any of these formats can be found, including no specific format
     # Put them in a dict because shorter versions of long date formats may also match
     extracted_dates = defaultdict(int)
-    for format, score in formats:
-        if format == '[Published] hh:mm A [EST] MMM DD, YYYY':
-            date_in_this_format = extract_datetime_string(date_string, date_format=format, use_arrow=True)
-        else:
-            date_in_this_format = extract_datetime_string(date_string, date_format=format)
+    for format, score, use_arrow in formats:
+        date_in_this_format = extract_datetime_string(date_string, date_format=format, use_arrow=use_arrow)
         if date_in_this_format:
             extracted_dates[date_in_this_format] += score
     print(extracted_dates)
