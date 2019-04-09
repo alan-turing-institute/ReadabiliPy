@@ -119,14 +119,14 @@ def extract_date(html):
         ('//span[@class="entry-date"]/text()', 1),
         ('//p[@itemprop="datePublished"]/text()', 1),
         ('//p[@class="entry-byline"]//time[@class="entry-date"]/@datetime', 1),
-        ('//article[contains(@id, "post")]//time[@class="entry-date published"]/@datetime', 1),
+        ('//article[contains(@id, "post")]//time[@class="entry-date published"]/@datetime', 25),
         ('substring-after(//*[comment()[contains(., "By")]]/comment(), "-")', 1),
         ('substring-after(//p[@class="text-muted"]/text(), ",")', 1)
     ]
 
     # Get the date
     date_string = extract_element(html, xpaths)
-
+    print(date_string)
     # Proceed only if a date is found in the html. Ignore anything pulled with < 2 characters, which cannot be handled by Pendulum
     if not date_string or len(date_string) < 2:
         return None
@@ -155,10 +155,13 @@ def extract_date(html):
     # Put them in a dict because shorter versions of long date formats may also match
     extracted_dates = defaultdict(int)
     for format, score in formats:
-        date_in_this_format = extract_datetime_string(date_string, date_format=format)
+        if format == '[Published] hh:mm A [EST] MMM DD, YYYY':
+            date_in_this_format = extract_datetime_string(date_string, date_format=format, use_arrow=True)
+        else:
+            date_in_this_format = extract_datetime_string(date_string, date_format=format)
         if date_in_this_format:
             extracted_dates[date_in_this_format] += score
-
+    print(extracted_dates)
     if not extracted_dates:
         return None
     # Return the date_string with highest score
