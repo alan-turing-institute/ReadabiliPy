@@ -83,9 +83,12 @@ def test_extract_date():
         """,
         """
             <div class="publish-date"> Published 11:32 AM EST Feb 19, 2019 </div>
+        """,
+        """
+            <meta name="published_time_telegram" content="2019-01-25T15:16:00+00:00" />
         """
     ]
-    expected_outputs = ["2018-12-21T06:30:21", "2018-12-21T00:00:00", None, "2018-10-09T01:03:32", "2018-12-13T21:02:01", "2019-01-30T09:39:19", "2019-02-19T11:32:00"]
+    expected_outputs = ["2018-12-21T06:30:21", "2018-12-21T00:00:00", None, "2018-10-09T01:03:32", "2018-12-13T21:02:01", "2019-01-30T09:39:19", "2019-02-19T11:32:00", "2019-01-25T15:16:00"]
     for html, expected_output in zip(htmls, expected_outputs):
         output = extract_date(html)
         assert output == expected_output

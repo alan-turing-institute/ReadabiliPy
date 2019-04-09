@@ -92,6 +92,7 @@ def extract_date(html):
         ('//meta[@name="Last-Modified"]/@content', 1),
         ('//meta[@name="dcterms.created"]/@content', 1),
         ('//meta[@name="published"]/@content', 1),
+        ('//meta[@name="published_time_telegram"]/@content', 1),
         ('//meta[@property="og:article:published_time"]/@content', 1),
         ('//meta[@property="og:pubdate"]/@content', 1),
         ('//meta[contains(concat(" ", normalize-space(@property), " "), " article:published_time ")]/@content', 1),
