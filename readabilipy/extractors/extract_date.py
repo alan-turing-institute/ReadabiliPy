@@ -115,7 +115,7 @@ def extract_date(html):
         ('//div[@class="publish-date"]/text()', 1),
         ('//footer[@class="byline"]/time/@datetime', 1),
         ('//span[@class="timestamp "]/@data-epoch-time', 1),
-        ('//span[@class="article-element__meta-item"]', 1),
+        ('//span[@class="article-element__meta-item"]/text()', 1),
         ('//span[@class="date published time"]/@title', 1),
         ('//span[@class="updated"]/text()', 1),
         ('//span[@class="entry-date"]/text()', 1),
