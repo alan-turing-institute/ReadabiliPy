@@ -159,7 +159,8 @@ def extract_date(html):
     for format, score, use_arrow in formats:
         date_in_this_format = extract_datetime_string(date_string, date_format=format, use_arrow=use_arrow)
         if date_in_this_format:
-            extracted_dates[date_in_this_format] += score
+            if "1970-" not in date_in_this_format:
+                extracted_dates[date_in_this_format] += score
 
     if not extracted_dates:
         return None
