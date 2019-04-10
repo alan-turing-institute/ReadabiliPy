@@ -89,6 +89,7 @@ def extract_date(html):
     # Tuple scores reflect confidence in these xpaths and the preference used for extraction
     xpaths = [
         ('//meta[@property="article:published_time"]/@content', 24),  # Unlike with title, makes sense to have extremely high confidence in popular date tags
+        ('//meta[@property="article:published"]/@content', 20),
         ('//meta[@name="Last-Modified"]/@content', 1),
         ('//meta[@name="dcterms.created"]/@content', 1),
         ('//meta[@name="published"]/@content', 1),
@@ -109,8 +110,8 @@ def extract_date(html):
         ('//div[@class="keyvals"]/@data-content_published_date', 1),
         ('//div[@class="article-byline"]/time[@class="visually-hidden"]/text()', 1),
         ('//div/time/@datetime', 1),
-        ('//div[@class="subarticle"]/p/text()', 1),
-        ('//div[@class="text"]/p/text()', 1),
+        # ('//div[@class="subarticle"]/p/text()', 1),
+        # ('//div[@class="text"]/p/text()', 1),
         ('//div[@class="publish-date"]/text()', 1),
         ('//footer[@class="byline"]/time/@datetime', 1),
         ('//span[@class="timestamp "]/@data-epoch-time', 1),
