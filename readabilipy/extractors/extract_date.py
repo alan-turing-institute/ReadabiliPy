@@ -92,7 +92,7 @@ def extract_date(html):
         ('//meta[@property="article:published"]/@content', 20),
         ('//meta[@name="Last-Modified"]/@content', 1),
         ('//meta[@name="dcterms.created"]/@content', 1),
-        ('//meta[@name="published"]/@content', 1),
+        ('//meta[@name="published"]/@content', 5),
         ('//meta[@name="published_time_telegram"]/@content', 1),
         ('//meta[@property="og:article:published_time"]/@content', 1),
         ('//meta[@property="og:pubdate"]/@content', 1),
@@ -110,8 +110,8 @@ def extract_date(html):
         ('//div[@class="keyvals"]/@data-content_published_date', 1),
         ('//div[@class="article-byline"]/time[@class="visually-hidden"]/text()', 1),
         ('//div/time/@datetime', 1),
-        # ('//div[@class="subarticle"]/p/text()', 1),
-        # ('//div[@class="text"]/p/text()', 1),
+        ('//div[@class="subarticle"]/p/text()', -1),
+        ('//div[@class="text"]/p/text()', -1),
         ('//div[@class="publish-date"]/text()', 1),
         ('//footer[@class="byline"]/time/@datetime', 1),
         ('//span[@class="timestamp "]/@data-epoch-time', 1),
@@ -128,7 +128,7 @@ def extract_date(html):
 
     # Get the date
     date_string = extract_element(html, xpaths, delete_longer=False)
-    print(date_string)
+
     # Proceed only if a date is found in the html. Ignore anything pulled with < 2 characters, which cannot be handled by Pendulum
     if not date_string or len(date_string) < 2:
         return None
@@ -160,7 +160,7 @@ def extract_date(html):
         date_in_this_format = extract_datetime_string(date_string, date_format=format, use_arrow=use_arrow)
         if date_in_this_format:
             extracted_dates[date_in_this_format] += score
-    print(extracted_dates)
+
     if not extracted_dates:
         return None
     # Return the date_string with highest score
