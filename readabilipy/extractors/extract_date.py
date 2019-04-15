@@ -3,6 +3,7 @@ from collections import defaultdict
 from .extract_element import extract_element
 import pendulum
 import re
+from dateutil import parser
 
 
 def pendulum_datetime_extract(date_string, date_format=None):
@@ -129,40 +130,12 @@ def extract_date(html):
     # Get the date
     date_string = extract_element(html, xpaths, delete_longer=False)
 
-    # Proceed only if a date is found in the html. Ignore anything pulled with < 2 characters, which cannot be handled by Pendulum
-    if not date_string or len(date_string) < 2:
-        return None
-
-    # Convert the date_string to a consistent format
-    # Tuple scores reflect preference of format, more specific formats should be prioritised
-    formats = [
-        ('YYYY-MM-DD hh:mm:ss', 6, False),
-        ('YYYY-MM-DD', 1, False),
-        ('ddd MMM DD YYYY hh:mm:ss', 6, False),
-        ('ddd MMM D YYYY HH:mm:ss', 6, False),
-        ('ddd MMM DD YYYY', 1, False),
-        ('DD/MM/YY', 1, False),
-        ('h:m A MM/DD/YYYY', 2, False),
-        ('MM/DD/YYYY', 1, True),
-        ('MMM DD YYYY', 1, True),
-        ('MMM D, YYYY', 1, True),
-        ('MMMM DD, YYYY', 1, True),
-        ('MMMM D, YYYY', 1, True),
-        ('[Published] hh:mm A [EST] MMM DD, YYYY', 2, True),
-        ('unix_milliseconds', 2, False),
-        (None, 2, False)
-    ]
-
-    # See if a date of any of these formats can be found, including no specific format
-    # Put them in a dict because shorter versions of long date formats may also match
-    extracted_dates = defaultdict(int)
-    for format, score, use_arrow in formats:
-        date_in_this_format = extract_datetime_string(date_string, date_format=format, use_arrow=use_arrow)
-        if date_in_this_format:
-            if "1970-" not in date_in_this_format:
-                extracted_dates[date_in_this_format] += score
-
-    if not extracted_dates:
-        return None
-    # Return the date_string with highest score
-    return max(extracted_dates, key=extracted_dates.get)
+    if date_string:
+        if "Published" in date_string:
+            date_time = arrow_datetime_extract(date_string, date_format='[Published] hh:mm A [EST] MMM DD, YYYY')
+            return date_time.format('YYYY-MM-DDTHH:mm:ss')
+        try:
+            return parser.parse(date_string, ignoretz=True).isoformat()
+        except Exception:
+            pass
+    return None
