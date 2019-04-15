@@ -1,5 +1,4 @@
 import arrow
-from collections import defaultdict
 from .extract_element import extract_element
 import pendulum
 import re
