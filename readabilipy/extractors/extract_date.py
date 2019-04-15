@@ -128,9 +128,9 @@ def extract_date(html):
     ]
 
     # Get the date
-    date_string = extract_element(html, xpaths, delete_longer=False)
+    date_string = extract_element(html, xpaths)
 
-    if date_string:    
+    if date_string:
         try:
             return parser.parse(date_string, ignoretz=True).isoformat()
         except Exception:

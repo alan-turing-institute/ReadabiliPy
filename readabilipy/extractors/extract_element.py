@@ -29,27 +29,15 @@ def get_element_candidates(html, xpaths, score_lower_limit=0):
     return extracted_strings
 
 
-def extract_element(html, xpaths, delete_longer=True):
+def extract_element(html, xpaths, combine_strings=None):
     """Return the relevant element (title, date or byline) from article HTML
         xpaths should be a list of tuples, each with the xpath and a reliability score
     """
 
     extracted_strings = get_element_candidates(html, xpaths, score_lower_limit=0)
 
-    # Consider elements where one is just a longer version of another to be the same and concatenate scores
-    delete_these = []
-    for element in extracted_strings:
-        for element2 in extracted_strings:
-            if element in element2 and element != element2:  # if an element is a shorter version of a longer one
-                if delete_longer:
-                    extracted_strings[element] += extracted_strings[element2]  # combine scores
-                    delete_these.append(element2)  # then assign the larger element for deletion
-                else:
-                    extracted_strings[element2] += extracted_strings[element]  # combine scores
-                    delete_these.append(element)  # then assign the shorter element for deletion
-    for del_str in delete_these:
-        if del_str in extracted_strings:
-            del extracted_strings[del_str]
+    if combine_strings:
+        extracted_strings = combine_strings(extracted_strings)
 
     # Only search with xpaths that have a score of -1 if nothing else can be found
     if not extracted_strings:
