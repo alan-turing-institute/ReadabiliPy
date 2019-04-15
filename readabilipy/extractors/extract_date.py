@@ -130,12 +130,11 @@ def extract_date(html):
     # Get the date
     date_string = extract_element(html, xpaths, delete_longer=False)
 
-    if date_string:
-        if "Published" in date_string:
-            date_time = arrow_datetime_extract(date_string, date_format='[Published] hh:mm A [EST] MMM DD, YYYY')
-            return date_time.format('YYYY-MM-DDTHH:mm:ss')
+    if date_string:    
         try:
             return parser.parse(date_string, ignoretz=True).isoformat()
         except Exception:
-            pass
+            date_time = arrow_datetime_extract(date_string, date_format='[Published] hh:mm A [EST] MMM DD, YYYY')
+            if date_time:
+                return date_time.format('YYYY-MM-DDTHH:mm:ss')
     return None
