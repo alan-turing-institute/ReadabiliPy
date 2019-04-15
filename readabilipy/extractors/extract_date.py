@@ -129,12 +129,24 @@ def extract_date(html):
 
     # Get the date
     date_string = extract_element(html, xpaths)
-
+    print(date_string)
     if date_string:
         try:
             return parser.parse(date_string, ignoretz=True).isoformat()
         except Exception:
-            date_time = arrow_datetime_extract(date_string, date_format='[Published] hh:mm A [EST] MMM DD, YYYY')
-            if date_time:
-                return date_time.format('YYYY-MM-DDTHH:mm:ss')
+            unusual_formats = [
+                '[Published] hh:mm A [EST] MMM DD, YYYY',
+                'dddd, MMMM DD, YYYY',
+                'h:m A MM/DD/YYYY',
+                'unix_milliseconds',
+                'MMM DD YYYY'
+            ]
+            for format in unusual_formats:
+                date_time = pendulum_datetime_extract(date_string, date_format=format)
+                if date_time:
+                    return date_time.format('YYYY-MM-DDTHH:mm:ss')
+                if format != 'unix_milliseconds':
+                    date_time = arrow_datetime_extract(date_string, date_format=format)
+                    if date_time:
+                        return date_time.format('YYYY-MM-DDTHH:mm:ss')
     return None

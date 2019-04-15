@@ -92,9 +92,20 @@ def test_extract_date():
         """,
         """
             <div class="text"><p>2019-01-25T15:16:00+00:00</p></div>
+        """,
+        """
+            <div class="article-byline">By
+                <span itemprop="author creator" itemtype="http://schema.org/Person" itemid="/by/michael-gryboski">
+                    <a class="reporter" href="/by/michael-gryboski">
+                        <span itemprop="name">Michael Gryboski</span>
+                    </a>
+                </span>
+                , Christian Post Reporter
+                <time class="visually-hidden"> | Monday, January 28, 2019</time>
+            </div>
         """
     ]
-    expected_outputs = ["2018-12-21T06:30:21", "2018-12-21T00:00:00", None, "2018-10-09T01:03:32", "2018-12-13T21:02:01", "2019-01-30T09:39:19", "2019-02-19T11:32:00", "2019-01-25T15:16:00", "2018-10-19T00:00:00", "2019-01-25T15:16:00"]
+    expected_outputs = ["2018-12-21T06:30:21", "2018-12-21T00:00:00", None, "2018-10-09T01:03:32", "2018-12-13T21:02:01", "2019-01-30T09:39:19", "2019-02-19T11:32:00", "2019-01-25T15:16:00", "2018-10-19T00:00:00", "2019-01-25T15:16:00", "2019-01-28T00:00:00"]
     for html, expected_output in zip(htmls, expected_outputs):
         output = extract_date(html)
         assert output == expected_output
