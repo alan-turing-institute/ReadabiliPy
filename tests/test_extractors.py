@@ -73,6 +73,7 @@ def test_extract_date():
         ("""<meta name="published_time_telegram" content="2019-01-25T15:16:00+00:00" />""", "2019-01-25T15:16:00"),
         ("""<p class="text-muted">Posted Friday, October 19, 2018</p>""", "2018-10-19T00:00:00"),
         ("""<div class="text"><p>2019-01-25T15:16:00+00:00</p></div>""", "2019-01-25T15:16:00"),
+        ("""<span class="timestamp " data-localize-time data-epoch-time="1545342875000" data-time-zone="-0800" data-time-format="%A %B %d, %Y">Thursday December 20, 2018</span>""", "2018-12-20T00:00:00"),
         ("""
             <div class="article-byline">By
                 <span itemprop="author creator" itemtype="http://schema.org/Person" itemid="/by/michael-gryboski">
