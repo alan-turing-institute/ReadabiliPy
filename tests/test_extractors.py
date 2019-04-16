@@ -75,6 +75,7 @@ def test_extract_date():
         ("""<div class="text"><p>2019-01-25T15:16:00+00:00</p></div>""", "2019-01-25T15:16:00"),
         ("""<span class="timestamp " data-localize-time data-epoch-time="1545342875000" data-time-zone="-0800" data-time-format="%A %B %d, %Y">Thursday December 20, 2018</span>""", "2018-12-20T00:00:00"),
         ("""<time style="text-transform:uppercase">8:16 AM 01/31/2019 | Politics</time>""", "2019-01-31T08:16:00"),
+        ("""<span class="article-element__meta-item">Jun 01 2017 posted to <a href="/d/politics" title="Politics" class="article-element__meta-link">Politics</a></span>""", "2017-06-01T00:00:00"),
         ("""
             <div class="article-byline">By
                 <span itemprop="author creator" itemtype="http://schema.org/Person" itemid="/by/michael-gryboski">
