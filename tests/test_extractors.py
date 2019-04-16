@@ -62,38 +62,18 @@ def test_extract_title():
 
 
 def test_extract_date():
-    htmls = [
-        """
-            <meta name="Last-Modified" content="2018-12-21 06:30:21" />
-        """,
-        """
-            <p itemprop="datePublished">12/21/2018</p>
-        """,
-        """
-            <h1>No dates here</h1>
-        """,
-        """
-            <meta property="article:published_time" content="2018-10-09T01:03:32" />
-        """,
-        """
-            <meta property="article:published_time" content="2018-12-13T21:02:01+00:00" />
-        """,
-        """
-            <meta property="article:published_time" content="2019-01-30 09:39:19 -0500" />
-        """,
-        """
-            <div class="publish-date"> Published 11:32 AM EST Feb 19, 2019 </div>
-        """,
-        """
-            <meta name="published_time_telegram" content="2019-01-25T15:16:00+00:00" />
-        """,
-        """
-            <p class="text-muted">Posted Friday, October 19, 2018</p>
-        """,
-        """
-            <div class="text"><p>2019-01-25T15:16:00+00:00</p></div>
-        """,
-        """
+    htmls_with_expected = [
+        ("""<meta name="Last-Modified" content="2018-12-21 06:30:21" />""", "2018-12-21T06:30:21"),
+        ("""<p itemprop="datePublished">12/21/2018</p>""", "2018-12-21T00:00:00"),
+        ("""<h1>No dates here</h1>""", None),
+        ("""<meta property="article:published_time" content="2018-10-09T01:03:32" />""", "2018-10-09T01:03:32"),
+        ("""<meta property="article:published_time" content="2018-12-13T21:02:01+00:00" />""", "2018-12-13T21:02:01"),
+        ("""<meta property="article:published_time" content="2019-01-30 09:39:19 -0500" />""", "2019-01-30T09:39:19"),
+        ("""<div class="publish-date"> Published 11:32 AM EST Feb 19, 2019 </div>""", "2019-02-19T11:32:00"),
+        ("""<meta name="published_time_telegram" content="2019-01-25T15:16:00+00:00" />""", "2019-01-25T15:16:00"),
+        ("""<p class="text-muted">Posted Friday, October 19, 2018</p>""", "2018-10-19T00:00:00"),
+        ("""<div class="text"><p>2019-01-25T15:16:00+00:00</p></div>""", "2019-01-25T15:16:00"),
+        ("""
             <div class="article-byline">By
                 <span itemprop="author creator" itemtype="http://schema.org/Person" itemid="/by/michael-gryboski">
                     <a class="reporter" href="/by/michael-gryboski">
@@ -103,9 +83,11 @@ def test_extract_date():
                 , Christian Post Reporter
                 <time class="visually-hidden"> | Monday, January 28, 2019</time>
             </div>
-        """
+        """,
+        "2019-01-28T00:00:00"
+        )
     ]
-    expected_outputs = ["2018-12-21T06:30:21", "2018-12-21T00:00:00", None, "2018-10-09T01:03:32", "2018-12-13T21:02:01", "2019-01-30T09:39:19", "2019-02-19T11:32:00", "2019-01-25T15:16:00", "2018-10-19T00:00:00", "2019-01-25T15:16:00", "2019-01-28T00:00:00"]
-    for html, expected_output in zip(htmls, expected_outputs):
+
+    for html, expected_output in htmls_with_expected:
         output = extract_date(html)
         assert output == expected_output
