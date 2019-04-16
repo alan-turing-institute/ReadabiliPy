@@ -130,12 +130,12 @@ def extract_date(html):
     date_string = extract_element(html, xpaths)
 
     if date_string:
+        for bad_string in ["Published", "|"]:
+            date_string = date_string.replace(bad_string, "")
         try:
             return parser.parse(date_string, ignoretz=True).isoformat()
         except Exception:
             unusual_formats = [
-                '[Published] hh:mm A [EST] MMM DD, YYYY',
-                'dddd, MMMM DD, YYYY',
                 'h:m A MM/DD/YYYY',
                 'unix_milliseconds',
                 'MMM DD YYYY'
@@ -144,8 +144,4 @@ def extract_date(html):
                 date_time = pendulum_datetime_extract(date_string, date_format=format)
                 if date_time:
                     return date_time.format('YYYY-MM-DDTHH:mm:ss')
-                if format != 'unix_milliseconds':
-                    date_time = arrow_datetime_extract(date_string, date_format=format)
-                    if date_time:
-                        return date_time.format('YYYY-MM-DDTHH:mm:ss')
     return None
