@@ -23,7 +23,7 @@ def extract_title(html):
         ('//div[@class="postarea"]/h2/a//text()', 1)
     ]
 
-    return extract_element(html, xpaths, combine_strings=combine_similar_titles)
+    return extract_element(html, xpaths, simplify_dict=combine_similar_titles)
 
 
 def combine_similar_titles(extracted_strings):
