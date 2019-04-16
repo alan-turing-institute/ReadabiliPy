@@ -1,9 +1,9 @@
 beautifulsoup4>=4.7.1
-dateutil
 html5lib
 lxml
 pycodestyle
 pyflakes
 pytest
 pytest-cov
+python-dateutil
 regex
