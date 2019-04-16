@@ -1,5 +1,4 @@
 from .extract_element import extract_element
-import re
 from dateutil import parser
 
 

@@ -87,8 +87,7 @@ def test_extract_date():
                 <time class="visually-hidden"> | Monday, January 28, 2019</time>
             </div>
         """,
-        "2019-01-28T00:00:00"
-        )
+            "2019-01-28T00:00:00")
     ]
 
     for html, expected_output in htmls_with_expected:
