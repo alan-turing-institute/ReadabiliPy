@@ -4,5 +4,6 @@ lxml
 pycodestyle
 pyflakes
 pytest
+pytest-benchmark
 pytest-cov
 regex

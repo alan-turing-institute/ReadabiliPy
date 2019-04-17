@@ -18,7 +18,7 @@ install:
 
 script:
   # Run all pytest unit tests
-  - python -m pytest -v tests --cov readabilipy --cov-report term-missing
+  - python -m pytest -v tests --cov readabilipy --cov-report term-missing --benchmark-disable
   # Run pyflakes for error detection
   - pyflakes *.py readabilipy tests
   # Check PEP8 compliance (ignoring long lines)
