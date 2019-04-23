@@ -43,7 +43,7 @@ def extract_element(html, xpaths, process_dict_fn=None):
     # Only search with xpaths that have a score of -1 if nothing else can be found
     if not extracted_strings:
         extracted_strings = get_element_candidates(html, xpaths, score_lower_limit=-1)
-    print(extracted_strings)
+
     # Return highest scoring element
     if not extracted_strings:
         return None
