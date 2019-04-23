@@ -17,12 +17,11 @@ RUN pip install -r requirements-dev.txt
 RUN apt-get install -y git
 
 # Clone ReadabiliPy and cd into it
-# RUN git clone https://github.com/alan-turing-institute/ReadabiliPy
-# WORKDIR "/ReadabiliPy"
+RUN git clone https://github.com/alan-turing-institute/ReadabiliPy
+WORKDIR "/ReadabiliPy"
 
-COPY readabilipy /readabilipy
-COPY tests /tests
-COPY javascript /javascript
+# Copy the latest benchmarks
+COPY tests/test_benchmarking.py tests/test_benchmarking.py
 
 # Run the benchmarks with Pytest
 CMD pytest --benchmark-only
