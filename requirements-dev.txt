@@ -5,4 +5,5 @@ pycodestyle
 pyflakes
 pytest
 pytest-cov
+python-dateutil
 regex
