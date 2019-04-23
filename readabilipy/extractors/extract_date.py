@@ -40,6 +40,7 @@ def extract_date(html):
         return standardise_datetime_format(date_string)
     return None
 
+
 def standardise_datetime_format(date_string):
     """Get an isoformat date string from a date string in any format"""
 
