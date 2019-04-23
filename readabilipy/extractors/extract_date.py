@@ -1,4 +1,5 @@
 from .extract_element import extract_element
+from contextlib import suppress
 from dateutil import parser
 
 
@@ -36,10 +37,14 @@ def extract_date(html):
     # Get the date
     date_string = extract_element(html, xpaths)
     if date_string:
-        for not_part_of_date in ["Published", "posted to", " | Politics", "|"]:
-            date_string = date_string.replace(not_part_of_date, "")
-        try:
-            return parser.parse(date_string, ignoretz=True).isoformat()
-        except Exception:
-            return None
+        return standardise_datetime_format(date_string)
+    return None
+
+def standardise_datetime_format(date_string):
+    """Get an isoformat date string from a date string in any format"""
+
+    for not_part_of_date in ["Published", "posted to", " | Politics", "|"]:  # add to this list as appropriate
+        date_string = date_string.replace(not_part_of_date, "")
+    with suppress(ValueError):
+        return parser.parse(date_string, ignoretz=True).isoformat()
     return None

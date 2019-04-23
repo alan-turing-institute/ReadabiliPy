@@ -1,5 +1,6 @@
 from ..readabilipy.extractors.extract_title import extract_title
 from ..readabilipy.extractors.extract_date import extract_date
+from ..readabilipy.extractors.extract_date import standardise_datetime_format
 
 
 def test_extract_title():
@@ -92,4 +93,15 @@ def test_extract_date():
 
     for html, expected_output in htmls_with_expected:
         output = extract_date(html)
+        assert output == expected_output
+
+
+def test_standardise_datetime_format():
+    dates_with_expected = [
+        ("2019-01-30 09:39:19 -0500", "2019-01-30T09:39:19"),
+        ("2018-12-13T21:02:01+05:00", "2018-12-13T21:02:01")
+    ]
+
+    for date, expected_output in dates_with_expected:
+        output = standardise_datetime_format(date)
         assert output == expected_output
