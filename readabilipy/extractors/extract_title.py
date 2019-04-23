@@ -21,17 +21,24 @@ def extract_title(html):
         ('//h1[@itemprop="headline"]//text()', 3),
         ('//h1[@class="post__title"]//text()', 1),
         ('//h2[@itemprop="headline"]//text()', 2),
-        ('//div[@class="postarea"]/h2/a//text()', 1)
+        ('//div[@class="postarea"]/h2/a//text()', 1),
+        ('//head/title/text()', 1),
+        ('//body/title/text()', 1),
     ]
 
     return extract_element(html, xpaths, process_dict_fn=combine_similar_titles)
 
 
 def combine_similar_titles(extracted_strings):
-    """Take a dictionary with titles and scores and combine scores for titles where one is just a longer version the other, taking the shorter as key"""
+    """Take a dictionary with titles and scores and combine scores for titles which we decide are the same."""
 
     # Iterate through each possible pair of title keys, including both permutations of each pair
     for title_pair in permutations(extracted_strings, 2):
+        # If the first title is a subset of the second then combine their scores, taking the shorter one as the key
         if title_pair[0] in title_pair[1]:
-            extracted_strings[title_pair[0]] += extracted_strings[title_pair[1]]  # combine scores
+            extracted_strings[title_pair[0]] += extracted_strings[title_pair[1]]
+        # If the first title is identical to the second (ignoring case) then combine their scores, taking the one with more capitals as the key
+        elif title_pair[0].lower() == title_pair[1].lower():
+            if len([c for c in title_pair[0] if c.isupper()]) > len([c for c in title_pair[1] if c.isupper()]):
+                extracted_strings[title_pair[0]] += extracted_strings[title_pair[1]]
     return extracted_strings
