@@ -4,8 +4,8 @@ from ..readabilipy.extractors.extract_date import standardise_datetime_format
 
 
 def test_extract_title():
-    htmls = [
-        """
+    htmls_with_expected = [
+        ("""
             <html>
             <head>
                 <meta name="fb_title" content="Example title" />
@@ -14,8 +14,8 @@ def test_extract_title():
                 <p>Hello world</p>
             <body>
             </html>
-        """,
-        """
+        """, "Example title"),
+        ("""
             <html>
             <head>
             </head>
@@ -26,8 +26,8 @@ def test_extract_title():
                 <p>Hello world</p>
             <body>
             </html>
-        """,
-        """
+        """, "Example title"),
+        ("""
             <html>
             <head>
             </head>
@@ -37,27 +37,25 @@ def test_extract_title():
                 <p>Hello world</p>
             <body>
             </html>
-        """,
-        """
+        """, "Example title"),
+        ("""
             <h1 class="entry-title">
                 <a href="http://addictinginfo.com/2018/10/15/trump-denies-charitable-donation-he-promised-if-elizabeth-warren-releases-dna-results-and-its-on-video/"
                     title="Permalink to Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And It&#8217;s On Video"
                     rel="bookmark">Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And
                     It&#8217;s On Video</a>
             </h1>
-        """,
-        """
+        """, "Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And It’s On Video"),
+        ("""
             <meta property="og:title" content="Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And It&#8217;s On Video" />
-        """,
-        """
+        """, "Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And It’s On Video"),
+        ("""
             <h1 class="entry-title">Pamela Geller in Breitbart News: Dueling Billboards from CAIR, AFDI in Times Square</h1>
             <meta property="og:title" content="Pamela Geller in Breitbart News: Dueling Billboards from CAIR, AFDI in Times Square - Geller Report" />
-        """
+        """, "Pamela Geller in Breitbart News: Dueling Billboards from CAIR, AFDI in Times Square")
     ]
-    expected_outputs = ["Example title"] * 3
-    expected_outputs.extend(["Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And It’s On Video"] * 2)
-    expected_outputs.append("Pamela Geller in Breitbart News: Dueling Billboards from CAIR, AFDI in Times Square")
-    for html, expected_output in zip(htmls, expected_outputs):
+
+    for html, expected_output in htmls_with_expected:
         output = extract_title(html)
         assert output == expected_output
 
