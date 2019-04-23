@@ -36,8 +36,8 @@ def extract_date(html):
     # Get the date
     date_string = extract_element(html, xpaths)
     if date_string:
-        for bad_string in ["Published", "posted to", " | Politics", "|"]:
-            date_string = date_string.replace(bad_string, "")
+        for not_part_of_date in ["Published", "posted to", " | Politics", "|"]:
+            date_string = date_string.replace(not_part_of_date, "")
         try:
             return parser.parse(date_string, ignoretz=True).isoformat()
         except Exception:

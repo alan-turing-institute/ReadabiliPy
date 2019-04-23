@@ -1,4 +1,5 @@
 from .extract_element import extract_element
+from itertools import permutations
 
 
 def extract_title(html):
@@ -23,21 +24,14 @@ def extract_title(html):
         ('//div[@class="postarea"]/h2/a//text()', 1)
     ]
 
-    return extract_element(html, xpaths, simplify_dict=combine_similar_titles)
+    return extract_element(html, xpaths, process_dict_fn=combine_similar_titles)
 
 
 def combine_similar_titles(extracted_strings):
     """Take a dictionary with titles and scores and combine scores for titles where one is just a longer version the other, taking the shorter as key"""
 
-    delete_these = []
-    for element in extracted_strings:
-        for element2 in extracted_strings:
-            if element in element2 and element != element2:  # if an element is a shorter version of a longer one
-                extracted_strings[element] += extracted_strings[element2]  # combine scores
-                delete_these.append(element2)  # then assign the larger element for deletion
-
-    for del_str in delete_these:
-        if del_str in extracted_strings:
-            del extracted_strings[del_str]
-
+    # Iterate through each possible pair of title keys, including both permutations of each pair
+    for title_pair in permutations(extracted_strings, 2):
+        if title_pair[0] in title_pair[1]:
+            extracted_strings[title_pair[0]] += extracted_strings[title_pair[1]]  # combine scores
     return extracted_strings

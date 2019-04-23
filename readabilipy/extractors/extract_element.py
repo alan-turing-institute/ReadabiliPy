@@ -29,16 +29,16 @@ def get_element_candidates(html, xpaths, score_lower_limit=0):
     return extracted_strings
 
 
-def extract_element(html, xpaths, simplify_dict=None):
+def extract_element(html, xpaths, process_dict_fn=None):
     """Return the relevant element (title, date or byline) from article HTML
         xpaths should be a list of tuples, each with the xpath and a reliability score
     """
 
     extracted_strings = get_element_candidates(html, xpaths, score_lower_limit=0)
 
-    # Reduce the number of dictionary keys for near-duplicates (see extract_element)
-    if simplify_dict:
-        extracted_strings = simplify_dict(extracted_strings)
+    # Edit the dictionary
+    if process_dict_fn:
+        extracted_strings = process_dict_fn(extracted_strings)
 
     # Only search with xpaths that have a score of -1 if nothing else can be found
     if not extracted_strings:
