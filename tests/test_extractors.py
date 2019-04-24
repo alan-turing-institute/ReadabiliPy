@@ -97,7 +97,11 @@ def test_extract_date():
 def test_standardise_datetime_format():
     dates_with_expected = [
         ("2019-01-30 09:39:19 -0500", "2019-01-30T09:39:19"),
-        ("2018-12-13T21:02:01+05:00", "2018-12-13T21:02:01")
+        ("2018-12-13T21:02:01+05:00", "2018-12-13T21:02:01"),
+        ("Posted Friday, October 19, 2018", "2018-10-19T00:00:00"),
+        (" Published 11:32 AM EST Feb 19, 2019", "2019-02-19T11:32:00"),
+        ("Jun 01 2017 posted to Politics", "2017-06-01T00:00:00"),
+        ("8:16 AM 01/31/2019 | Politics", "2019-01-31T08:16:00"),
     ]
 
     for date, expected_output in dates_with_expected:

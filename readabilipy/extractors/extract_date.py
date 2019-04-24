@@ -25,13 +25,14 @@ def extract_date(html):
         ('//div[@class="text"]/p/text()', -1),
         ('//div[@class="publish-date"]/text()', 1),
         ('//span[@class="timestamp "]/text()', 1),
-        ('//span[@class="article-element__meta-item"]/text()', 1),
+        ('//span[@class="article-element__meta-item"]/text()[contains(., "posted")]', 1),
         ('//span[@class="updated"]/text()', 1),
         ('//span[@class="entry-date"]/text()', 1),
         ('//p[@itemprop="datePublished"]/text()', 1),
         ('//p[@class="entry-byline"]//time[@class="entry-date"]/@datetime', 1),
         ('substring-after(//*[comment()[contains(., "By")]]/comment(), "-")', 1),
-        ('substring-after(//p[@class="text-muted"]/text(), ",")', 1)
+        ('//p[@class="text-muted"]/text()[contains(., "Posted")]', 1),
+
     ]
 
     # Get the date
@@ -41,11 +42,9 @@ def extract_date(html):
     return None
 
 
-def standardise_datetime_format(date_string):
+def standardise_datetime_format(date_string, **kwargs):
     """Get an isoformat date string from a date string in any format"""
 
-    for not_part_of_date in ["Published", "posted to", " | Politics", "|"]:  # add to this list as appropriate
-        date_string = date_string.replace(not_part_of_date, "")
     with suppress(ValueError):
-        return parser.parse(date_string, ignoretz=True).isoformat()
+        return parser.parse(date_string, ignoretz=True, fuzzy=True, **kwargs).isoformat()
     return None
