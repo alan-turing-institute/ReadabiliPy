@@ -6,8 +6,7 @@ from subprocess import check_call
 from bs4 import BeautifulSoup
 from bs4.element import Comment, NavigableString, CData
 from .plain_html import parse_to_tree
-from .extractors.extract_title import extract_title
-from .extractors.extract_date import extract_date
+from .extractors import extract_date, extract_title
 from .text_manipulation import normalise_text
 
 
