@@ -2,7 +2,7 @@ import os
 from ..readabilipy.json_parser import parse_to_json
 from ..readabilipy.extractors.extract_title import extract_title
 
-test_filepath = os.path.join(os.path.dirname(__file__), "data", "addictinginfo.com-1_full_article.html")
+test_filepath = os.path.join(os.path.dirname(__file__), "data", "benchmarkinghuge.html")
 with open(test_filepath) as h:
     html = h.read()
 
