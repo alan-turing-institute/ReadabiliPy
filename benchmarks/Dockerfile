@@ -1,25 +1,18 @@
 FROM python:3
 
-# Install node.js following instructions from
-# https://nodejs.org/en/download/package-manager/
+# Install requirements
 RUN apt-get update
 RUN apt-get -y install curl
 RUN curl -sL https://deb.nodesource.com/setup_11.x | bash -
 RUN apt install nodejs
-
-# Install node.js dependencies
 RUN npm install
-# Install python dependencies
 RUN pip install --upgrade pip
-COPY requirements-dev.txt /requirements-dev.txt
-RUN pip install -r requirements-dev.txt
-
-# Install git
 RUN apt-get install -y git
 
-# Clone ReadabiliPy and cd into it
+# Clone ReadabiliPy and install python packages
 RUN git clone -b benchmarking --single-branch https://github.com/alan-turing-institute/ReadabiliPy
 WORKDIR "/ReadabiliPy"
+RUN pip install -r requirements-dev.txt
 
 # Run the benchmarks with Pytest
 CMD pytest --benchmark-only
