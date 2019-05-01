@@ -30,18 +30,13 @@ def extract_date(html):
         ('//span[@class="entry-date"]/text()', 1),
         ('//p[@itemprop="datePublished"]/text()', 1),
         ('//p[@class="entry-byline"]//time[@class="entry-date"]/@datetime', 1),
-        ('substring(//*[comment()[contains(., "By")]]/comment(), "-")', 1), # conservativehq
         ('substring-after(//p[@class="text-muted"]/text()[contains(., "Posted")], ",")', 2), # redstatewatcher
     ]
 
     # Get the date
     date_string = extract_element(html, xpaths)
-    dayfirst = False
     if date_string:
-        if "By" in date_string: # Change this condition
-            dayfirst = True
-    if date_string:
-        return standardise_datetime_format(date_string, dayfirst=dayfirst)
+        return standardise_datetime_format(date_string)
     return None
 
 

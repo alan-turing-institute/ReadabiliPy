@@ -29,7 +29,6 @@ def test_extract_date():
             </div>
         """,
             "2019-01-28T00:00:00"),
-        ("""<html><!-- By  - 08/01/10 --></html>""", "2010-01-08T00:00:00"),
     ]
 
     for html, expected_output in htmls_with_expected:
