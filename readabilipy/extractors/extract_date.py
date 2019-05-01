@@ -35,19 +35,18 @@ def extract_date(html):
 
     # Get the date
     date_string = extract_element(html, xpaths)
-    print(date_string)
     dayfirst = False
     if date_string:
-        if "By" in date_string:
+        if "By" in date_string: # Change this condition
             dayfirst = True
     if date_string:
         return standardise_datetime_format(date_string, dayfirst=dayfirst)
     return None
 
 
-def standardise_datetime_format(date_string, **kwargs):
+def standardise_datetime_format(date_string, ignoretz=True, **kwargs):
     """Get an isoformat date string from a date string in any format"""
 
     with suppress(ValueError):
-        return parser.parse(date_string, ignoretz=True, fuzzy=True, **kwargs).isoformat()
+        return parser.parse(date_string, ignoretz=ignoretz, fuzzy=True, **kwargs).isoformat()
     return None

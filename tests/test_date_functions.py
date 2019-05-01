@@ -50,3 +50,82 @@ def test_standardise_datetime_format():
     for date, expected_output in dates_with_expected:
         output = standardise_datetime_format(date)
         assert output == expected_output
+
+
+def test_extract_datetime_iso8601_keep_timezone_keep():
+    datetime_string = '2014-10-24T17:32:46+12:00'
+    iso_string = standardise_datetime_format(datetime_string, ignoretz=False)
+    expected_iso_string = '2014-10-24T17:32:46+12:00'
+
+    assert iso_string == expected_iso_string
+
+
+def test_extract_datetime_iso8601_drop_timezone():
+    datetime_string = '2014-10-24T17:32:46+12:00'
+    iso_string = standardise_datetime_format(datetime_string)
+    expected_iso_string = '2014-10-24T17:32:46'
+
+    assert iso_string == expected_iso_string
+
+
+def test_extract_datetime_uk_format_without_timezone():
+    datetime_string = '01/03/05'
+    format_string = 'DD/MM/YY'
+    iso_string = standardise_datetime_format(datetime_string, dayfirst=True)
+    expected_iso_string = '2005-03-01T00:00:00'
+
+    assert iso_string == expected_iso_string
+
+
+def test_extract_datetime_us_format_without_timezone():
+    datetime_string = '03/01/05'
+    format_string = 'MM/DD/YY'
+    iso_string = standardise_datetime_format(datetime_string)
+    expected_iso_string = '2005-03-01T00:00:00'
+
+    assert iso_string == expected_iso_string
+
+
+def test_extract_datetime_byline_mmddyy_with_mmddyy_format():
+    datetime_string = 'CHQ Staff | 10/17/18'
+    format_string = 'MM/DD/YY'
+    iso_string = standardise_datetime_format(datetime_string)
+    expected_iso_string = '2018-10-17T00:00:00'
+
+    assert iso_string == expected_iso_string
+
+
+def test_extract_datetime_byline_mmddyyyy_with_mmddyy_format():
+    datetime_string = 'CHQ Staff | 10/17/2018'
+    format_string = 'MM/DD/YY'
+    iso_string = standardise_datetime_format(datetime_string)
+    expected_iso_string = '2018-10-17T00:00:00'
+
+    assert iso_string == expected_iso_string
+
+
+def test_extract_datetime_byline_mdyy_with_mdyy_format():
+    datetime_string = 'CHQ Staff | 1/7/18'
+    format_string = 'M/D/YY'
+    iso_string = standardise_datetime_format(datetime_string)
+    expected_iso_string = '2018-01-07T00:00:00'
+
+    assert iso_string == expected_iso_string
+
+
+def test_extract_datetime_byline_0m0dyy_with_mdyy_format():
+    datetime_string = 'CHQ Staff | 01/07/18'
+    format_string = 'M/D/YY'
+    iso_string = standardise_datetime_format(datetime_string)
+    expected_iso_string = '2018-01-07T00:00:00'
+
+    assert iso_string == expected_iso_string
+
+
+def test_extract_datetime_byline_mmddyy_with_mdyy_format():
+    datetime_string = 'CHQ Staff | 12/17/18'
+    format_string = 'M/D/YY'
+    iso_string = standardise_datetime_format(datetime_string)
+    expected_iso_string = '2018-12-17T00:00:00'
+
+    assert iso_string == expected_iso_string
