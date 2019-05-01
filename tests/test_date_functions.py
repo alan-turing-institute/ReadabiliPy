@@ -77,7 +77,7 @@ def test_extract_datetime_uk_format_without_timezone():
 
 def test_extract_datetime_us_format_without_timezone():
     datetime_string = '03/01/05'
-    format_string = 'MM/DD/YY'
+    # format_string = 'MM/DD/YY'
     iso_string = standardise_datetime_format(datetime_string)
     expected_iso_string = '2005-03-01T00:00:00'
 
@@ -86,7 +86,7 @@ def test_extract_datetime_us_format_without_timezone():
 
 def test_extract_datetime_byline_mmddyy_with_mmddyy_format():
     datetime_string = 'CHQ Staff | 10/17/18'
-    format_string = 'MM/DD/YY'
+    # format_string = 'MM/DD/YY'
     iso_string = standardise_datetime_format(datetime_string)
     expected_iso_string = '2018-10-17T00:00:00'
 
@@ -95,7 +95,7 @@ def test_extract_datetime_byline_mmddyy_with_mmddyy_format():
 
 def test_extract_datetime_byline_mmddyyyy_with_mmddyy_format():
     datetime_string = 'CHQ Staff | 10/17/2018'
-    format_string = 'MM/DD/YY'
+    # format_string = 'MM/DD/YY'
     iso_string = standardise_datetime_format(datetime_string)
     expected_iso_string = '2018-10-17T00:00:00'
 
@@ -104,7 +104,7 @@ def test_extract_datetime_byline_mmddyyyy_with_mmddyy_format():
 
 def test_extract_datetime_byline_mdyy_with_mdyy_format():
     datetime_string = 'CHQ Staff | 1/7/18'
-    format_string = 'M/D/YY'
+    # format_string = 'M/D/YY'
     iso_string = standardise_datetime_format(datetime_string)
     expected_iso_string = '2018-01-07T00:00:00'
 
@@ -113,7 +113,7 @@ def test_extract_datetime_byline_mdyy_with_mdyy_format():
 
 def test_extract_datetime_byline_0m0dyy_with_mdyy_format():
     datetime_string = 'CHQ Staff | 01/07/18'
-    format_string = 'M/D/YY'
+    # format_string = 'M/D/YY'
     iso_string = standardise_datetime_format(datetime_string)
     expected_iso_string = '2018-01-07T00:00:00'
 
@@ -122,7 +122,7 @@ def test_extract_datetime_byline_0m0dyy_with_mdyy_format():
 
 def test_extract_datetime_byline_mmddyy_with_mdyy_format():
     datetime_string = 'CHQ Staff | 12/17/18'
-    format_string = 'M/D/YY'
+    # format_string = 'M/D/YY'
     iso_string = standardise_datetime_format(datetime_string)
     expected_iso_string = '2018-12-17T00:00:00'
 
