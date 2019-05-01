@@ -16,7 +16,6 @@ def extract_date(html):
         ('//meta[@name="published_time_telegram"]/@content', 1),
         ('//meta[@property="og:article:published_time"]/@content', 1),
         ('//meta[@itemprop="datePublished"]/@content', 2),
-        ('//time[contains(@class, "entry-date")]/@datetime', 3),
         ('//time/@datetime', 6),
         ('//time/text()', 1),
         ('//div[@class="keyvals"]/@data-content_published_date', 1),
