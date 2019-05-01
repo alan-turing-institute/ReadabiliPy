@@ -1,6 +1,7 @@
 beautifulsoup4>=4.7.1
 html5lib
 lxml
+pendulum
 pycodestyle
 pyflakes
 pytest
