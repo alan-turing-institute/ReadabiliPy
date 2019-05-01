@@ -30,7 +30,6 @@ def extract_date(html):
         ('//span[@class="entry-date"]/text()', 1),
         ('//p[@itemprop="datePublished"]/text()', 1),
         ('//p[@class="entry-byline"]//time[@class="entry-date"]/@datetime', 1),
-        ('substring-after(//p[@class="text-muted"]/text()[contains(., "Posted")], ",")', 2), # redstatewatcher
     ]
 
     # Get the date
