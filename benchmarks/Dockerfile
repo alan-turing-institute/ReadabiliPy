@@ -12,6 +12,7 @@ RUN apt-get install -y git
 # Clone ReadabiliPy and install python packages
 RUN git clone -b benchmarking --single-branch https://github.com/alan-turing-institute/ReadabiliPy
 WORKDIR "/ReadabiliPy"
+RUN git pull
 RUN pip install -r requirements-dev.txt
 
 # Run the benchmarks with Pytest
