@@ -36,7 +36,8 @@ def extract_date(html):
     extracted_dates = extract_element(html, xpaths)
     if not extracted_dates:
         return None
-    date_string = max(extracted_dates, key=extracted_dates.get)
+    # date_string = max(extracted_dates, key=extracted_dates.get)
+    date_string = max(extracted_dates, key=lambda x: extracted_dates[x].get('score'))
     if date_string:
         return standardise_datetime_format(date_string)
     return None

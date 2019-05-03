@@ -22,14 +22,28 @@ def get_element_candidates(html, xpaths, score_lower_limit=0):
                 if isinstance(found_elements, lxml.etree._ElementUnicodeResult):
                     element = normalise_whitespace(found_elements)
                     if element:
-                        extracted_strings[element] += score
+                        if element in extracted_strings:
+                            extracted_strings[element]['score'] += score
+                            if extraction_xpath not in extracted_strings[element]['xpaths']:
+                                extracted_strings[element]['xpaths'].append(extraction_xpath)
+                        else:
+                            extracted_strings[element] = {}
+                            extracted_strings[element]['score'] = score
+                            extracted_strings[element]['xpaths'] = [extraction_xpath]
                 # If a list of elements found:
                 else:
                     for found_element in found_elements:
                         if isinstance(found_element, lxml.etree._ElementUnicodeResult):
                             element = normalise_whitespace(found_element)
                             if element:
-                                extracted_strings[element] += score
+                                if element in extracted_strings:
+                                    extracted_strings[element]['score'] += score
+                                    if extraction_xpath not in extracted_strings[element]['xpaths']:
+                                        extracted_strings[element]['xpaths'].append(extraction_xpath)
+                                else:
+                                    extracted_strings[element] = {}
+                                    extracted_strings[element]['score'] = score
+                                    extracted_strings[element]['xpaths'] = [extraction_xpath]
     return extracted_strings
 
 
