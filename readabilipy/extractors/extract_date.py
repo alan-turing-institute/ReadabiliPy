@@ -9,6 +9,7 @@ def extract_date(html):
 
     # List of xpaths for HTML tags that could contain a date
     # Tuple scores reflect confidence in these xpaths and the preference used for extraction
+    # Some of the xpaths also have a specific format we expect the date html element to be
     xpaths = [
         ('//meta[@property="article:published_time"]/@content', 24),
         ('//meta[@property="article:published"]/@content', 20),
@@ -30,36 +31,26 @@ def extract_date(html):
         ('//p[@itemprop="datePublished"]/text()', 1, 'MMMM DD, YYYY'),
         ('//p[@class="entry-byline"]//time[@class="entry-date"]/@datetime', 1),
     ]
-    xpaths_minus_formats = []
-    xpath_format_mapping = {}
-    for tuple in xpaths:
-        if len(tuple) == 2:
-            xpaths_minus_formats.append(tuple)
-        else:
-            xpaths_minus_formats.append((tuple[0], tuple[1]))
-            xpath_format_mapping[tuple[0]] = tuple[2]
 
-    # Get the date
-    extracted_dates = extract_element(html, xpaths_minus_formats)
+    # Get all the dates
+    extracted_dates = extract_element(html, xpaths)
     if not extracted_dates:
         return None
+    # Select date with highest score
     date_string = max(extracted_dates, key=lambda x: extracted_dates[x].get('score'))
+    # Assign the format variable if the the highest scoring xpath used has one
     xpaths_used = extracted_dates[date_string]['xpaths']
-    formats_used = []
+    format = None
+    high_score = 0
     for xpath in xpaths_used:
-        if xpath in xpath_format_mapping:
-            formats_used.append(xpath_format_mapping[xpath])
-    if len(formats_used) == 0:
-        isodate = standardise_datetime_format(date_string)
-    else:
-        isoformat_dates = []
-        for format in formats_used:
-            isoformat_dates.append(standardise_datetime_format(date_string, format=format))
-        for date in isoformat_dates:
-            if date != isoformat_dates[0]:
-                raise Exception('Different isoformat dates were retrieved')
-        isodate = isoformat_dates[0]
-    return isodate
+        for tuple in xpaths:
+            if tuple[0] == xpath:
+                if tuple[1] > high_score:
+                    high_score = tuple[1]
+                    if len(tuple) == 3:
+                        format = tuple[2]
+
+    return standardise_datetime_format(date_string, format=format)
 
 
 def standardise_datetime_format(date_string, ignoretz=True, format=None, **kwargs):
