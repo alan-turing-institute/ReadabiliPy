@@ -45,5 +45,4 @@ def combine_similar_titles(extracted_strings):
         elif title_pair[0].lower() == title_pair[1].lower():
             if len([c for c in title_pair[0] if c.isupper()]) > len([c for c in title_pair[1] if c.isupper()]):
                 extracted_strings[title_pair[0]]['score'] += extracted_strings[title_pair[1]]['score']
-    print(extracted_strings)
     return extracted_strings
