@@ -4,7 +4,11 @@ from ..text_manipulation import normalise_whitespace
 
 
 def get_element_candidates(html, xpaths, score_lower_limit=0):
-
+    """Return the relevant elements (e.g. titles, dates or bylines) from article HTML, specificed by xpaths.
+        xpaths should be a list of tuples, each with the xpath and a reliability score
+        An xpath will be ignored if its score is below the limit.
+        The returned dictionary should have the processed elements as keys and scores as values
+    """
     # Parse the html and extract the contents using all xpaths
     lxml_html = lxml.html.fromstring(html)
     extracted_strings = defaultdict(int)
@@ -30,8 +34,11 @@ def get_element_candidates(html, xpaths, score_lower_limit=0):
 
 
 def extract_element(html, xpaths, process_dict_fn=None):
-    """Return the relevant element (title, date or byline) from article HTML
-        xpaths should be a list of tuples, each with the xpath and a reliability score
+    """Return the relevant elements (titles, dates or bylines) from article HTML, specificed by xpaths.
+        xpaths should be a list of tuples, each with the xpath and a reliability scores.
+        Processing of the dictionary can be handled with the arg function.
+        xpaths with a score of -1 will only be considered if no elements are found in the html by other xpaths
+        The returned dictionary should have the processed elements as keys and scores as values
     """
 
     extracted_strings = get_element_candidates(html, xpaths, score_lower_limit=0)
@@ -43,8 +50,4 @@ def extract_element(html, xpaths, process_dict_fn=None):
     # Only search with xpaths that have a score of -1 if nothing else can be found
     if not extracted_strings:
         extracted_strings = get_element_candidates(html, xpaths, score_lower_limit=-1)
-
-    # Return highest scoring element
-    if not extracted_strings:
-        return None
-    return max(extracted_strings, key=extracted_strings.get)
+    return extracted_strings

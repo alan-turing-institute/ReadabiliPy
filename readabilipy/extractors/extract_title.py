@@ -26,7 +26,10 @@ def extract_title(html):
         ('//body/title/text()', 1),
     ]
 
-    return extract_element(html, xpaths, process_dict_fn=combine_similar_titles)
+    extracted_titles =  extract_element(html, xpaths, process_dict_fn=combine_similar_titles)
+    if not extracted_titles:
+        return None
+    return max(extracted_titles, key=extracted_titles.get)
 
 
 def combine_similar_titles(extracted_strings):
