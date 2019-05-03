@@ -20,12 +20,12 @@ def test_get_element_candidates():
     """
 
     expected_output_1 = defaultdict(int)
-    expected_output_1['Title 1'] = 4
-    expected_output_1['Title 2'] = 5
+    expected_output_1['Title 1'] = {'score': 4, 'xpaths': ['//h1[@class="entry-title"]//text()']}
+    expected_output_1['Title 2'] = {'score': 5, 'xpaths': ['//h1[@itemprop="headline"]//text()', '//h1[@class="post__title"]//text()']}
 
     expected_output_2 = defaultdict(int)
-    expected_output_2['Title 1'] = 4
-    expected_output_2['Title 2'] = 3
+    expected_output_2['Title 1'] = {'score': 4, 'xpaths': ['//h1[@class="entry-title"]//text()']}
+    expected_output_2['Title 2'] = {'score': 3, 'xpaths': ['//h1[@itemprop="headline"]//text()']}
 
     assert get_element_candidates(html, xpaths, score_lower_limit=0) == expected_output_1
     assert get_element_candidates(html, xpaths, score_lower_limit=3) == expected_output_2
@@ -52,15 +52,15 @@ def test_extract_element():
     """
 
     expected_output_1 = defaultdict(int)
-    expected_output_1['Title 1'] = 4
-    expected_output_1['Title 2'] = 3
+    expected_output_1['Title 1'] = {'score': 4, 'xpaths': ['//h1[@class="entry-title"]//text()']}
+    expected_output_1['Title 2'] = {'score': 3, 'xpaths': ['//h1[@itemprop="headline"]//text()']}
 
     expected_output_2 = defaultdict(int)
-    expected_output_2['Title 2'] = -1
+    expected_output_2['Title 2'] = {'score': -1, 'xpaths': ['//h1[@class="post__title"]//text()']}
 
     expected_output_3 = defaultdict(int)
     expected_output_3['Title 1'] = 7
-    expected_output_3['Title 2'] = 3
+    expected_output_3['Title 2'] = {'score': 3, 'xpaths': ['//h1[@itemprop="headline"]//text()']}
 
     assert extract_element(html, xpaths) == expected_output_1
     assert extract_element(html_2, xpaths) == expected_output_2

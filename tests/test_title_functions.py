@@ -1,4 +1,3 @@
-from collections import defaultdict
 from ..readabilipy.extractors.extract_title import extract_title
 from ..readabilipy.extractors.extract_title import combine_similar_titles
 
@@ -62,14 +61,14 @@ def test_extract_title():
 
 def test_combine_similar_titles():
 
-    extracted_strings = defaultdict(int)
-    extracted_strings['title 1'] = 1
-    extracted_strings['Title 1'] = 1
-    extracted_strings['Title 1 - Extended'] = 1
+    extracted_strings = {}
+    extracted_strings['title 1'] = {'score': 1}
+    extracted_strings['Title 1'] = {'score': 1}
+    extracted_strings['Title 1 - Extended'] = {'score': 1}
 
-    expected_output = defaultdict(int)
-    expected_output['title 1'] = 1
-    expected_output['Title 1'] = 3
-    expected_output['Title 1 - Extended'] = 1
+    expected_output = {}
+    expected_output['title 1'] = {'score': 1}
+    expected_output['Title 1'] = {'score': 3}
+    expected_output['Title 1 - Extended'] = {'score': 1}
 
     assert combine_similar_titles(extracted_strings) == expected_output
