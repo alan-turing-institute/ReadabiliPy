@@ -1,4 +1,6 @@
+from collections import defaultdict
 from ..readabilipy.extractors.extract_title import extract_title
+from ..readabilipy.extractors.extract_title import combine_similar_titles
 
 
 def test_extract_title():
@@ -56,3 +58,18 @@ def test_extract_title():
     for html, expected_output in htmls_with_expected:
         output = extract_title(html)
         assert output == expected_output
+
+
+def test_combine_similar_titles():
+
+    extracted_strings = defaultdict(int)
+    extracted_strings['title 1'] = 1
+    extracted_strings['Title 1'] = 1
+    extracted_strings['Title 1 - Extended'] = 1
+
+    expected_output = defaultdict(int)
+    expected_output['title 1'] = 1
+    expected_output['Title 1'] = 3
+    expected_output['Title 1 - Extended'] = 1
+
+    assert combine_similar_titles(extracted_strings) == expected_output
