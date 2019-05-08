@@ -17,10 +17,6 @@ def extract_date(html):
         ('//meta[@itemprop="datePublished"]/@content', 2),
         ('//time/@datetime', 6),
         ('//time/text()', 1),
-        ('//span[@class="timestamp "]/text()', 1),
-        ('//span[@class="updated"]/text()', 1, 'YYYY-MM-DD'),
-        ('//span[@class="entry-date"]/text()', 1, 'MMM D, YYYY'),
-        ('//p[@itemprop="datePublished"]/text()', 1, 'MMMM DD, YYYY'),
     ]
 
     # Get all the dates

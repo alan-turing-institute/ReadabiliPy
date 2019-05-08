@@ -4,12 +4,10 @@ from ..readabilipy.extractors.extract_date import standardise_datetime_format
 
 def test_extract_date():
     htmls_with_expected = [
-        ("""<p itemprop="datePublished">December 21, 2018</p>""", "2018-12-21T00:00:00"),
         ("""<h1>No dates here</h1>""", None),
         ("""<meta property="article:published_time" content="2018-10-09T01:03:32" />""", "2018-10-09T01:03:32"),
         ("""<meta property="article:published_time" content="2018-12-13T21:02:01+00:00" />""", "2018-12-13T21:02:01"),
         ("""<meta property="article:published_time" content="2019-01-30 09:39:19 -0500" />""", "2019-01-30T09:39:19"),
-        ("""<span class="timestamp " data-localize-time data-epoch-time="1545342875000" data-time-zone="-0800" data-time-format="%A %B %d, %Y">Thursday December 20, 2018</span>""", "2018-12-20T00:00:00"),
         ("""<time style="text-transform:uppercase">8:16 AM 01/31/2019 | Politics</time>""", "2019-01-31T08:16:00"),
         ("""
             <div class="article-byline">By
@@ -23,8 +21,6 @@ def test_extract_date():
             </div>
         """,
             "2019-01-28T00:00:00"),
-        ("""<span class="updated">2018/12/21</span>""", "2018-12-21T00:00:00"),
-        ("""<span class="entry-date">January 1, 2018</span>""", "2018-01-01T00:00:00"),
     ]
 
     for html, expected_output in htmls_with_expected:
