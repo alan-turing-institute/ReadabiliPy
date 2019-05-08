@@ -13,30 +13,20 @@ def extract_date(html):
     xpaths = [
         ('//meta[@property="article:published_time"]/@content', 24),
         ('//meta[@property="article:published"]/@content', 20),
-        ('//meta[@name="Last-Modified"]/@content', 1, 'YYYY-MM-DD hh:mm:ss'),
-        ('//meta[@name="dcterms.created"]/@content', 1),
-        ('//meta[@name="published_time_telegram"]/@content', 1),
         ('//meta[@property="og:article:published_time"]/@content', 1),
         ('//meta[@itemprop="datePublished"]/@content', 2),
         ('//time/@datetime', 6),
         ('//time/text()', 1),
-        ('//div[@class="keyvals"]/@data-content_published_date', 1),
-        ('//div[@class="subarticle"]/p/text()', -1, 'MMMM D, YYYY'),
-        ('//div[@class="text"]/p/text()', -1, 'MMMM D, YYYY'),
-        ('//div[@class="publish-date"]/text()', 1, '[Published] hh:mm A [EST] MMM DD, YYYY'),
         ('//span[@class="timestamp "]/text()', 1),
-        ('//span[@class="article-element__meta-item"]/text()[contains(., "posted")]', 1, 'MMM DD YYYY'),
         ('//span[@class="updated"]/text()', 1, 'YYYY-MM-DD'),
         ('//span[@class="entry-date"]/text()', 1, 'MMM D, YYYY'),
         ('//p[@itemprop="datePublished"]/text()', 1, 'MMMM DD, YYYY'),
-        ('//p[@class="entry-byline"]//time[@class="entry-date"]/@datetime', 1),
     ]
 
     # Get all the dates
     extracted_dates = extract_element(html, xpaths)
-    if not extracted_dates:
+    if len(extracted_dates) == 0:
         return None
-    # Select date with highest score
     date_string = max(extracted_dates, key=lambda x: extracted_dates[x].get('score'))
     # Assign the format variable if the the highest scoring xpath used has one
     xpaths_used = extracted_dates[date_string]['xpaths']

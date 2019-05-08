@@ -4,18 +4,13 @@ from ..readabilipy.extractors.extract_date import standardise_datetime_format
 
 def test_extract_date():
     htmls_with_expected = [
-        ("""<meta name="Last-Modified" content="2018-12-21 06:30:21" />""", "2018-12-21T06:30:21"),
         ("""<p itemprop="datePublished">December 21, 2018</p>""", "2018-12-21T00:00:00"),
         ("""<h1>No dates here</h1>""", None),
         ("""<meta property="article:published_time" content="2018-10-09T01:03:32" />""", "2018-10-09T01:03:32"),
         ("""<meta property="article:published_time" content="2018-12-13T21:02:01+00:00" />""", "2018-12-13T21:02:01"),
         ("""<meta property="article:published_time" content="2019-01-30 09:39:19 -0500" />""", "2019-01-30T09:39:19"),
-        ("""<div class="publish-date"> Published 11:32 AM EST Feb 19, 2019 </div>""", "2019-02-19T11:32:00"),
-        ("""<meta name="published_time_telegram" content="2019-01-25T15:16:00+00:00" />""", "2019-01-25T15:16:00"),
-        ("""<div class="text"><p>2019-01-25T15:16:00+00:00</p></div>""", "2019-01-25T15:16:00"),
         ("""<span class="timestamp " data-localize-time data-epoch-time="1545342875000" data-time-zone="-0800" data-time-format="%A %B %d, %Y">Thursday December 20, 2018</span>""", "2018-12-20T00:00:00"),
         ("""<time style="text-transform:uppercase">8:16 AM 01/31/2019 | Politics</time>""", "2019-01-31T08:16:00"),
-        ("""<span class="article-element__meta-item">Jun 01 2017 posted to <a href="/d/politics" title="Politics" class="article-element__meta-link">Politics</a></span>""", "2017-06-01T00:00:00"),
         ("""
             <div class="article-byline">By
                 <span itemprop="author creator" itemtype="http://schema.org/Person" itemid="/by/michael-gryboski">
@@ -28,8 +23,6 @@ def test_extract_date():
             </div>
         """,
             "2019-01-28T00:00:00"),
-        ("""<div class="subarticle"><p>October 22, 2018</p></div>""", "2018-10-22T00:00:00"),
-        ("""<div class="text"><p>October 22, 2018</p></div>""", "2018-10-22T00:00:00"),
         ("""<span class="updated">2018/12/21</span>""", "2018-12-21T00:00:00"),
         ("""<span class="entry-date">January 1, 2018</span>""", "2018-01-01T00:00:00"),
     ]
