@@ -1,7 +1,5 @@
 from .extract_element import extract_element
-from contextlib import suppress
-from dateutil import parser
-from pendulum import from_format
+import re
 
 
 def extract_date(html):
@@ -43,10 +41,9 @@ def extract_date(html):
 def standardise_datetime_format(date_string, ignoretz=True, format=None, **kwargs):
     """Get an isoformat date string from a date string in any format"""
 
-    if format:  # When format specified, use Pendulum
-        with suppress(ValueError):
-            return from_format(date_string, format).replace(tzinfo=None).isoformat()
-
-    with suppress(ValueError):  # When no format specified, use dateutil to make use of fuzzy param
-        return parser.parse(date_string, ignoretz=ignoretz, fuzzy=True, **kwargs).isoformat()
+    if not ignoretz:
+        return date_string
+    expression = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}"
+    if re.search(expression, date_string):
+        return re.search(expression, date_string).group(0)
     return None
