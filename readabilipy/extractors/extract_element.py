@@ -14,9 +14,7 @@ def get_element_candidates(html, xpaths, score_lower_limit=0):
     extracted_strings = defaultdict(int)
 
     # Get all elements specified and concatenate scores
-    for tuple in xpaths:
-        extraction_xpath = tuple[0]
-        score = tuple[1]
+    for extraction_xpath, score in xpaths:
         if score >= score_lower_limit:
             found_elements = lxml_html.xpath(extraction_xpath)
             if found_elements:
