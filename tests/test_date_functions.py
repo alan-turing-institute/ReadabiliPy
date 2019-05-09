@@ -8,19 +8,6 @@ def test_extract_date():
         ("""<meta property="article:published_time" content="2018-10-09T01:03:32" />""", "2018-10-09T01:03:32"),
         ("""<meta property="article:published_time" content="2018-12-13T21:02:01+00:00" />""", "2018-12-13T21:02:01"),
         ("""<meta property="article:published_time" content="2019-01-30 09:39:19 -0500" />""", "2019-01-30T09:39:19"),
-        ("""<time style="text-transform:uppercase">8:16 AM 01/31/2019 | Politics</time>""", "2019-01-31T08:16:00"),
-        ("""
-            <div class="article-byline">By
-                <span itemprop="author creator" itemtype="http://schema.org/Person" itemid="/by/michael-gryboski">
-                    <a class="reporter" href="/by/michael-gryboski">
-                        <span itemprop="name">Michael Gryboski</span>
-                    </a>
-                </span>
-                , Christian Post Reporter
-                <time class="visually-hidden"> | Monday, January 28, 2019</time>
-            </div>
-        """,
-            "2019-01-28T00:00:00"),
     ]
 
     for html, expected_output in htmls_with_expected:

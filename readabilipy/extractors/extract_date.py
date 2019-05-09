@@ -11,12 +11,13 @@ def extract_date(html):
     # Tuple scores reflect confidence in these xpaths and the preference used for extraction
     # Some of the xpaths also have a specific format we expect the date html element to be
     xpaths = [
-        ('//meta[@property="article:published_time"]/@content', 24),
-        ('//meta[@property="article:published"]/@content', 20),
-        ('//meta[@property="og:article:published_time"]/@content', 1),
-        ('//meta[@itemprop="datePublished"]/@content', 2),
-        ('//time/@datetime', 6),
-        ('//time/text()', 1),
+        ('//meta[@property="article:published_time"]/@content', 13),
+        ('//meta[@property="article:modified_time"]/@content', 2),
+        ('//meta[@property="article:published"]/@content', 7),
+        ('//meta[@property="og:updated_time"]/@content', 10),
+        ('//meta[@itemprop="dateModified"]/@content', 2),
+        ('//meta[@itemprop="datePublished"]/@content', 3),
+        ('//time/@datetime', 3),
     ]
 
     # Get all the dates
