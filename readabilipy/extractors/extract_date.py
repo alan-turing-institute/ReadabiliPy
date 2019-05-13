@@ -38,7 +38,7 @@ def ensure_iso_date_format(date_string, ignoretz=True):
         try:
             if date_format == "%Y-%m-%dT%H:%M:%S%z" and ":" == date_string[-3:-2]:  # Below required for Python versions < 3.7
                 date_string = date_string[:-3] + date_string[-2:]  # Remove colon between hours and minutes of timezone
-            elif date_format == "%Y-%m-%dT%H:%M:%S" and 'Z' in date_string:  # Below required for Python versions < 3.7
+            elif 'Z' in date_string and '000Z' not in date_string:  # Below required for Python versions < 3.7
                 date_string = date_string.replace('Z', '')  # Remove Z so we can interpret e.g. '2019-02-18T17:52:10Z'
             else:
                 date_string = date_string
