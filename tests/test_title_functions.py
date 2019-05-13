@@ -48,10 +48,22 @@ def test_extract_title():
         ("""
             <meta property="og:title" content="Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And It&#8217;s On Video" />
         """, "Trump Denies Charitable Donation He Promised If Elizabeth Warren Releases DNA Results And It’s On Video"),
+        ("""<head><title>Test title</title></head>""", "Test title"),
+        ("""<head><title><p>Test title</p></title></head>""", "Test title")
+    ]
+
+    for html, expected_output in htmls_with_expected:
+        output = extract_title(html)
+        assert output == expected_output
+
+
+def test_title_shortening():
+
+    htmls_with_expected = [
         ("""
             <h1 class="entry-title">Pamela Geller in Breitbart News: Dueling Billboards from CAIR, AFDI in Times Square</h1>
             <meta property="og:title" content="Pamela Geller in Breitbart News: Dueling Billboards from CAIR, AFDI in Times Square - Geller Report" />
-        """, "Pamela Geller in Breitbart News: Dueling Billboards from CAIR, AFDI in Times Square")
+        """, "Pamela Geller in Breitbart News: Dueling Billboards from CAIR, AFDI in Times Square"),
     ]
 
     for html, expected_output in htmls_with_expected:
@@ -62,13 +74,13 @@ def test_extract_title():
 def test_combine_similar_titles():
 
     extracted_strings = {}
-    extracted_strings['title 1'] = {'score': 1}
-    extracted_strings['Title 1'] = {'score': 1}
-    extracted_strings['Title 1 - Extended'] = {'score': 1}
+    extracted_strings['title 1'] = {'score': 1, 'xpaths': ['a']}
+    extracted_strings['Title 1'] = {'score': 1, 'xpaths': ['b']}
+    extracted_strings['Title 1 - Extended'] = {'score': 1, 'xpaths': ['c']}
 
     expected_output = {}
-    expected_output['title 1'] = {'score': 1}
-    expected_output['Title 1'] = {'score': 3}
-    expected_output['Title 1 - Extended'] = {'score': 1}
+    expected_output['title 1'] = {'score': 1, 'xpaths': ['a']}
+    expected_output['Title 1'] = {'score': 3, 'xpaths': ['a', 'b', 'c']}
+    expected_output['Title 1 - Extended'] = {'score': 1, 'xpaths': ['c']}
 
     assert combine_similar_titles(extracted_strings) == expected_output
