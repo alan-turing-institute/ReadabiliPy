@@ -1,6 +1,5 @@
 from .extract_element import extract_element
-from contextlib import suppress
-from dateutil import parser
+import re
 
 
 def extract_date(html):
@@ -9,43 +8,30 @@ def extract_date(html):
     # List of xpaths for HTML tags that could contain a date
     # Tuple scores reflect confidence in these xpaths and the preference used for extraction
     xpaths = [
-        ('//meta[@property="article:published_time"]/@content', 24),  # Unlike with title, makes sense to have extremely high confidence in popular date tags
-        ('//meta[@property="article:published"]/@content', 20),
-        ('//meta[@name="Last-Modified"]/@content', 1),
-        ('//meta[@name="dcterms.created"]/@content', 1),
-        ('//meta[@name="published_time_telegram"]/@content', 1),
-        ('//meta[@property="og:article:published_time"]/@content', 1),
-        ('//meta[@itemprop="datePublished"]/@content', 2),
-        ('//time[contains(@class, "entry-date")]/@datetime', 3),
-        ('//time/@datetime', 6),
-        ('//time/text()', 1),
-        ('//div[@class="keyvals"]/@data-content_published_date', 1),
-        ('//div/time/@datetime', 1),
-        ('//div[@class="subarticle"]/p/text()', -1),
-        ('//div[@class="text"]/p/text()', -1),
-        ('//div[@class="publish-date"]/text()', 1),
-        ('//span[@class="timestamp "]/text()', 1),
-        ('//span[@class="article-element__meta-item"]/text()', 1),
-        ('//span[@class="updated"]/text()', 1),
-        ('//span[@class="entry-date"]/text()', 1),
-        ('//p[@itemprop="datePublished"]/text()', 1),
-        ('//p[@class="entry-byline"]//time[@class="entry-date"]/@datetime', 1),
-        ('substring-after(//*[comment()[contains(., "By")]]/comment(), "-")', 1),
-        ('substring-after(//p[@class="text-muted"]/text(), ",")', 1)
+        ('//meta[@property="article:published_time"]/@content', 13),
+        ('//meta[@property="article:modified_time"]/@content', 2),
+        ('//meta[@property="article:published"]/@content', 7),
+        ('//meta[@property="og:updated_time"]/@content', 10),
+        ('//meta[@itemprop="dateModified"]/@content', 2),
+        ('//meta[@itemprop="datePublished"]/@content', 3),
+        ('//time/@datetime', 3),
     ]
 
-    # Get the date
-    date_string = extract_element(html, xpaths)
-    if date_string:
-        return standardise_datetime_format(date_string)
-    return None
+    # Get all the dates
+    extracted_dates = extract_element(html, xpaths)
+    if len(extracted_dates) == 0:
+        return None
+    # Set the date_string as that with the highest score assigned by extract_element
+    date_string = max(extracted_dates, key=lambda x: extracted_dates[x].get('score'))
+    return standardise_datetime_format(date_string)
 
 
-def standardise_datetime_format(date_string):
+def standardise_datetime_format(date_string, ignoretz=True):
     """Get an isoformat date string from a date string in any format"""
 
-    for not_part_of_date in ["Published", "posted to", " | Politics", "|"]:  # add to this list as appropriate
-        date_string = date_string.replace(not_part_of_date, "")
-    with suppress(ValueError):
-        return parser.parse(date_string, ignoretz=True).isoformat()
+    if not ignoretz:
+        return date_string
+    expression = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}"
+    if re.search(expression, date_string):
+        return re.search(expression, date_string).group(0)
     return None

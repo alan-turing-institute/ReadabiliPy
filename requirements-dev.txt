@@ -6,5 +6,4 @@ pyflakes
 pytest
 pytest-benchmark
 pytest-cov
-python-dateutil
 regex
