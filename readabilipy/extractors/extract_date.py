@@ -1,5 +1,7 @@
 from .extract_element import extract_element
-import re
+# from dateparser import parse
+# import re
+from datetime import datetime
 
 
 def extract_date(html):
@@ -23,15 +25,21 @@ def extract_date(html):
         return None
     # Set the date_string as that with the highest score assigned by extract_element
     date_string = max(extracted_dates, key=lambda x: extracted_dates[x].get('score'))
-    return standardise_datetime_format(date_string)
+    return ensure_iso_date_format(date_string)
 
 
-def standardise_datetime_format(date_string, ignoretz=True):
-    """Check date_string is isoformat and return it"""
-
-    expression = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}"
-    if re.search(expression, date_string):
-        if not ignoretz:
-            return date_string
-        return re.search(expression, date_string).group(0)
+def ensure_iso_date_format(date_string, ignoretz=True):
+    """Check date_string is in one of our supported formats and return it"""
+    supported_date_formats = [
+        "%Y-%m-%dT%H:%M:%S%z",
+        "%Y-%m-%dT%H:%M:%S"
+    ]
+    for date_format in supported_date_formats:
+        try:
+            isodate = datetime.strptime(date_string, date_format)
+            if ignoretz:
+                isodate = isodate.replace(tzinfo=None)
+            return isodate.isoformat()
+        except ValueError:
+            pass
     return None

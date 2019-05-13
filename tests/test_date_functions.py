@@ -1,5 +1,5 @@
 from ..readabilipy.extractors.extract_date import extract_date
-from ..readabilipy.extractors.extract_date import standardise_datetime_format
+from ..readabilipy.extractors.extract_date import ensure_iso_date_format
 
 
 def test_extract_date():
@@ -19,28 +19,36 @@ def test_extract_date():
         assert output == expected_output
 
 
-def test_standardise_datetime_format_timezone_keep():
+def test_ensure_iso_date_format_timezone_keep():
     datetime_string = '2014-10-24T17:32:46+12:00'
-    iso_string = standardise_datetime_format(datetime_string, ignoretz=False)
+    iso_string = ensure_iso_date_format(datetime_string, ignoretz=False)
     expected_iso_string = '2014-10-24T17:32:46+12:00'
 
     assert iso_string == expected_iso_string
 
 
-def test_standardise_datetime_format_timezone_drop():
+def test_ensure_iso_date_format_timezone_drop():
     datetime_string = '2014-10-24T17:32:46+12:00'
-    iso_string = standardise_datetime_format(datetime_string)
+    iso_string = ensure_iso_date_format(datetime_string)
     expected_iso_string = '2014-10-24T17:32:46'
 
     assert iso_string == expected_iso_string
 
 
-def test_standardise_datetime_format_non_iso_string():
+def test_ensure_iso_date_format_no_tz():
+    datetime_string = '2014-10-24T17:32:46'
+    iso_string = ensure_iso_date_format(datetime_string)
+    expected_iso_string = '2014-10-24T17:32:46'
+
+    assert iso_string == expected_iso_string
+
+
+def test_ensure_iso_date_format_non_iso_string():
     htmls_with_expected = [
         ("""Hello world""", None),
         ("""10/10/2019""", None),
     ]
 
     for html, expected_output in htmls_with_expected:
-        output = standardise_datetime_format(html)
+        output = ensure_iso_date_format(html)
         assert output == expected_output
