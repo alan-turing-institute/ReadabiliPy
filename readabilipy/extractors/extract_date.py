@@ -1,6 +1,4 @@
 from .extract_element import extract_element
-# from dateparser import parse
-# import re
 from datetime import datetime
 
 
