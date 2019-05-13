@@ -19,7 +19,7 @@ def test_extract_title():
         ("""<h1 class="title">Example title 12</h1>""", "Example title 12"),
         ("""<h1 itemprop="headline">Example title 13</h2>""", "Example title 13"),
         ("""<h2 itemprop="headline">Example title 14</h2>""", "Example title 14"),
-        ("""<h2 class="title">Example title 15</h2>""", None), # not one of the xpaths
+        ("""<h2 class="title">Example title 15</h2>""", None), #  not one of the xpaths
         ("""<div class="postarea"><h2><a>Example title 16</a></h2></div>""", "Example title 16"),
         ("""<body><title>Example title 17</title></body>""", "Example title 17"),
     ]
