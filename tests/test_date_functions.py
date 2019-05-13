@@ -57,7 +57,7 @@ def test_ensure_iso_date_format_hh_colon_mmZ_format():
     expected_iso_string = '2019-02-18T17:52:10'
 
     assert iso_string == expected_iso_string
-    
+
 
 def test_ensure_iso_date_format_non_iso_string():
     htmls_with_expected = [
