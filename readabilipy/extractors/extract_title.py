@@ -34,7 +34,7 @@ def extract_title(html):
 
 def combine_similar_titles(extracted_strings):
     """Take a dictionary with titles and nested dicts with scores and combine scores for titles which we decide are the same."""
-    print(extracted_strings)
+
     # Iterate through each possible pair of title keys, including both permutations of each pair
     for title_pair in permutations(extracted_strings, 2):
         # If the first title is a subset of the second then combine their scores, taking the shorter one as the key
