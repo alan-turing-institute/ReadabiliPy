@@ -30,7 +30,8 @@ def ensure_iso_date_format(date_string, ignoretz=True):
     """Check date_string is in one of our supported formats and return it"""
     supported_date_formats = [
         "%Y-%m-%dT%H:%M:%S%z",
-        "%Y-%m-%dT%H:%M:%S"
+        "%Y-%m-%dT%H:%M:%S",
+        "%Y-%m-%dT%H:%M:%S.%fZ"
     ]
     for date_format in supported_date_formats:
         try:

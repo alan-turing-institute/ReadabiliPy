@@ -43,6 +43,14 @@ def test_ensure_iso_date_format_no_tz():
     assert iso_string == expected_iso_string
 
 
+def test_ensure_iso_date_format_000Z_format():
+    datetime_string = '2019-02-15T15:54:50.000Z'
+    iso_string = ensure_iso_date_format(datetime_string)
+    expected_iso_string = '2019-02-15T15:54:50'
+
+    assert iso_string == expected_iso_string
+    
+
 def test_ensure_iso_date_format_non_iso_string():
     htmls_with_expected = [
         ("""Hello world""", None),
