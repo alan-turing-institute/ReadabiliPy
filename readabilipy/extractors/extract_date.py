@@ -27,11 +27,11 @@ def extract_date(html):
 
 
 def standardise_datetime_format(date_string, ignoretz=True):
-    """Get an isoformat date string from a date string in any format"""
+    """Check date_string is isoformat and return it"""
 
-    if not ignoretz:
-        return date_string
     expression = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}"
     if re.search(expression, date_string):
+        if not ignoretz:
+            return date_string
         return re.search(expression, date_string).group(0)
     return None

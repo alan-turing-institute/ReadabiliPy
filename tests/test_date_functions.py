@@ -33,3 +33,14 @@ def test_standardise_datetime_format_timezone_drop():
     expected_iso_string = '2014-10-24T17:32:46'
 
     assert iso_string == expected_iso_string
+
+
+def test_standardise_datetime_format_non_iso_string():
+    htmls_with_expected = [
+        ("""Hello world""", None),
+        ("""10/10/2019""", None),
+    ]
+
+    for html, expected_output in htmls_with_expected:
+        output = standardise_datetime_format(html)
+        assert output == expected_output
