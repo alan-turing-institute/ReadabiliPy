@@ -31,6 +31,7 @@ def ensure_iso_date_format(date_string, ignoretz=True):
     supported_date_formats = [
         "%Y-%m-%dT%H:%M:%S",  # e.g. '2014-10-24T17:32:46'
         "%Y-%m-%dT%H:%M:%S%z",  # e.g. '2014-10-24T17:32:46+12:00'
+        "%Y-%m-%dT%H:%M:%SZ",  # e.g. '2019-02-18T17:52:10Z'
         "%Y-%m-%dT%H:%M:%S.%fZ"  # e.g. '2019-02-15T15:54:50.000Z'
     ]
 
@@ -38,8 +39,6 @@ def ensure_iso_date_format(date_string, ignoretz=True):
         try:
             if date_format == "%Y-%m-%dT%H:%M:%S%z" and ":" == date_string[-3:-2]:  # Below required for Python versions < 3.7
                 date_string = date_string[:-3] + date_string[-2:]  # Remove colon between hours and minutes of timezone
-            if 'Z' in date_string and '000Z' not in date_string:  # Below required for Python versions < 3.7
-                date_string = date_string.replace('Z', '')  # Remove Z so we can interpret e.g. '2019-02-18T17:52:10Z'
             isodate = datetime.strptime(date_string, date_format)
             if ignoretz:
                 isodate = isodate.replace(tzinfo=None)
