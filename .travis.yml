@@ -23,3 +23,7 @@ script:
   - pyflakes *.py readabilipy tests
   # Check PEP8 compliance (ignoring long lines)
   - pycodestyle --statistics --ignore=E501 --count *.py readabilipy tests
+
+after_success:
+  # Upload results to coveralls.io
+  - coveralls
