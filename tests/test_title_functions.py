@@ -1,32 +1,32 @@
 from ..readabilipy.extractors.extract_title import extract_title
 from ..readabilipy.extractors.extract_title import combine_similar_titles
+import pytest
 
 
-def test_extract_title():
+htmls_with_expected = [
+    ("""<meta name="fb_title" content="Example title 1" />""", "Example title 1"),
+    ("""<meta property="og:title" content="Example title 2" />""", "Example title 2"),
+    ("""<head><title>Example title 3</title></head>""", "Example title 3"),
+    ("""<head><title><p>Example title 4</p></title></head>""", "Example title 4"),
+    ("""<meta itemprop="headline" content="Example title 5" />)""", "Example title 5"),
+    ("""<meta name="sailthru.title" content="Example title 6" />)""", "Example title 6"),
+    ("""<meta name="dcterms.title" content="Example title 7" />)""", "Example title 7"),
+    ("""<meta name="title" content="Example title 8" />)""", "Example title 8"),
+    ("""<header name="entry-header"><h1 class="entry-title">Example title 9</h1></header>""", "Example title 9"),
+    ("""<h1 class="entry-title">Example title 10</h1>""", "Example title 10"),
+    ("""<header><h1>Example title 11</h1></header>""", "Example title 11"),
+    ("""<h1 class="title">Example title 12</h1>""", "Example title 12"),
+    ("""<h1 itemprop="headline">Example title 13</h2>""", "Example title 13"),
+    ("""<h2 itemprop="headline">Example title 14</h2>""", "Example title 14"),
+    ("""<h2 class="title">Example title 15</h2>""", None),  # not one of the xpaths in extract_title()
+    ("""<div class="postarea"><h2><a>Example title 16</a></h2></div>""", "Example title 16"),
+    ("""<body><title>Example title 17</title></body>""", "Example title 17"),
+]
 
-    htmls_with_expected = [
-        ("""<meta name="fb_title" content="Example title 1" />""", "Example title 1"),
-        ("""<meta property="og:title" content="Example title 2" />""", "Example title 2"),
-        ("""<head><title>Example title 3</title></head>""", "Example title 3"),
-        ("""<head><title><p>Example title 4</p></title></head>""", "Example title 4"),
-        ("""<meta itemprop="headline" content="Example title 5" />)""", "Example title 5"),
-        ("""<meta name="sailthru.title" content="Example title 6" />)""", "Example title 6"),
-        ("""<meta name="dcterms.title" content="Example title 7" />)""", "Example title 7"),
-        ("""<meta name="title" content="Example title 8" />)""", "Example title 8"),
-        ("""<header name="entry-header"><h1 class="entry-title">Example title 9</h1></header>""", "Example title 9"),
-        ("""<h1 class="entry-title">Example title 10</h1>""", "Example title 10"),
-        ("""<header><h1>Example title 11</h1></header>""", "Example title 11"),
-        ("""<h1 class="title">Example title 12</h1>""", "Example title 12"),
-        ("""<h1 itemprop="headline">Example title 13</h2>""", "Example title 13"),
-        ("""<h2 itemprop="headline">Example title 14</h2>""", "Example title 14"),
-        ("""<h2 class="title">Example title 15</h2>""", None),  # not one of the xpaths
-        ("""<div class="postarea"><h2><a>Example title 16</a></h2></div>""", "Example title 16"),
-        ("""<body><title>Example title 17</title></body>""", "Example title 17"),
-    ]
 
-    for html, expected_output in htmls_with_expected:
-        output = extract_title(html)
-        assert output == expected_output
+@pytest.mark.parametrize("html, expected", htmls_with_expected)
+def test_extract_title(html, expected):
+    assert extract_title(html) == expected
 
 
 def test_extract_title_prioritises_highest_score_xpath():
