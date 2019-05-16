@@ -22,8 +22,8 @@ def extract_title(html):
         ('//h1[@class="post__title"]//text()', 1),
         ('//h2[@itemprop="headline"]//text()', 2),
         ('//div[@class="postarea"]/h2/a//text()', 1),
-        ('//head/title/text()', 1),
-        ('//body/title/text()', 1),
+        ('//head/title//text()', 1),
+        ('//body/title//text()', 1),
     ]
 
     extracted_titles = extract_element(html, xpaths, process_dict_fn=combine_similar_titles)
@@ -40,8 +40,12 @@ def combine_similar_titles(extracted_strings):
         # If the first title is a subset of the second then combine their scores, taking the shorter one as the key
         if title_pair[0] in title_pair[1]:
             extracted_strings[title_pair[0]]['score'] += extracted_strings[title_pair[1]]['score']
+            extracted_strings[title_pair[0]]['xpaths'] += extracted_strings[title_pair[1]]['xpaths']
         # If the first title is identical to the second (ignoring case) then combine their scores, taking the one with more capitals as the key
         elif title_pair[0].lower() == title_pair[1].lower():
             if len([c for c in title_pair[0] if c.isupper()]) > len([c for c in title_pair[1] if c.isupper()]):
                 extracted_strings[title_pair[0]]['score'] += extracted_strings[title_pair[1]]['score']
+                extracted_strings[title_pair[0]]['xpaths'] += extracted_strings[title_pair[1]]['xpaths']
+    for score_xpath_dict in extracted_strings.values():
+        score_xpath_dict['xpaths'].sort()
     return extracted_strings
