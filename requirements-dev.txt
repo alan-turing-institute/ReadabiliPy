@@ -7,4 +7,5 @@ pyflakes
 pytest
 pytest-benchmark
 pytest-cov
+python-coveralls
 regex
