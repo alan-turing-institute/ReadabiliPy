@@ -8,22 +8,22 @@ def extract_title(html):
     # List of xpaths for HTML tags that could contain a title
     # Tuple scores reflect confidence in these xpaths and the preference used for extraction
     xpaths = [
-        ('//meta[@property="og:title"]/@content', 4),
-        ('//meta[contains(@itemprop, "headline")]/@content', 2),
-        ('//meta[@name="fb_title"]/@content', 1),
-        ('//meta[@name="sailthru.title"]/@content', 1),
-        ('//meta[@name="dcterms.title"]/@content', 1),
-        ('//meta[@name="title"]/@content', 1),
         ('//header[@class="entry-header"]/h1[@class="entry-title"]//text()', 4),
-        ('//header/h1//text()', 1),
-        ('//h1[@class="title"]//text()', 1),
+        ('//meta[@property="og:title"]/@content', 4),
         ('//h1[@class="entry-title"]//text()', 3),
         ('//h1[@itemprop="headline"]//text()', 3),
-        ('//h1[@class="post__title"]//text()', 1),
         ('//h2[@itemprop="headline"]//text()', 2),
-        ('//div[@class="postarea"]/h2/a//text()', 1),
-        ('//head/title//text()', 1),
+        ('//meta[contains(@itemprop, "headline")]/@content', 2),
         ('//body/title//text()', 1),
+        ('//div[@class="postarea"]/h2/a//text()', 1),
+        ('//h1[@class="post__title"]//text()', 1),
+        ('//h1[@class="title"]//text()', 1),
+        ('//head/title//text()', 1),
+        ('//header/h1//text()', 1),
+        ('//meta[@name="dcterms.title"]/@content', 1),
+        ('//meta[@name="fb_title"]/@content', 1),
+        ('//meta[@name="sailthru.title"]/@content', 1),
+        ('//meta[@name="title"]/@content', 1),
     ]
 
     extracted_titles = extract_element(html, xpaths, process_dict_fn=combine_similar_titles)
