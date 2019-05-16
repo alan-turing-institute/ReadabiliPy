@@ -42,7 +42,7 @@ def ensure_iso_date_format(date_string, ignoretz=True):
             # we ensure that all versions of python can parse datetimes like these
             if date_format == "%Y-%m-%dT%H:%M:%S%z" and date_string[-3] == ':':
                 isodate = datetime.strptime(date_string[:-3] + date_string[-2:], date_format)
-            else
+            else:
                 isodate = datetime.strptime(date_string, date_format)
             if ignoretz:
                 isodate = isodate.replace(tzinfo=None)
