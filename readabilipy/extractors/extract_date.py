@@ -36,8 +36,8 @@ def ensure_iso_date_format(date_string, ignoretz=True):
     ]
 
     for date_format in supported_date_formats:
-        try:
-            if date_format == "%Y-%m-%dT%H:%M:%S%z" and ":" == date_string[-3:-2]:  # Below required for Python versions < 3.7
+        try:  # Below required for Python versions < 3.7 (works with >= 3.7), removes colon from timezone e.g. '2014-10-24T17:32:46+12:00' => '2014-10-24T17:32:46+1200'
+            if date_format == "%Y-%m-%dT%H:%M:%S%z" and date_string[-3] == ':':
                 date_string = date_string[:-3] + date_string[-2:]  # Remove colon between hours and minutes of timezone
             isodate = datetime.strptime(date_string, date_format)
             if ignoretz:
