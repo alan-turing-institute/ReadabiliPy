@@ -50,6 +50,12 @@ def test_ensure_iso_date_format_hh_colon_mmZ_format():
     assert ensure_iso_date_format(datetime_string) == expected_iso_string
 
 
+def test_ensure_iso_date_format_with_ms():
+    datetime_string = '2019-05-14T16:45:01.493'
+    expected_iso_string = '2019-05-14T16:45:01'
+    assert ensure_iso_date_format(datetime_string) == expected_iso_string
+
+
 htmls_with_expected = [
     ("""Hello world""", None),
     ("""10/10/2019""", None),
