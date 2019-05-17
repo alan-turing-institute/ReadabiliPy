@@ -29,10 +29,11 @@ def extract_date(html):
 def ensure_iso_date_format(date_string, ignoretz=True):
     """Check date_string is in one of our supported formats and return it"""
     supported_date_formats = [
-        "%Y-%m-%dT%H:%M:%S",     # '2014-10-24T17:32:46'
-        "%Y-%m-%dT%H:%M:%S%z",   # '2014-10-24T17:32:46+12:00'
-        "%Y-%m-%dT%H:%M:%SZ",    # '2014-10-24T17:32:46Z'
-        "%Y-%m-%dT%H:%M:%S.%fZ"  # '2014-10-24T17:32:46.000Z'
+        "%Y-%m-%dT%H:%M:%S",      # '2014-10-24T17:32:46'
+        "%Y-%m-%dT%H:%M:%S%z",    # '2014-10-24T17:32:46+12:00'
+        "%Y-%m-%dT%H:%M:%SZ",     # '2014-10-24T17:32:46Z'
+        "%Y-%m-%dT%H:%M:%S.%fZ",  # '2014-10-24T17:32:46.000Z'
+        "%Y-%m-%dT%H:%M:%S.%f"    # '2014-10-24T17:32:46.493'
     ]
 
     for date_format in supported_date_formats:
@@ -45,7 +46,7 @@ def ensure_iso_date_format(date_string, ignoretz=True):
             else:
                 isodate = datetime.strptime(date_string, date_format)
             if ignoretz:
-                isodate = isodate.replace(tzinfo=None)
+                isodate = isodate.replace(tzinfo=None, microsecond=0)
             return isodate.isoformat()
         except ValueError:
             pass
