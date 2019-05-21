@@ -1,4 +1,7 @@
-from ..readabilipy.text_manipulation import normalise_unicode, normalise_whitespace, normalise_text, simplify_html, strip_control_characters
+from pytest import mark
+from ..readabilipy.simplifiers import normalise_text, normalise_unicode, normalise_whitespace, strip_control_characters, strip_html_whitespace
+from ..readabilipy.simplifiers import text
+from .checks import check_exact_html_output
 
 
 def test_unicode_normalisation():
@@ -17,7 +20,7 @@ def test_text_normalisation():
     assert normalise_text(unnormalised_string) == "Amélie Poulain"
 
 
-def test_simplify_html():
+def test_strip_html_whitespace():
     formatted_string = """
     <html>
         <body>
@@ -25,7 +28,7 @@ def test_simplify_html():
         </body>
     </html>
     """
-    assert simplify_html(formatted_string) == "<html><body><p>Some text here</p></body></html>"
+    assert strip_html_whitespace(formatted_string) == "<html><body><p>Some text here</p></body></html>"
 
 
 def test_strip_control_characters_non_printing_characters():
@@ -62,3 +65,30 @@ def test_strip_control_characters_tab():
     unnormalised_string = "A string with tabs\tin​c\u200Bluded\ufeff"
     assert strip_control_characters(unnormalised_string) == "A string with tabs\tincluded"
     assert normalise_text(unnormalised_string) == "A string with tabs included"
+
+
+# Test whitespace around tags
+@mark.parametrize('terminal_punctuation', text.terminal_punctuation_marks)
+def test_ensure_correct_punctuation_joining(terminal_punctuation):
+    """Do not join with ' ' if the following character is a punctuation mark."""
+    input_html = """
+        <div>
+            <p>
+                Some text <a href="example.com">like this</a>{0} with punctuation.
+            </p>
+        </div>""".format(terminal_punctuation)
+    expected_output = """<div><p>Some text like this{0} with punctuation.</p></div>""".format(terminal_punctuation)
+    check_exact_html_output(input_html, expected_output)
+
+
+@mark.parametrize('matched_pair', text.matched_punctuation_marks)
+def test_ensure_correct_bracket_quote_joining(matched_pair):
+    """Do not join with ' ' if we are inside matched punctuation marks."""
+    input_html = """
+        <div>
+            <p>
+                Some text {0}<a href="example.com">like this</a>{1} with punctuation.
+            </p>
+        </div>""".format(*matched_pair)
+    expected_output = """<div><p>Some text {0}like this{1} with punctuation.</p></div>""".format(*matched_pair)
+    check_exact_html_output(input_html, expected_output)

@@ -1,7 +1,22 @@
 # from .checks import check_extract_article
 from bs4 import BeautifulSoup
-from ..readabilipy.json_parser import plain_element, plain_text_leaf_node, add_node_indexes, content_digest
-from ..readabilipy.text_manipulation import normalise_text
+from ..readabilipy import simple_json_from_html_string
+from ..readabilipy.simplifiers import normalise_text
+from ..readabilipy.simple_json import plain_element, plain_text_leaf_node, add_node_indexes, content_digest
+
+
+def test_empty_page():
+    """Empty pages should return an empty <div>."""
+    html = ""
+    parsed_content = simple_json_from_html_string(html)
+    assert parsed_content["content"] == "<div></div>"
+
+
+def test_contentless_page():
+    """Contentless pages should return an empty <div>."""
+    html = "<html></html>"
+    parsed_content = simple_json_from_html_string(html)
+    assert parsed_content["content"] == "<div></div>"
 
 
 def test_plain_element_with_comments():
@@ -45,7 +60,7 @@ def test_leaf_nodes_without_text():
 
 
 def test_node_index_assignment():
-    """Whitelisted elements should get an appropriate index but bares strings should not."""
+    """Whitelisted elements should get an appropriate index but bare strings should not."""
     html = """
         <div>
             <p>Some text</p>

@@ -1,6 +1,6 @@
 from collections import defaultdict
 import lxml.html
-from ..text_manipulation import normalise_whitespace
+from ..simplifiers import normalise_whitespace
 
 
 def extract_element(html, xpaths, process_dict_fn=None):
@@ -9,12 +9,14 @@ def extract_element(html, xpaths, process_dict_fn=None):
         Processing of the dictionary can be handled with the arg function.
         The returned dictionary should have the processed elements as keys and dicts with scores and the xpaths used as values
     """
-
-    # Parse the html and extract the contents using all xpaths
-    lxml_html = lxml.html.fromstring(html)
-    extracted_strings = defaultdict(dict)
+    # Attempt to parse the html, aborting here if it is not parseable
+    try:
+        lxml_html = lxml.html.fromstring(html)
+    except lxml.etree.ParserError:
+        return None
 
     # Get all elements specified and combine scores
+    extracted_strings = defaultdict(dict)
     for extraction_xpath, score in xpaths:
         found_elements = lxml_html.xpath(extraction_xpath)
         found_elements = found_elements if isinstance(found_elements, list) else [found_elements]

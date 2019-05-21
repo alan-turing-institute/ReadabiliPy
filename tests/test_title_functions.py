@@ -1,6 +1,6 @@
+import pytest
 from ..readabilipy.extractors.extract_title import extract_title
 from ..readabilipy.extractors.extract_title import combine_similar_titles
-import pytest
 
 
 htmls_with_expected = [

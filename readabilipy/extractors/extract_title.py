@@ -1,5 +1,5 @@
-from .extract_element import extract_element
 from itertools import permutations
+from .extract_element import extract_element
 
 
 def extract_title(html):
