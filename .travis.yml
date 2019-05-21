@@ -1,7 +1,9 @@
 sudo: enabled
 dist: xenial
 language: python
-python: 3.6
+python:
+  - 3.6
+  - 3.7
 
 before_install:
   # Install node.js following instructions from
