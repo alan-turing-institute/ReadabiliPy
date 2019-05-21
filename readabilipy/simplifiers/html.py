@@ -1,6 +1,7 @@
 """Common HTML cleaning functions."""
-from bs4 import BeautifulSoup, Comment, Doctype
+from bs4 import Comment, Doctype
 from .text import normalise_text
+
 
 def elements_to_delete():
     """Elements that will be deleted together with their contents."""
@@ -49,6 +50,7 @@ def block_level_whitelist():
                 'ol', 'p', 'pre', 'section', 'table', 'tbody', 'thead',
                 'tfoot', 'tr', 'td', 'th', 'ul']
     return elements
+
 
 def structural_elements():
     """Structural elements we do no further processing on (though we do remove attributes and alter their contents)"""

@@ -71,22 +71,24 @@ def test_strip_control_characters_tab():
 @mark.parametrize('terminal_punctuation', text.terminal_punctuation_marks)
 def test_ensure_correct_punctuation_joining(terminal_punctuation):
     """Do not join with ' ' if the following character is a punctuation mark."""
-    check_exact_html_output("""
+    input_html = """
         <div>
             <p>
                 Some text <a href="example.com">like this</a>{0} with punctuation.
             </p>
-        </div>""".format(terminal_punctuation),
-        """<div><p>Some text like this{0} with punctuation.</p></div>""".format(terminal_punctuation))
+        </div>""".format(terminal_punctuation)
+    expected_output = """<div><p>Some text like this{0} with punctuation.</p></div>""".format(terminal_punctuation)
+    check_exact_html_output(input_html, expected_output)
 
 
 @mark.parametrize('matched_pair', text.matched_punctuation_marks)
 def test_ensure_correct_bracket_quote_joining(matched_pair):
-    """Do not join with ' ' if the following character is a punctuation mark."""
-    check_exact_html_output("""
+    """Do not join with ' ' if we are inside matched punctuation marks."""
+    input_html = """
         <div>
             <p>
                 Some text {0}<a href="example.com">like this</a>{1} with punctuation.
             </p>
-        </div>""".format(*matched_pair),
-        """<div><p>Some text {0}like this{1} with punctuation.</p></div>""".format(*matched_pair))
+        </div>""".format(*matched_pair)
+    expected_output = """<div><p>Some text {0}like this{1} with punctuation.</p></div>""".format(*matched_pair)
+    check_exact_html_output(input_html, expected_output)

@@ -4,6 +4,7 @@ html5lib
 lxml
 pycodestyle
 pyflakes
+pylint
 pytest
 pytest-benchmark
 pytest-cov

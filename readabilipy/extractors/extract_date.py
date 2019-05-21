@@ -1,5 +1,5 @@
-from .extract_element import extract_element
 from datetime import datetime
+from .extract_element import extract_element
 
 
 def extract_date(html):

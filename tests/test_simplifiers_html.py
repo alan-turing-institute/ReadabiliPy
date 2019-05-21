@@ -2,6 +2,7 @@
 from bs4 import BeautifulSoup
 from ..readabilipy.simplifiers import html
 
+
 def test_remove_metadata():
     HTML = """
         <!DOCTYPE html>
@@ -29,5 +30,3 @@ def test_remove_blacklist():
     soup = BeautifulSoup(HTML, "html5lib")
     html.remove_blacklist(soup)
     assert "button" not in str(soup)
-
-

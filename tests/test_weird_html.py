@@ -1,7 +1,5 @@
 """Tests for weird HTML input."""
-from pytest import mark
 from .checks import check_exact_html_output
-from ..readabilipy.simplifiers.text import matched_punctuation_marks, terminal_punctuation_marks
 
 
 def test_non_printing_control_characters():
@@ -35,9 +33,6 @@ def test_iframe_with_source():
         """<div><iframe src="https://www.youtube.com/embed/BgB5E91lD6s" width="640" height="355" frameborder="0" allowfullscreen="allowfullscreen"></iframe></div>""",
         "<div></div>"
     )
-
-
-
 
 
 # Test comments inside tags

@@ -2,6 +2,7 @@
 from ..readabilipy import simple_tree_from_html_string
 from ..readabilipy.simplifiers import strip_html_whitespace
 
+
 def test_remove_cdata():
     """Test all possible methods of CData inclusion. Note that in the final
     example the '//' prefixes have no effect (since we are not in a <script>)

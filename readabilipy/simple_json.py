@@ -35,7 +35,7 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
         }
 
     # Only keep the subset of Readability.js fields we are using (and therefore testing for accuracy of extraction)
-    # TODO: Add tests for additional fields and include them when we look at packaging this wrapper up for PyPI
+    # NB: Need to add tests for additional fields and include them when we look at packaging this wrapper up for PyPI
     # Initialise output article to include all fields with null values
     article_json = {
         "title": None,
@@ -53,7 +53,7 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
             article_json["byline"] = input_json["byline"]
         if "date" in input_json and input_json["date"]:
             article_json["date"] = input_json["date"]
-        if "content" in input_json and input_json["content"]: # and input_json["content"] != "<div></div>":
+        if "content" in input_json and input_json["content"]:
             article_json["content"] = input_json["content"]
             article_json["plain_content"] = plain_content(article_json["content"], content_digests, node_indexes)
             article_json["plain_text"] = extract_text_blocks_as_plain_text(article_json["plain_content"])
@@ -151,23 +151,22 @@ def is_text(element):
 
 
 def is_non_printing(element):
-    return (type(element) in [Comment, CData])
+    return any(isinstance(element, _e) for _e in [Comment, CData])
 
 
 def add_node_indexes(element, node_index="0"):
+    # Can't add attributes to string types
     if is_text(element):
-        # Can't add attributes to string types
         return element
-    else:
-        # Add index to current element
-        element["data-node-index"] = node_index
-        # Add index to child elements
-        for local_idx, child in enumerate(
-                [c for c in element.contents if not is_text(c)], start=1):
-            # Can't add attributes to leaf string types
-            child_index = "{stem}.{local}".format(
-                stem=node_index, local=local_idx)
-            add_node_indexes(child, node_index=child_index)
+    # Add index to current element
+    element["data-node-index"] = node_index
+    # Add index to child elements
+    for local_idx, child in enumerate(
+            [c for c in element.contents if not is_text(c)], start=1):
+        # Can't add attributes to leaf string types
+        child_index = "{stem}.{local}".format(
+            stem=node_index, local=local_idx)
+        add_node_indexes(child, node_index=child_index)
     return element
 
 

@@ -1,5 +1,5 @@
-from ..readabilipy.extractors import extract_date, ensure_iso_date_format
 import pytest
+from ..readabilipy.extractors import extract_date, ensure_iso_date_format
 
 
 htmls_with_expected = [
