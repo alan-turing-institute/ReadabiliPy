@@ -276,7 +276,6 @@ def recursively_prune_elements(soup):
     # Repeatedly apply single_replace() until no elements are being removed
     while single_replace():
         pass
-    # remove_empty_strings_and_elements()
 
 
 def parse_to_tree(html):

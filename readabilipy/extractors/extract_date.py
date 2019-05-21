@@ -19,7 +19,7 @@ def extract_date(html):
 
     # Get all the dates
     extracted_dates = extract_element(html, xpaths)
-    if len(extracted_dates) == 0:
+    if not extracted_dates:
         return None
     # Set the date_string as that with the highest score assigned by extract_element
     date_string = max(extracted_dates, key=lambda x: extracted_dates[x]["score"])

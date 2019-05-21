@@ -53,7 +53,7 @@ def parse_to_json(html, content_digests=False, node_indexes=False, use_readabili
             article_json["byline"] = input_json["byline"]
         if "date" in input_json and input_json["date"]:
             article_json["date"] = input_json["date"]
-        if "content" in input_json and input_json["content"]:
+        if "content" in input_json and input_json["content"]: # and input_json["content"] != "<div></div>":
             article_json["content"] = input_json["content"]
             article_json["plain_content"] = plain_content(article_json["content"], content_digests, node_indexes)
             article_json["plain_text"] = extract_text_blocks_as_plain_text(article_json["plain_content"])
