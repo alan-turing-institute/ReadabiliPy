@@ -1,4 +1,7 @@
-from .json_parser import parse_to_json
-from .plain_html import parse_to_tree
+from .simple_json import simple_json_from_html_string
+from .simple_tree import simple_tree_from_html_string
 
-__all__ = ['parse_to_json', 'parse_to_tree']
+__all__ = [
+    'simple_json_from_html_string',
+    'simple_tree_from_html_string',
+]

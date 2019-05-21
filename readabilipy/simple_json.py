@@ -5,12 +5,12 @@ import tempfile
 from subprocess import check_call
 from bs4 import BeautifulSoup
 from bs4.element import Comment, NavigableString, CData
-from .plain_html import parse_to_tree
+from .simple_tree import simple_tree_from_html_string
 from .extractors import extract_date, extract_title
-from .text_manipulation import normalise_text
+from .simplifiers import normalise_text
 
 
-def parse_to_json(html, content_digests=False, node_indexes=False, use_readability=False):
+def simple_json_from_html_string(html, content_digests=False, node_indexes=False, use_readability=False):
     if use_readability:
         temp_dir = tempfile.gettempdir()
         # Write input HTML to temporary file so it is available to the node.js script
@@ -31,7 +31,7 @@ def parse_to_json(html, content_digests=False, node_indexes=False, use_readabili
         input_json = {
             "title": extract_title(html),
             "date": extract_date(html),
-            "content": str(parse_to_tree(html))
+            "content": str(simple_tree_from_html_string(html))
         }
 
     # Only keep the subset of Readability.js fields we are using (and therefore testing for accuracy of extraction)

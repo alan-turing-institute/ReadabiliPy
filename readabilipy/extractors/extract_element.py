@@ -1,6 +1,6 @@
 from collections import defaultdict
 import lxml.html
-from ..text_manipulation import normalise_whitespace
+from ..simplifiers import normalise_whitespace
 
 
 def extract_element(html, xpaths, process_dict_fn=None):

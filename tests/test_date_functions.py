@@ -1,5 +1,4 @@
-from ..readabilipy.extractors.extract_date import extract_date
-from ..readabilipy.extractors.extract_date import ensure_iso_date_format
+from ..readabilipy.extractors import extract_date, ensure_iso_date_format
 import pytest
 
 
@@ -56,12 +55,6 @@ def test_ensure_iso_date_format_with_ms():
     assert ensure_iso_date_format(datetime_string) == expected_iso_string
 
 
-htmls_with_expected = [
-    ("""Hello world""", None),
-    ("""10/10/2019""", None),
-]
-
-
-@pytest.mark.parametrize("html, expected", htmls_with_expected)
+@pytest.mark.parametrize("html, expected", [("Hello world", None), ("10/10/2019", None)])
 def test_ensure_iso_date_format_non_iso_string(html, expected):
     assert ensure_iso_date_format(html) == expected

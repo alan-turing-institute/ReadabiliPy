@@ -3,7 +3,6 @@ from ..readabilipy.extractors.extract_element import extract_element
 
 
 def test_extract_element():
-
     xpaths = [
         ('//h1[@class="entry-title"]//text()', 4),
         ('//h1[@itemprop="headline"]//text()', 3),
@@ -25,7 +24,6 @@ def test_extract_element():
 
 
 def test_extract_element_with_passed_func():
-
     def process_dict(d):
         d['Title 1'] = 7
         return d

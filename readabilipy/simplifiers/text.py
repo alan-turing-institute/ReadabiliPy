@@ -30,7 +30,7 @@ def normalise_text(text):
     return text
 
 
-def simplify_html(text):
+def strip_html_whitespace(text):
     """Simplify HTML by stripping whitespace."""
     # Normalise unicode first to try and standardise whitespace characters as much as possible before normalising them
     text = normalise_text(text)

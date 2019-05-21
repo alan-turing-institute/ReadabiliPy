@@ -1,20 +1,21 @@
 # from .checks import check_extract_article
 from bs4 import BeautifulSoup
-from ..readabilipy.json_parser import parse_to_json, plain_element, plain_text_leaf_node, add_node_indexes, content_digest
-from ..readabilipy.text_manipulation import normalise_text
+from ..readabilipy import simple_json_from_html_string
+from ..readabilipy.simplifiers import normalise_text
+from ..readabilipy.simple_json import plain_element, plain_text_leaf_node, add_node_indexes, content_digest
 
 
 def test_empty_page():
     """Empty pages should return an empty <div>."""
     html = ""
-    parsed_content = parse_to_json(html)
+    parsed_content = simple_json_from_html_string(html)
     assert parsed_content["content"] == "<div></div>"
 
 
 def test_contentless_page():
     """Contentless pages should return an empty <div>."""
     html = "<html></html>"
-    parsed_content = parse_to_json(html)
+    parsed_content = simple_json_from_html_string(html)
     assert parsed_content["content"] == "<div></div>"
 
 
