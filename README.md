@@ -17,12 +17,12 @@ This package also augments the output of `Readability.js` to also return a list 
       - `-o`: The path to the file the output article JSON data should be written to.
 
 - `readabilipy` folder
-  - `json_parser.py` file containing the function `parse_to_json()`.
+  - `simple_json.py` file containing the function `simple_json_from_html_string()`.
     - Usage:
     ```python
-    from readabilipy import parse_to_json
+    from readabilipy import simple_json_from_html_string
 
-    article = parse_to_json(html_string, content_digests=False, node_indexes=False, use_readability=False)
+    article = simple_json_from_html_string(html_string, content_digests=False, node_indexes=False, use_readability=False)
     ```
     - The function returns a dictionary with the following fields:
       - `title`: The article title
@@ -36,24 +36,24 @@ This package also augments the output of `Readability.js` to also return a list 
       - An optional `node_indexes` flag can be passed to the Python wrapper. When this is set to `True`, each HTML element in the `plain_content` field has a `data-node-indexes` attribute, which holds a hierarchical index describing the location of element within the `plain_content` HTML structure.
       - An optional `use_readability` flag can be passed to the Python wrapper. When this is set to `True`, Mozilla's `Readability.js` will be used as the parser. If it is set to `False` then the pure-python parser in `plain_html.py` will be used instead.
 
-  - `plain_html.py` file containing the function `parse_to_tree()`.
+  - `simple_tree.py` file containing the function `simple_tree_from_html_string()`.
     - Usage:
     ```python
-    from readabilipy import parse_to_tree
+    from readabilipy import simple_tree_from_html_string
 
-    article = parse_to_tree(html_string)
+    article = simple_tree_from_html_string(html_string)
     ```
     - The function returns a `bs4.BeautifulSoup` object containing a cleaned, parsed HTML tree.
 
 
-- `extract_article.py`: A Python script that uses `readabilipy.parse_to_json()` to extract the augmented readable article data.
+- `extract_article.py`: A Python script that uses `readabilipy.simple_json_from_html_string()` to extract the augmented readable article data.
   - Usage: `python extract_article.py -i <input_file> -o <output_file> [-c] [-n] [-p]`
   - All arguments have long and short form versions.
     - `-i` / `--input-file`: The path to an input file containing full or partial HTML as text.
     - `-o` / `--output-file`: The path to the file the output article JSON data should be written to.
-    - `-c` / `--content-digests` (optional): If this flag is provided, then `parse_to_json()` is called with `content_digests=True`
-    - `-n` / `--node-indexes` (optional): If this flag is provided, then `parse_to_json()` is called with `node_indexes=True`
-    - `-p` / `--use-python-parser` (optional): If this flag is provided then `parse_to_json()` is called with `use_readability=False`
+    - `-c` / `--content-digests` (optional): If this flag is provided, then `simple_json_from_html_string()` is called with `content_digests=True`
+    - `-n` / `--node-indexes` (optional): If this flag is provided, then `simple_json_from_html_string()` is called with `node_indexes=True`
+    - `-p` / `--use-python-parser` (optional): If this flag is provided then `simple_json_from_html_string()` is called with `use_readability=False`
 
 
 ## Installation
