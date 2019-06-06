@@ -31,6 +31,7 @@ def ensure_iso_date_format(date_string, ignoretz=True):
     supported_date_formats = [
         "%Y-%m-%dT%H:%M:%S",      # '2014-10-24T17:32:46'
         "%Y-%m-%dT%H:%M:%S%z",    # '2014-10-24T17:32:46+12:00'
+        "%Y-%m-%dT%H:%M%z",       # '2014-10-24T17:32+12:00'
         "%Y-%m-%dT%H:%M:%SZ",     # '2014-10-24T17:32:46Z'
         "%Y-%m-%dT%H:%M:%S.%fZ",  # '2014-10-24T17:32:46.000Z'
         "%Y-%m-%dT%H:%M:%S.%f"    # '2014-10-24T17:32:46.493'
