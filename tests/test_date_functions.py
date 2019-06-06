@@ -31,6 +31,12 @@ def test_ensure_iso_date_format_timezone_drop():
     assert ensure_iso_date_format(datetime_string) == expected_iso_string
 
 
+def test_ensure_iso_date_format_no_seconds():
+    datetime_string = '2014-10-24T17:32+12:00'
+    expected_iso_string = '2014-10-24T17:32:00'
+    assert ensure_iso_date_format(datetime_string) == expected_iso_string
+
+
 def test_ensure_iso_date_format_no_tz():
     datetime_string = '2014-10-24T17:32:46'
     expected_iso_string = '2014-10-24T17:32:46'
