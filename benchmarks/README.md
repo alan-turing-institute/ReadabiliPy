@@ -38,7 +38,7 @@ Benchmarks run on these dates, are for the following [ReadabiliPy](https://githu
 2. 2019-05-14 => [d3b3c365...](https://github.com/alan-turing-institute/ReadabiliPy/tree/d3b3c365984aa26ce0a8f0fda6b3fd75b9e837a2)
 3. 2019-05-31 => [73493922...](https://github.com/alan-turing-institute/ReadabiliPy/tree/734939221048041e545e3a4bd205a84e87631a3f)
 
-**Benchmarks on Ed's Macbook:**
+**Benchmarks on a Macbook:**
 
 | Date  | Date parse  | Title parse  | Full parse  |
 |---|---|---|---|
@@ -47,7 +47,7 @@ Benchmarks run on these dates, are for the following [ReadabiliPy](https://githu
 | 2019-05-31  | 80.5528  | 94.9283  | 2290.3153  |
 
 
-**Benchmarks on Ed's Macbook in Docker container:**
+**Benchmarks on a Macbook in Docker container:**
 
 | Date  | Date parse  | Title parse  | Full parse  |
 |---|---|---|---|
