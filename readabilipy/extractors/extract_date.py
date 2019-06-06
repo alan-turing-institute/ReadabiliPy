@@ -31,6 +31,7 @@ def ensure_iso_date_format(date_string, ignoretz=True):
     supported_date_formats = [
         "%Y-%m-%dT%H:%M:%S",      # '2014-10-24T17:32:46'
         "%Y-%m-%dT%H:%M:%S%z",    # '2014-10-24T17:32:46+12:00'
+        "%Y-%m-%dT%H:%M%z",       # '2014-10-24T17:32+12:00'
         "%Y-%m-%dT%H:%M:%SZ",     # '2014-10-24T17:32:46Z'
         "%Y-%m-%dT%H:%M:%S.%fZ",  # '2014-10-24T17:32:46.000Z'
         "%Y-%m-%dT%H:%M:%S.%f"    # '2014-10-24T17:32:46.493'
@@ -41,7 +42,7 @@ def ensure_iso_date_format(date_string, ignoretz=True):
             # For python < 3.7, strptime() is not able to parse timezones containing
             # colons (eg. 2014-10-24T17:32:46+12:00). By stripping the colon here,
             # we ensure that all versions of python can parse datetimes like these
-            if date_format == "%Y-%m-%dT%H:%M:%S%z" and date_string[-3] == ':':
+            if date_format in ("%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M%z") and date_string[-3] == ':':
                 isodate = datetime.strptime(date_string[:-3] + date_string[-2:], date_format)
             else:
                 isodate = datetime.strptime(date_string, date_format)
