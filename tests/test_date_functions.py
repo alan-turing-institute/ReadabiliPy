@@ -10,6 +10,8 @@ htmls_with_expected = [
     ("""<meta property="og:updated_time" content="2019-01-30T09:39:21-0500" />""", "2019-01-30T09:39:21"),
     ("""<meta itemprop="dateModified" content="2019-01-30T09:39:22-0500" />""", "2019-01-30T09:39:22"),
     ("""<meta itemprop="datePublished" content="2019-01-30T09:39:23-0500" />""", "2019-01-30T09:39:23"),
+    ("""<meta property="og:article:published_time" content="2019-01-30T09:39:25-0500" />""", "2019-01-30T09:39:25"),
+    ("""<meta property="og:article:modified_time" content="2019-01-30T09:39:26-0500" />""", "2019-01-30T09:39:26"),
     ("""<time datetime="2019-01-30T09:39:24-0500" />""", "2019-01-30T09:39:24"),
 ]
 

@@ -10,6 +10,8 @@ def extract_date(html):
     xpaths = [
         ('//meta[@property="article:published_time"]/@content', 13),
         ('//meta[@property="og:updated_time"]/@content', 10),
+        ('//meta[@property="og:article:published_time"]/@content', 10),
+        ('//meta[@property="og:article:modified_time"]/@content', 10),
         ('//meta[@property="article:published"]/@content', 7),
         ('//meta[@itemprop="datePublished"]/@content', 3),
         ('//time/@datetime', 3),
