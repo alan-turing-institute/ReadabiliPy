@@ -23,9 +23,16 @@ def extract_date(html):
     extracted_dates = extract_element(html, xpaths)
     if not extracted_dates:
         return None
+
     # Set the date_string as that with the highest score assigned by extract_element
-    date_string = max(extracted_dates, key=lambda x: extracted_dates[x]["score"])
-    return ensure_iso_date_format(date_string)
+    # If this is not in isoformat, go with the higest scoring date_string that is
+    for _ in range(len(extracted_dates)):
+        date_string = max(extracted_dates, key=lambda x: extracted_dates[x]["score"])
+        iso_date = ensure_iso_date_format(date_string)
+        if iso_date:
+            return iso_date
+        extracted_dates.pop(date_string, None)  # Remove the higest scoring date from the dict
+    return None
 
 
 def ensure_iso_date_format(date_string, ignoretz=True):

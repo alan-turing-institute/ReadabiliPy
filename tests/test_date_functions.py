@@ -21,6 +21,12 @@ def test_extract_date(html, expected):
     assert extract_date(html) == expected
 
 
+def test_extract_date_finds_isoformat_from_lower_scoring_xpath_when_highest_scoring_not_isoformat():
+    html = """<meta property="article:published_time" content="2017-01-01" />
+                <meta property="article:modified_time" content="2019-01-01T00:00:00" />"""
+    expected = "2019-01-01T00:00:00"
+    assert extract_date(html) == expected
+
 def test_ensure_iso_date_format_timezone_keep():
     datetime_string = '2014-10-24T17:32:46+12:00'
     expected_iso_string = '2014-10-24T17:32:46+12:00'
