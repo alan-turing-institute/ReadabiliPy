@@ -23,9 +23,13 @@ def extract_date(html):
     extracted_dates = extract_element(html, xpaths)
     if not extracted_dates:
         return None
-    # Set the date_string as that with the highest score assigned by extract_element
-    date_string = max(extracted_dates, key=lambda x: extracted_dates[x]["score"])
-    return ensure_iso_date_format(date_string)
+
+    # Search through the extracted date strings in order of score and take the first that is in isoformat
+    for date_string in sorted(extracted_dates, key=lambda ds: extracted_dates[ds]["score"], reverse=True):
+        iso_date = ensure_iso_date_format(date_string)
+        if iso_date:
+            return iso_date
+    return None
 
 
 def ensure_iso_date_format(date_string, ignoretz=True):
