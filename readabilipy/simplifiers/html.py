@@ -183,6 +183,7 @@ def insert_paragraph_breaks(soup):
     # Use a list rather than the generator, since we are altering the tree as we traverse it
     for element in list(soup.find_all(string=True)):
         if BREAK_INDICATOR in element:
+
             # Split the text into two or more fragments (there maybe be multiple BREAK_INDICATORs in the string)
             text_fragments = [s.strip() for s in str(element).split(BREAK_INDICATOR)]
 
@@ -196,7 +197,11 @@ def insert_paragraph_breaks(soup):
                     new_p_element = soup.new_tag("p")
                     new_p_element.string = text_fragment
                     parent_element.insert_after(new_p_element)
-                parent_element.string.replace_with(text_fragments[0])
+                # Replace the parent string if it exists or add one if not
+                if parent_element.string:
+                    parent_element.string.replace_with(text_fragments[0])
+                else:
+                    parent_element.string = text_fragments[0]
             # Otherwise we want to simply include all the text fragments as independent NavigableStrings (that will be wrapped later)
             else:
                 # Iterate in reverse order as we are repeatedly adding new elements directly after the original one
