@@ -183,7 +183,6 @@ def insert_paragraph_breaks(soup):
     # Use a list rather than the generator, since we are altering the tree as we traverse it
     for element in list(soup.find_all(string=True)):
         if BREAK_INDICATOR in element:
-
             # Split the text into two or more fragments (there maybe be multiple BREAK_INDICATORs in the string)
             text_fragments = [s.strip() for s in str(element).split(BREAK_INDICATOR)]
 
