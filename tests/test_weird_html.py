@@ -51,3 +51,17 @@ def test_tags_inside_words():
         """a<a href="http://example.com">i</a>sle""",
         "<div><p>aisle</p></div>"
     )
+
+
+# Test splitting for unclosed tags inside paragraphs
+def test_paragraph_splitting_with_unclosed_tags():
+    """Ensure that paragraphs with unclosed tags inside them split correctly."""
+    check_exact_html_output(
+        """
+        <p>
+            <meta charset="utf-8">First paragraph.
+            <br><br>
+            Second paragraph.
+        </p>""",
+        "<div><p>First paragraph.</p><p>Second paragraph.</p></div>"
+    )
