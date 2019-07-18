@@ -52,6 +52,7 @@ def test_tags_inside_words():
         "<div><p>aisle</p></div>"
     )
 
+
 # Test splitting for unclosed tags inside paragraphs
 def test_paragraph_splitting_with_unclosed_tags():
     """Ensure that paragraphs with unclosed tags inside them split correctly."""
