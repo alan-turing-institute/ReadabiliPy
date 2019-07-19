@@ -1,5 +1,5 @@
 """Common HTML cleaning functions."""
-from bs4 import Comment, Doctype
+from bs4 import Comment, Doctype, NavigableString
 from .text import normalise_text
 
 
@@ -114,12 +114,15 @@ def process_special_elements(soup):
     """Flatten special elements while processing their contents."""
     for element_name in special_elements():
         for element in soup.find_all(element_name):
+            # Insert appropriate strings before and/or after the contents
             if element.name == 'q':
-                element.string = '"{0}"'.format(element.string)
+                element.insert_before(NavigableString('"'))
+                element.insert_after(NavigableString('"'))
             if element.name == 'sub':
-                element.string = '_{0}'.format(element.string)
+                element.insert_before(NavigableString('_'))
             if element.name == 'sup':
-                element.string = '^{0}'.format(element.string)
+                element.insert_before(NavigableString('^'))
+            # Replace the element by its contents
             element.unwrap()
 
 
