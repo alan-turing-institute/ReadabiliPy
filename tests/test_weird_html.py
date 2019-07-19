@@ -65,3 +65,34 @@ def test_paragraph_splitting_with_unclosed_tags():
         </p>""",
         "<div><p>First paragraph.</p><p>Second paragraph.</p></div>"
     )
+
+
+# Test nested superscript
+def test_nested_superscript():
+    """Ensure that nested superscripts are correctly parsed."""
+    check_exact_html_output(
+        "<p>Some text with <sup>nested <sup>superscripts</sup></sup> here.</p>",
+        "<div><p>Some text with ^nested ^superscripts here.</p></div>"
+    )
+
+
+# Test linebreaks inside superscript
+def test_linebreaks_inside_superscript():
+    """Ensure that linebreaks inside superscript are correctly parsed."""
+    check_exact_html_output(
+        "<p>Some text <sup>with<br/>superscripts</sup> that should be joined.</p>",
+        "<div><p>Some text ^with superscripts that should be joined.</p></div>"
+    )
+
+
+# Test nested superscript with linebreaks
+def test_nested_superscript_with_linebreaks():
+    """Ensure that nested superscripts with linebreaks are correctly parsed."""
+    check_exact_html_output(
+        """
+        <p>Some text<br>
+        with linebreaks <sup><br>
+        <sup>around a footnote</sup></sup>.
+        </p>""",
+        "<div><p>Some text with linebreaks ^ ^around a footnote.</p></div>"
+    )
