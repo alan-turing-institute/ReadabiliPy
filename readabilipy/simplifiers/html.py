@@ -152,6 +152,33 @@ def remove_empty_strings_and_elements(soup):
             element.extract()
 
 
+def unnest_paragraphs(soup):
+    """Split out block-level elements illegally contained inside paragraphs."""
+    illegal_elements = ["address", "article", "aside", "blockquote", "canvas", "dd", "div", "dl", "dt", "fieldset",
+                        "figcaption", "figure", "footer", "form", "h1>-<h6", "header", "hr", "li", "main", "nav",
+                        "noscript", "ol", "p", "pre", "section", "table", "tfoot", "ul", "video"]
+    for nested_type in illegal_elements:
+        # Search for nested elements that need to be split out
+        nested_elements = [e for e in soup.find_all('p') if e.find(nested_type)]
+        while nested_elements:
+            # Separate this element into the nested element, plus before and after
+            elem_nested = nested_elements[0].find(nested_type)
+            p_before = soup.new_tag("p")
+            for sibling in list(elem_nested.previous_siblings):
+                p_before.append(sibling)
+            p_after = soup.new_tag("p")
+            for sibling in list(elem_nested.next_siblings):
+                p_after.append(sibling)
+            # Replace element by before/nested/after.
+            # NB. this is done in reverse order as we are adding after the current position
+            nested_elements[0].insert_after(p_after)
+            nested_elements[0].insert_after(elem_nested)
+            nested_elements[0].insert_after(p_before)
+            nested_elements[0].decompose()
+            # Rerun search for nested elements now that we have rewritten the tree
+            nested_elements = [e for e in soup.find_all('p') if e.find(nested_type)]
+
+
 def insert_paragraph_breaks(soup):
     """Identify <br> and <hr> and split their parent element into multiple elements where appropriate."""
     # Indicator which is used as a placeholder to mark paragraph breaks
@@ -167,7 +194,7 @@ def insert_paragraph_breaks(soup):
 
             # If there's only one <br> then we replace it with a space
             if len(br_element_chain) == 1:
-                br_element_chain[0].replace_with(" ")
+                br_element_chain[0].replace_with(' ')
             # If there are multiple <br>s then replace them with BREAK_INDICATOR
             else:
                 br_element_chain[0].replace_with(BREAK_INDICATOR)
@@ -199,11 +226,8 @@ def insert_paragraph_breaks(soup):
                     new_p_element = soup.new_tag("p")
                     new_p_element.string = text_fragment
                     parent_element.insert_after(new_p_element)
-                # Replace the parent string if it exists or add one if not
-                if parent_element.string:
-                    parent_element.string.replace_with(text_fragments[0])
-                else:
-                    parent_element.string = text_fragments[0]
+                # Replace this element by a navigable string containing the first text fragment
+                element.replace_with(NavigableString(text_fragments[0]))
             # Otherwise we want to simply include all the text fragments as independent NavigableStrings (that will be wrapped later)
             else:
                 # Iterate in reverse order as we are repeatedly adding new elements directly after the original one

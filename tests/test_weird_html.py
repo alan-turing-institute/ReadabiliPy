@@ -67,7 +67,7 @@ def test_paragraph_splitting_with_unclosed_tags():
     )
 
 
-# Test nested superscript
+# Test (possibly illegal) nested elements
 def test_nested_superscript():
     """Ensure that nested superscripts are correctly parsed."""
     check_exact_html_output(
@@ -76,8 +76,7 @@ def test_nested_superscript():
     )
 
 
-# Test linebreaks inside superscript
-def test_linebreaks_inside_superscript():
+def test_nested_linebreaks_inside_superscript():
     """Ensure that linebreaks inside superscript are correctly parsed."""
     check_exact_html_output(
         "<p>Some text <sup>with<br/>superscripts</sup> that should be joined.</p>",
@@ -85,7 +84,6 @@ def test_linebreaks_inside_superscript():
     )
 
 
-# Test nested superscript with linebreaks
 def test_nested_superscript_with_linebreaks():
     """Ensure that nested superscripts with linebreaks are correctly parsed."""
     check_exact_html_output(
@@ -95,4 +93,32 @@ def test_nested_superscript_with_linebreaks():
         <sup>around a footnote</sup></sup>.
         </p>""",
         "<div><p>Some text with linebreaks ^ ^around a footnote.</p></div>"
+    )
+
+
+def test_nested_table_inside_paragraph():
+    """Ensure that blocks (illegally) nested inside paragraphs are split out."""
+    check_exact_html_output(
+        """
+        <p>
+            First paragraph.
+            <br/><br/>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Table text.</td>
+                    </tr>
+                </tbody>
+            </table>
+            Second paragraph.
+        </p>""",
+        "<div><p>First paragraph.</p><table><tbody><tr><td>Table text.</td></tr></tbody></table><p>Second paragraph.</p></div>"
+    )
+
+
+def test_nested_span_inside_paragraph():
+    """Ensure that spans nested inside paragraphs are kept in."""
+    check_exact_html_output(
+        "<p>Some text <span>in a span</span> that should stay together.</p>""",
+        "<div><p>Some text in a span that should stay together.</p></div>"
     )
