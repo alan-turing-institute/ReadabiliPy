@@ -5,8 +5,8 @@ from ..readabilipy.simplifiers import strip_html_whitespace
 from ..readabilipy.simple_json import extract_text_blocks_as_plain_text
 
 
-def check_exact_html_output(test_fragment, expected_output=None):
-    """Check that expected output is present when parsing HTML fragment."""
+def get_normalised_html_output(test_fragment, expected_output=None):
+    """Get normalised HTML output."""
     if expected_output is None:
         expected_output = test_fragment
     article_json = simple_json_from_html_string(test_fragment)
@@ -16,18 +16,18 @@ def check_exact_html_output(test_fragment, expected_output=None):
     normalised_result = strip_html_whitespace(content)
     print("expectation:", normalised_expectation)
     print("result:", normalised_result)
+    return (normalised_expectation, normalised_result)
+
+
+def check_exact_html_output(test_fragment, expected_output=None):
+    """Check that expected output is present when parsing HTML fragment."""
+    normalised_expectation, normalised_result = get_normalised_html_output(test_fragment, expected_output)
     assert normalised_expectation == normalised_result
 
 
 def check_html_output_contains_text(test_fragment, expected_output=None):
     """Check that expected output is present when parsing HTML fragment."""
-    if expected_output is None:
-        expected_output = test_fragment
-    article_json = simple_json_from_html_string(test_fragment)
-    content = str(article_json["plain_content"])
-    # Check that expected output is present after simplifying the HTML
-    normalised_expectation = strip_html_whitespace(expected_output)
-    normalised_result = strip_html_whitespace(content)
+    normalised_expectation, normalised_result = get_normalised_html_output(test_fragment, expected_output)
     assert normalised_expectation in normalised_result
 
 
