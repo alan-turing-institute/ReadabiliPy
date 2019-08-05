@@ -164,9 +164,11 @@ def unnest_paragraphs(soup):
             # Separate this element into the nested element, plus before and after
             elem_nested = nested_elements[0].find(nested_type)
             p_before = soup.new_tag("p")
-            [p_before.append(sibling) for sibling in list(elem_nested.previous_siblings)]
+            for sibling in list(elem_nested.previous_siblings):
+                p_before.append(sibling)
             p_after = soup.new_tag("p")
-            [p_after.append(sibling) for sibling in list(elem_nested.next_siblings)]
+            for sibling in list(elem_nested.next_siblings):
+                p_after.append(sibling)
             # Replace element by before/nested/after.
             # NB. this is done in reverse order as we are adding after the current position
             nested_elements[0].insert_after(p_after)
