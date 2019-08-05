@@ -115,6 +115,7 @@ def test_nested_table_inside_paragraph():
         "<div><p>First paragraph.</p><table><tbody><tr><td>Table text.</td></tr></tbody></table><p>Second paragraph.</p></div>"
     )
 
+
 def test_nested_span_inside_paragraph():
     """Ensure that spans nested inside paragraphs are kept in."""
     check_exact_html_output(
