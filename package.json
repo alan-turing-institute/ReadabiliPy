@@ -20,6 +20,6 @@
   "devDependencies": {},
   "dependencies": {
     "jsdom": ">=12.2.0",
-    "minimist": "^1.2.0"
+    "minimist": "^1.2.3"
   }
 }
