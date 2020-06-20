@@ -14,7 +14,7 @@ before_install:
 
 install:
   # Install package, while updating dependencies
-  - pip install --upgrade --upgrade-strategy eager -e .[dev]
+  - pip install --upgrade --upgrade-strategy eager .[dev]
 
 script:
   # Run all pytest unit tests
