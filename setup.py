@@ -99,7 +99,7 @@ class CustomInstall(install):
             return
 
         jsdir = os.path.join(self.install_lib, NAME, "javascript")
-        pkgjson = os.path.join(jsdir, 'package.json')
+        pkgjson = os.path.join(jsdir, "package.json")
         if not os.path.exists(pkgjson):
             print(
                 "Error: Couldn't find package.json. This is unexpected.",
@@ -108,7 +108,17 @@ class CustomInstall(install):
             return
 
         with chdir(jsdir):
-            subprocess.check_call(["npm", "install"])
+            try:
+                cp = subprocess.run(["npm", "install"])
+                returncode = cp.returncode
+            except FileNotFoundError:
+                returncode = 1
+
+        if not returncode == 0:
+            print(
+                "Error: Failed to install dependencies with npm.",
+                file=sys.stderr,
+            )
 
 
 # Where the magic happens:
