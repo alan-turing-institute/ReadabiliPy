@@ -8,6 +8,7 @@ import os
 
 from contextlib import contextmanager
 
+
 @contextmanager
 def chdir(path):
     """Change directory in context and return to original on exit"""
