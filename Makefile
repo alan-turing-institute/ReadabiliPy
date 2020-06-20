@@ -52,7 +52,9 @@ dist: ## Make Python source distribution
 .PHONY: test
 
 test: venv ## Run unit tests
-	source $(VENV_DIR)/bin/activate && cd $(TEST_DIR) && python -m pytest .
+	source $(VENV_DIR)/bin/activate && cd $(TEST_DIR) && \
+		python -m pytest -v . --cov readabilipy \
+		--cov-report term-missing --benchmark-disable
 
 #################
 # Documentation #
