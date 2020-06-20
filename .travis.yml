@@ -13,8 +13,8 @@ before_install:
   - sudo apt install nodejs
 
 install:
-  # Install package
-  - pip install -e .[dev]
+  # Install package, while updating dependencies
+  - pip install --upgrade --upgrade-strategy eager -e .[dev]
 
 script:
   # Run all pytest unit tests
