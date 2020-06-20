@@ -2,7 +2,9 @@ import hashlib
 import json
 import os
 import tempfile
-from subprocess import check_call
+import subprocess
+import sys
+
 from bs4 import BeautifulSoup
 from bs4.element import Comment, NavigableString, CData
 from .simple_tree import simple_tree_from_html_string
@@ -11,7 +13,23 @@ from .simplifiers import normalise_text
 from .utils import chdir
 
 
+def have_node():
+    try:
+        cp = subprocess.run(['node', '-v'], stdout=subprocess.DEVNULL, 
+                stderr=subprocess.DEVNULL)
+        returncode = cp.returncode
+    except FileNotFoundError:
+        returncode = 1
+    return returncode == 0
+
+
 def simple_json_from_html_string(html, content_digests=False, node_indexes=False, use_readability=False):
+    if use_readability and not have_node():
+        print("Warning: node executable not found, reverting to pure-Python "
+                "mode. Install node.js to use Readability.js.", 
+                file=sys.stderr)
+        use_readability = False
+
     if use_readability:
         temp_dir = tempfile.gettempdir()
         # Write input HTML to temporary file so it is available to the node.js script
@@ -23,12 +41,11 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
         article_json_path = os.path.join(temp_dir, "article.json")
         jsdir = os.path.join(os.path.dirname(__file__), 'javascript')
         with chdir(jsdir):
-            check_call(["node", "ExtractArticle.js", "-i", html_path, "-o", article_json_path])
+            subprocess.check_call(["node", "ExtractArticle.js", "-i", html_path, "-o", article_json_path])
 
         # Read output of call to Readability.parse() from JSON file and return as Python dictionary
         with open(article_json_path) as f:
             input_json = json.loads(f.read())
-
     else:
         input_json = {
             "title": extract_title(html),
