@@ -86,10 +86,6 @@ class CustomInstall(install):
         )
         return cp.returncode == 0
 
-    def have_package_json(self):
-        pkgjson = os.path.join(here, "package.json")
-        return os.path.exists(pkgjson)
-
     def run(self):
         # run original install code
         install.run(self)
@@ -102,14 +98,15 @@ class CustomInstall(install):
             )
             return
 
-        if not self.have_package_json():
+        jsdir = os.path.join(self.install_lib, NAME, "javascript")
+        pkgjson = os.path.join(jsdir, 'package.json')
+        if not os.path.exists(pkgjson):
             print(
                 "Error: Couldn't find package.json. This is unexpected.",
                 file=sys.stderr,
             )
             return
 
-        jsdir = os.path.join(self.install_lib, NAME, "javascript")
         with chdir(jsdir):
             subprocess.check_call(["npm", "install"])
 
