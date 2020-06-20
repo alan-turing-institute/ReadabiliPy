@@ -13,14 +13,13 @@ before_install:
   - sudo apt install nodejs
 
 install:
-  # Install node.js dependencies
-  - npm install
-  # Install python dependencies
-  - pip install -r requirements-dev.txt
+  # Install package
+  - pip install -e .[dev]
 
 script:
   # Run all pytest unit tests
-  - python -m pytest -v tests --cov readabilipy --cov-report term-missing --benchmark-disable
+  - cd tests && \
+    python -m pytest -v . --cov readabilipy --cov-report term-missing --benchmark-disable
   # Run pyflakes for error detection
   - pyflakes *.py readabilipy tests
   # Check PEP8 compliance (ignoring long lines)
