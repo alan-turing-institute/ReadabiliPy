@@ -3,8 +3,13 @@
 
 import io
 import os
+import subprocess
+import sys
+
+from contextlib import contextmanager
 
 from setuptools import find_packages, setup
+from setuptools.command.install import install
 
 # Package meta-data.
 NAME = "readabilipy"
@@ -61,6 +66,54 @@ else:
     about["__version__"] = VERSION
 
 
+@contextmanager
+def chdir(path):
+    # From https://stackoverflow.com/a/37996581, couldn't find a built-in
+    original_path = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(original_path)
+
+
+class CustomInstall(install):
+    def have_npm(self):
+        cp = subprocess.run(
+            ["npm", "version"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        return cp.returncode == 0
+
+    def have_package_json(self):
+        pkgjson = os.path.join(here, "package.json")
+        return os.path.exists(pkgjson)
+
+    def run(self):
+        # run original install code
+        install.run(self)
+
+        # Run NPM installation
+        if not self.have_npm():
+            print(
+                "Warning: NPM is needed to use Readability.js.",
+                file=sys.stderr,
+            )
+            return
+
+        if not self.have_package_json():
+            print(
+                "Error: Couldn't find package.json. This is unexpected.",
+                file=sys.stderr,
+            )
+            return
+
+        jsdir = os.path.join(self.install_lib, NAME, "javascript")
+        with chdir(jsdir):
+            subprocess.check_call(["npm", "install"])
+
+
 # Where the magic happens:
 setup(
     name=NAME,
@@ -78,6 +131,7 @@ setup(
     entry_points={
         "console_scripts": ["readabilipy=readabilipy.__main__:main"],
     },
+    cmdclass={"install": CustomInstall},
     install_requires=REQUIRED,
     extras_require=EXTRAS,
     include_package_data=True,
