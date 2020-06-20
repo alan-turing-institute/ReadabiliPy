@@ -1,6 +1,6 @@
 import os
-from ..readabilipy import simple_json_from_html_string
-from ..readabilipy.extractors import extract_date, extract_title
+from readabilipy import simple_json_from_html_string
+from readabilipy.extractors import extract_date, extract_title
 
 
 TEST_FILEPATH = os.path.join(os.path.dirname(__file__), "data", "benchmarkinghuge.html")

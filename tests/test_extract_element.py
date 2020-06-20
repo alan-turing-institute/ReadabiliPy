@@ -1,5 +1,5 @@
 from collections import defaultdict
-from ..readabilipy.extractors.extract_element import extract_element
+from readabilipy.extractors.extract_element import extract_element
 
 
 def test_extract_element():

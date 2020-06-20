@@ -1,5 +1,5 @@
 """Tests for weird HTML input."""
-from .checks import check_exact_html_output
+from checks import check_exact_html_output
 
 
 def test_non_printing_control_characters():

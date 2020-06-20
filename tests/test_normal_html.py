@@ -1,5 +1,5 @@
 """Test readability.py on sample articles"""
-from .checks import check_exact_html_output, check_html_output_contains_text
+from checks import check_exact_html_output, check_html_output_contains_text
 
 
 # Test bare text behaviours
