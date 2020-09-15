@@ -55,10 +55,10 @@ test: venv ## Run unit tests
 	source $(VENV_DIR)/bin/activate && cd $(TEST_DIR) && \
 		python -m pytest -v . --cov readabilipy \
 		--cov-report term-missing --benchmark-disable
-	source $(VENV_DIR)/bin/activate && pyflakes *.py readabilipy tests
+	source $(VENV_DIR)/bin/activate && pyflakes *.py readabilipy $(TEST_DIR)
 	source $(VENV_DIR)/bin/activate && pycodestyle --statistics \
-		--ignore=E501 --count *.py readabilipy tests
-	source $(VENV_DIR)/bin/activate && pylint readabilipy
+		--ignore=E501 --count *.py readabilipy $(TEST_DIR)
+	source $(VENV_DIR)/bin/activate && pylint readabilipy $(TEST_DIR)
 
 #################
 # Documentation #
