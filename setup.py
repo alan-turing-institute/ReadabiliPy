@@ -79,11 +79,14 @@ def chdir(path):
 
 class CustomInstall(install):
     def have_npm(self):
-        cp = subprocess.run(
-            ["npm", "version"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
+        try:
+            cp = subprocess.run(
+                ["npm", "version"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+        except FileNotFoundError:
+            return False
         return cp.returncode == 0
 
     def run(self):
