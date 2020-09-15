@@ -25,7 +25,7 @@ script:
   # Check PEP8 compliance (ignoring long lines)
   - pycodestyle --statistics --ignore=E501 --count *.py readabilipy tests
   # Run pylint for stricter error checking
-  - pylint readabilipy
+  - pylint readabilipy tests
 
 after_success:
   # Upload results to coveralls.io
