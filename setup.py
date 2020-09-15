@@ -93,7 +93,7 @@ class CustomInstall(install):
         # Run NPM installation
         if not self.have_npm():
             print(
-                "Warning: NPM is needed to use Readability.js.",
+                "Warning: A working NPM installation was not found. The package will be installed but will use Python-based article extraction.",
                 file=sys.stderr,
             )
             return
@@ -102,7 +102,7 @@ class CustomInstall(install):
         pkgjson = os.path.join(jsdir, "package.json")
         if not os.path.exists(pkgjson):
             print(
-                "Error: Couldn't find package.json. This is unexpected.",
+                "Error: Couldn't find package.json. Package will fall back on Python-based extraction.",
                 file=sys.stderr,
             )
             return
@@ -116,7 +116,7 @@ class CustomInstall(install):
 
         if not returncode == 0:
             print(
-                "Error: Failed to install dependencies with npm.",
+                "Error: Failed to install dependencies with npm. Package will fall back on Python-based extraction.",
                 file=sys.stderr,
             )
 
