@@ -28,17 +28,15 @@ REQUIRED = [
     "regex",
 ]
 
+docs_require = ["sphinx", "m2r"]
+test_require = ["pycodestyle", "pyflakes", "pylint", "pytest", "pytest-benchmark", "pytest-cov", "python-coveralls"]
+dev_require = []
+
 # What packages are optional?
 EXTRAS = {
-    "dev": [
-        "pycodestyle",
-        "pyflakes",
-        "pylint",
-        "pytest",
-        "pytest-benchmark",
-        "pytest-cov",
-        "python-coveralls",
-    ]
+    "docs": docs_require,
+    "test": test_require,
+    "dev": docs_require + test_require + dev_require,
 }
 
 # The rest you shouldn't have to touch too much :)
