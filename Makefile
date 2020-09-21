@@ -16,6 +16,7 @@ TEST_DIR=./tests
 
 .DEFAULT_GOAL := help
 
+# Display a help message when called without target, using the ## comments
 help:
 	@grep -E '^[0-9a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) |\
 		 awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m\
