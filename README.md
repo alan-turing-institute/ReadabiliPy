@@ -5,7 +5,7 @@
 
 ReadabiliPy contains a Python wrapper for Mozilla's [Readability.js](https://github.com/mozilla/readability) Node.js package, as well as article extraction routines written in pure Python.
 
-This package also augments the output of `Readability.js` to also return a list of plain text representations of article paragraphs.
+This package augments the output of `Readability.js` to also return a list of plain text representations of article paragraphs.
 
 ReadabiliPy comes with a handy command line application: ``readabilipy``.
 
