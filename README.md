@@ -11,13 +11,15 @@ ReadabiliPy comes with a handy command line application: ``readabilipy``.
 
 ## Installation
 
-To use the Readability.js wrapper you need to have a working [Node.js](https://nodejs.org/en/download/) installation of version 10 or higher. Make sure to install Node.js before installing this package. If you only want to use the Python-based article extraction, you don't need to install Node.js.
+To use the Readability.js wrapper you need to have a working [Node.js](https://nodejs.org/en/download/) installation of version 10 or higher. Make sure to install Node.js before installing this package, as this ensures Readability.js will be installed. If you only want to use the Python-based article extraction, you don't need to install Node.js.
 
 ReadabiliPy can be installed simply from PyPI:
 
 ```
 $ pip install readabilipy
 ```
+
+Note that to update to a new version of Readability.js you can simply reinstall ReadabiliPy.
 
 ## Usage
 
