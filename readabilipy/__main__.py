@@ -7,6 +7,7 @@
 import argparse
 import json
 
+from .__version__ import __version__
 from .simple_json import simple_json_from_html_string
 
 
@@ -43,6 +44,13 @@ def main():
         "--use-python-parser",
         action="store_true",
         help="Use the pure-python 'plain_html' parser included in this project rather than Mozilla's Readability.js.",
+    )
+    parser.add_argument(
+        "-V",
+        "--version",
+        help="Show version and exit",
+        action="version",
+        version=__version__,
     )
 
     args = parser.parse_args()
