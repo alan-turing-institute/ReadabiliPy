@@ -263,7 +263,7 @@ def main(target=None):
             continue
         skip = False
         step.run(context)
-    cprint("\nDone!", color="yellow", style="bright")
+    cprint("\nDone!", colour="yellow", style="bright")
 
 
 if __name__ == "__main__":
