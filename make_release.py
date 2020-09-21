@@ -22,9 +22,9 @@ import webbrowser
 try:
     import colorama
     colorama.init()
-    BE_COLORFUL = True
+    BE_COLOURFUL = True
 except ImportError:
-    BE_COLORFUL = False
+    BE_COLOURFUL = False
 
 
 URLS = {
@@ -33,11 +33,11 @@ URLS = {
 }
 
 
-def colored(msg, color=None, style=None):
-    if not BE_COLORFUL:
+def coloured(msg, colour=None, style=None):
+    if not BE_COLOURFUL:
         return msg
 
-    colors = {
+    colours = {
         "red": colorama.Fore.RED,
         "green": colorama.Fore.GREEN,
         "cyan": colorama.Fore.CYAN,
@@ -50,17 +50,17 @@ def colored(msg, color=None, style=None):
         "dim": colorama.Style.DIM,
         None: "",
     }
-    pre = colors[color] + styles[style]
+    pre = colours[colour] + styles[style]
     post = colorama.Style.RESET_ALL
     return f"{pre}{msg}{post}"
 
 
-def cprint(msg, color=None, style=None):
-    print(colored(msg, color=color, style=style))
+def cprint(msg, colour=None, style=None):
+    print(coloured(msg, colour=colour, style=style))
 
 
 def wait_for_enter():
-    input(colored("\nPress Enter to continue", style="dim"))
+    input(coloured("\nPress Enter to continue", style="dim"))
     print()
 
 
@@ -92,21 +92,21 @@ class Step:
             self.action(context)
             self.post(context)
         except KeyboardInterrupt:
-            cprint("\nInterrupted.", color="red")
+            cprint("\nInterrupted.", colour="red")
             raise SystemExit(1)
 
     def instruct(self, msg):
-        cprint(msg, color="green")
+        cprint(msg, colour="green")
 
     def print_run(self, msg):
-        cprint("Run:", color="cyan", style="bright")
+        cprint("Run:", colour="cyan", style="bright")
         self.print_cmd(msg)
 
     def print_cmd(self, msg):
-        cprint("\t" + msg, color="cyan", style="bright")
+        cprint("\t" + msg, colour="cyan", style="bright")
 
     def do_cmd(self, cmd):
-        cprint(f"Going to run: {cmd}", color="magenta", style="bright")
+        cprint(f"Going to run: {cmd}", colour="magenta", style="bright")
         wait_for_enter()
         os.system(cmd)
 
