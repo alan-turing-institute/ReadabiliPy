@@ -1,8 +1,8 @@
 # from .checks import check_extract_article
 from bs4 import BeautifulSoup
-from ..readabilipy import simple_json_from_html_string
-from ..readabilipy.simplifiers import normalise_text
-from ..readabilipy.simple_json import plain_element, plain_text_leaf_node, add_node_indexes, content_digest
+from readabilipy import simple_json_from_html_string
+from readabilipy.simplifiers import normalise_text
+from readabilipy.simple_json import plain_element, plain_text_leaf_node, add_node_indexes, content_digest
 
 
 def test_empty_page():

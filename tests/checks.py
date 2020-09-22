@@ -1,8 +1,8 @@
 import json
 import os
-from ..readabilipy import simple_json_from_html_string
-from ..readabilipy.simplifiers import strip_html_whitespace
-from ..readabilipy.simple_json import extract_text_blocks_as_plain_text
+from readabilipy import simple_json_from_html_string
+from readabilipy.simplifiers import strip_html_whitespace
+from readabilipy.simple_json import extract_text_blocks_as_plain_text
 
 
 def get_normalised_html_output(test_fragment, expected_output=None):

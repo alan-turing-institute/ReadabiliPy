@@ -1,6 +1,6 @@
 """Tests for simple_tree functions."""
-from ..readabilipy import simple_tree_from_html_string
-from ..readabilipy.simplifiers import strip_html_whitespace
+from readabilipy import simple_tree_from_html_string
+from readabilipy.simplifiers import strip_html_whitespace
 
 
 def test_remove_cdata():

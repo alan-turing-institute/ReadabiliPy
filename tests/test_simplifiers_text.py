@@ -1,7 +1,8 @@
 from pytest import mark
-from ..readabilipy.simplifiers import normalise_text, normalise_unicode, normalise_whitespace, strip_control_characters, strip_html_whitespace
-from ..readabilipy.simplifiers import text
-from .checks import check_exact_html_output
+from checks import check_exact_html_output
+
+from readabilipy.simplifiers import normalise_text, normalise_unicode, normalise_whitespace, strip_control_characters, strip_html_whitespace
+from readabilipy.simplifiers import text
 
 
 def test_unicode_normalisation():

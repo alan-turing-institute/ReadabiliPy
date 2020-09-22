@@ -1,0 +1,2 @@
+include readabilipy/javascript/*.js
+include readabilipy/javascript/package.json

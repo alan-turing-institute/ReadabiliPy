@@ -1,4 +1,4 @@
-from .checks import check_extract_article
+from checks import check_extract_article
 
 
 def test_extract_simple_article_with_readability_js():

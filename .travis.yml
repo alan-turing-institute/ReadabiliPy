@@ -4,29 +4,30 @@ language: python
 python:
   - 3.6
   - 3.7
+  - 3.8
 
 before_install:
-  # Install node.js following instructions from
-  #   https://nodejs.org/en/download/package-manager/
-  - sudo apt install curl
-  - curl -sL https://deb.nodesource.com/setup_11.x | sudo bash -
-  - sudo apt install nodejs
+  # Use the pre-installed nvm version to update node
+  # Apparently Travis comes with nvm even on the python containers
+  - nvm install v12.18.1
+  - nvm use v12.18.1
+  - node -v
+  - npm version
 
 install:
-  # Install node.js dependencies
-  - npm install
-  # Install python dependencies
-  - pip install -r requirements-dev.txt
+  # Install package, while updating dependencies
+  - pip install --upgrade --upgrade-strategy eager .[dev]
 
 script:
   # Run all pytest unit tests
-  - python -m pytest -v tests --cov readabilipy --cov-report term-missing --benchmark-disable
+  - cd tests && python -m pytest -v . --cov readabilipy --cov-report term-missing --benchmark-disable && cd ..
   # Run pyflakes for error detection
   - pyflakes *.py readabilipy tests
   # Check PEP8 compliance (ignoring long lines)
   - pycodestyle --statistics --ignore=E501 --count *.py readabilipy tests
   # Run pylint for stricter error checking
-  - pylint readabilipy tests
+  - pylint readabilipy
+  - pylint ./tests/*.py
 
 after_success:
   # Upload results to coveralls.io
