@@ -3,27 +3,29 @@
 [![Build Status](https://travis-ci.org/alan-turing-institute/ReadabiliPy.svg?branch=master)](https://travis-ci.org/alan-turing-institute/ReadabiliPy)
 [![Coverage Status](https://coveralls.io/repos/github/alan-turing-institute/ReadabiliPy/badge.svg?branch=master)](https://coveralls.io/github/alan-turing-institute/ReadabiliPy?branch=master)
 
-ReadabiliPy contains a Python wrapper for Mozilla's [Readability.js](https://github.com/mozilla/readability) Node.js package, as well as article extraction routines written in pure Python.
+`ReadabiliPy` contains a Python wrapper for Mozilla's [Readability.js](https://github.com/mozilla/readability) Node.js package, as well as article extraction routines written in pure Python.
 
 This package augments the output of `Readability.js` to also return a list of plain text representations of article paragraphs.
 
-ReadabiliPy comes with a handy command line application: ``readabilipy``.
+`ReadabiliPy` comes with a handy command line application: ``readabilipy``.
 
 ## Installation
 
-To use the Readability.js wrapper you need to have a working [Node.js](https://nodejs.org/en/download/) installation of version 10 or higher. Make sure to install Node.js before installing this package, as this ensures Readability.js will be installed. If you only want to use the Python-based article extraction, you don't need to install Node.js.
+To use the `Readability.js` wrapper you need to have a working [Node.js](https://nodejs.org/en/download/) installation of version 10 or higher.
+Make sure to install Node.js before installing this package, as this ensures Readability.js will be installed.
+If you only want to use the Python-based article extraction, you **do not need** to install Node.js.
 
-ReadabiliPy can be installed simply from PyPI:
+`ReadabiliPy` can be installed simply from PyPI:
 
 ```
 $ pip install readabilipy
 ```
 
-Note that to update to a new version of Readability.js you can simply reinstall ReadabiliPy.
+Note that to update to a new version of `Readability.js` you can simply reinstall `ReadabiliPy`.
 
 ## Usage
 
-ReadabiliPy can be used either as a command line application or as a Python library.
+`ReadabiliPy` can be used either as a command line application or as a Python library.
 
 ### Command line application
 
@@ -72,7 +74,9 @@ optional arguments:
 
 ## Library
 
-ReadabiliPy can also be used as a Python package. The main routine is called ``simple_json_from_html_string`` and expects the HTML article as a string. Here is an example of extracting an article after downloading the page using [requests](https://requests.readthedocs.io/en/master/):
+ReadabiliPy can also be used as a Python package.
+The main routine is called ``simple_json_from_html_string`` and expects the HTML article as a string.
+Here is an example of extracting an article after downloading the page using [requests](https://requests.readthedocs.io/en/master/):
 
 ```python
 >>> import requests
@@ -103,8 +107,9 @@ The second top-level function exported by ReadabiliPy is ``simple_tree_from_html
 
 ## Notes
 
-License: MIT License, see the LICENSE file.
+License: MIT License, see the `LICENSE` file.
 
 Copyright (c) 2018, The Alan Turing Institute
 
-If you encounter any issues or have any suggestions for improvement, please open an issue [on Github](https://github.com/alan-turing-institute/ReadabiliPy). You're helping to make this project better for everyone!
+If you encounter any issues or have any suggestions for improvement, please open an issue [on Github](https://github.com/alan-turing-institute/ReadabiliPy).
+You're helping to make this project better for everyone!
