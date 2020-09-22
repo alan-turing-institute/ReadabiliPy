@@ -33,7 +33,4 @@ script:
 
 after_success:
   # Upload results to coveralls.io
-  - pwd
-  - ls -alh
-  - cat .coverage
   - coveralls
