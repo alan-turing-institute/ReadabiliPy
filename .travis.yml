@@ -17,6 +17,8 @@ before_install:
 install:
   # Install package, while updating dependencies
   - pip install --upgrade --upgrade-strategy eager .[dev]
+  # Install any javascript dependencies
+  - cd readabilipy/javascript && npm install && cd -
 
 script:
   # Run all pytest unit tests
