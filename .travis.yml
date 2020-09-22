@@ -17,10 +17,12 @@ before_install:
 install:
   # Install package, while updating dependencies
   - pip install --upgrade --upgrade-strategy eager .[dev]
+  # Install any javascript dependencies
+  - cd readabilipy/javascript && npm install && cd -
 
 script:
   # Run all pytest unit tests
-  - cd tests && python -m pytest -v . --cov readabilipy --cov-report term-missing --benchmark-disable && cd ..
+  - python -m pytest -v . --cov readabilipy --cov-report term-missing --benchmark-disable
   # Run pyflakes for error detection
   - pyflakes *.py readabilipy tests
   # Check PEP8 compliance (ignoring long lines)
