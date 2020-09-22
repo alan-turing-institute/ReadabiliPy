@@ -15,8 +15,10 @@ from setuptools.command.install import install
 NAME = "readabilipy"
 DESCRIPTION = "Python wrapper for Mozilla's Readability.js"
 URL = "https://github.com/alan-turing-institute/ReadabiliPy"
-EMAIL = "jrobinson@turing.ac.uk"
 AUTHOR = "The Alan Turing Institute"
+AUTHOR_EMAIL = "info@turing.ac.uk"
+MAINTAINER = "James Robinson"
+MAINTAINER_EMAIL = "jrobinson@turing.ac.uk"
 REQUIRES_PYTHON = ">=3.6.0"
 VERSION = None
 
@@ -130,7 +132,9 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     author=AUTHOR,
-    author_email=EMAIL,
+    author_email=AUTHOR_EMAIL,
+    maintainer=MAINTAINER,
+    maintainer_email=MAINTAINER_EMAIL,
     python_requires=REQUIRES_PYTHON,
     url=URL,
     packages=find_packages(
@@ -151,6 +155,8 @@ setup(
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
     ],
