@@ -1,4 +1,5 @@
 beautifulsoup4>=4.7.1
+coveralls
 datetime
 html5lib
 lxml
@@ -8,5 +9,4 @@ pylint
 pytest
 pytest-benchmark
 pytest-cov
-python-coveralls
 regex
