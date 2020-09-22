@@ -1,5 +1,7 @@
 # Change Log
 
-## Version 0.1.0
+## Version 0.2.0
+* Restructured project ready for initial PyPI upload.
 
-* Initial release of Python package to PyPI.
+## Version 0.1.0
+* Final version used by Misinformation project.
