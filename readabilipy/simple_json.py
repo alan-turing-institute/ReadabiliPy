@@ -65,12 +65,12 @@ def extract_text_blocks_as_plain_text(paragraph_html):
     # Load article as DOM
     soup = BeautifulSoup(paragraph_html, 'html.parser')
     # Select all lists
-    lists = soup.find_all(['ul', 'ol'])
+    list_elements = soup.find_all(['ul', 'ol'])
     # Prefix text in all list items with "* " and make lists paragraphs
-    for l in lists:
-        plain_items = "".join(list(filter(None, [plain_text_leaf_node(li)["text"] for li in l.find_all('li')])))
-        l.string = plain_items
-        l.name = "p"
+    for list_element in list_elements:
+        plain_items = "".join(list(filter(None, [plain_text_leaf_node(li)["text"] for li in list_element.find_all('li')])))
+        list_element.string = plain_items
+        list_element.name = "p"
     # Select all text blocks
     text_blocks = [s.parent for s in soup.find_all(string=True)]
     text_blocks = [plain_text_leaf_node(block) for block in text_blocks]
