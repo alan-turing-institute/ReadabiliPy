@@ -29,7 +29,7 @@ REQUIRED = [
 ]
 
 docs_require = ["sphinx", "m2r"]
-test_require = ["pycodestyle", "pyflakes", "pylint", "pytest", "pytest-benchmark", "pytest-cov", "python-coveralls"]
+test_require = ["coveralls", "pycodestyle", "pyflakes", "pylint", "pytest", "pytest-benchmark", "pytest-cov"]
 dev_require = []
 
 # What packages are optional?
