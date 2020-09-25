@@ -24,7 +24,7 @@ def have_node():
         return False
 
     major = int(cp.stdout.split(b'.')[0].lstrip(b'v'))
-    if not major >= 10:
+    if major < 10:
         return False
 
     # check that this package has a node_modules dir in the javascript
