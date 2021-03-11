@@ -10,7 +10,6 @@ from bs4.element import Comment, NavigableString, CData
 from .simple_tree import simple_tree_from_html_string
 from .extractors import extract_date, extract_title
 from .simplifiers import normalise_text
-from .utils import chdir
 
 
 def have_node():
@@ -49,8 +48,7 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
         # Call Mozilla's Readability.js Readability.parse() function via node, writing output to a temporary file
         article_json_path = os.path.join(temp_dir, "article.json")
         jsdir = os.path.join(os.path.dirname(__file__), 'javascript')
-        with chdir(jsdir):
-            subprocess.check_call(["node", "ExtractArticle.js", "-i", html_path, "-o", article_json_path])
+        subprocess.check_call(["node", "ExtractArticle.js", "-i", html_path, "-o", article_json_path], cwd=jsdir)
 
         # Read output of call to Readability.parse() from JSON file and return as Python dictionary
         with open(article_json_path) as f:
