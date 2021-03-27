@@ -87,7 +87,7 @@ def extract_text_blocks_js(paragraph_html):
     # Load article as DOM
     soup = BeautifulSoup(paragraph_html, 'html.parser')
     # Select all text blocks
-    text_blocks = [{"text": s} for s in soup.find_all(string=True)]
+    text_blocks = [{"text": str(s)} for s in soup.find_all(string=True)]
     return text_blocks
 
 
