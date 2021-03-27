@@ -83,7 +83,7 @@ def remove_metadata(soup):
     We were a bit worried about potentially removing content here but satisfied
     ourselves it won't be displayed by most browsers in most cases
     (see https://github.com/alan-turing-institute/ReadabiliPy/issues/32)"""
-    for comment in soup.findAll(string=lambda text: any([isinstance(text, x) for x in [Comment, Doctype]])):
+    for comment in soup.findAll(string=lambda text: any(isinstance(text, x) for x in [Comment, Doctype])):
         comment.extract()
 
 
