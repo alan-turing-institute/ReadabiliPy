@@ -1,8 +1,12 @@
+
+from subprocess import CompletedProcess
+from unittest import mock
+
 # from .checks import check_extract_article
 from bs4 import BeautifulSoup
 from readabilipy import simple_json_from_html_string
 from readabilipy.simplifiers import normalise_text
-from readabilipy.simple_json import plain_element, plain_text_leaf_node, add_node_indexes, content_digest
+from readabilipy.simple_json import plain_element, plain_text_leaf_node, add_node_indexes, content_digest, have_node
 
 
 def test_empty_page():
@@ -88,3 +92,32 @@ def test_content_digest_assignment():
     assert digests == ['5271913f47bd4cbfda56ff8c0cddfc481d6bc4fe99725906068fbb6144bfeab4',
                        '4c2e9e6da31a64c70623619c449a040968cdbea85945bf384fa30ed2d5d24fa3',
                        '']
+
+
+@mock.patch('subprocess.run')
+def test_have_node_1(mock_subprocess_run):
+    mock_subprocess_run.side_effect = FileNotFoundError("No such file or directory: 'node'")
+    assert not have_node()
+
+
+@mock.patch('subprocess.run')
+def test_have_node_2(mock_subprocess_run):
+    mock_subprocess_run.return_value = CompletedProcess("", 1)
+    assert not have_node()
+
+
+@mock.patch('subprocess.run')
+def test_have_node_3(mock_subprocess_run):
+    mock_subprocess_run.return_value = CompletedProcess("", 0, stdout=b"v9.0.0\n")
+    assert not have_node()
+
+
+@mock.patch('os.path.exists')
+def test_have_node_4(mock_os_path_exists):
+    mock_os_path_exists.return_value = False
+    assert not have_node()
+
+
+def test_have_node_5():
+    # Assumes we're running on a system with Node/Readability.js installed
+    assert have_node()
