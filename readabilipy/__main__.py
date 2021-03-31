@@ -8,7 +8,7 @@ import argparse
 import json
 
 from .__version__ import __version__
-from .simple_json import simple_json_from_html_string
+from .simple_json import simple_json_from_html_string, have_node
 
 
 def main():
@@ -50,7 +50,7 @@ def main():
         "--version",
         help="Show version and exit",
         action="version",
-        version=__version__,
+        version=f"{__version__} (Readability.js supported: {'yes' if have_node() else 'no'})",
     )
 
     args = parser.parse_args()
