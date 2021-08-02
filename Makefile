@@ -53,7 +53,7 @@ dist: ## Make Python source distribution
 .PHONY: test
 
 test: venv ## Run unit tests
-	source $(VENV_DIR)/bin/activate && python -m pytest -v . --cov readabilipy --cov-report term-missing --benchmark-disable
+	source $(VENV_DIR)/bin/activate && cd $(TEST_DIR) && python -m pytest -v . --cov readabilipy --cov-report term-missing --benchmark-disable
 	source $(VENV_DIR)/bin/activate && pyflakes *.py readabilipy $(TEST_DIR)
 	source $(VENV_DIR)/bin/activate && pycodestyle --statistics --ignore=E501 --count *.py readabilipy $(TEST_DIR)
 	source $(VENV_DIR)/bin/activate && pylint readabilipy $(TEST_DIR)/*.py
@@ -79,7 +79,7 @@ docs: install ## Build documentation with Sphinx
 # Virtual environment #
 #######################
 
-.PHONY: venv
+.PHONY: venv clean_venv
 
 venv: $(VENV_DIR)/bin/activate
 
@@ -87,6 +87,9 @@ $(VENV_DIR)/bin/activate: setup.py
 	test -d $(VENV_DIR) || python -m venv $(VENV_DIR)
 	source $(VENV_DIR)/bin/activate && pip install .[dev]
 	touch $(VENV_DIR)/bin/activate
+
+clean_venv:
+	rm -rf $(VENV_DIR)
 
 ############
 # Clean up #
