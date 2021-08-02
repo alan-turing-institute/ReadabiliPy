@@ -79,7 +79,7 @@ docs: install ## Build documentation with Sphinx
 # Virtual environment #
 #######################
 
-.PHONY: venv
+.PHONY: venv clean_venv
 
 venv: $(VENV_DIR)/bin/activate
 
@@ -87,6 +87,9 @@ $(VENV_DIR)/bin/activate: setup.py
 	test -d $(VENV_DIR) || python -m venv $(VENV_DIR)
 	source $(VENV_DIR)/bin/activate && pip install .[dev]
 	touch $(VENV_DIR)/bin/activate
+
+clean_venv:
+	rm -rf $(VENV_DIR)
 
 ############
 # Clean up #

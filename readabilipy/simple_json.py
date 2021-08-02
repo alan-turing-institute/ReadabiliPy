@@ -17,12 +17,21 @@ def have_node():
     """Check that we can run node and have a new enough version """
     try:
         cp = subprocess.run(['node', '-v'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
-        returncode = cp.returncode
     except FileNotFoundError:
         return False
 
+    if not cp.returncode == 0:
+        return False
+
     major = int(cp.stdout.split(b'.')[0].lstrip(b'v'))
-    return returncode == 0 and major >= 10
+    if major < 10:
+        return False
+
+    # check that this package has a node_modules dir in the javascript
+    # directory, if it doesn't, it wasn't installed with Node support
+    jsdir = os.path.join(os.path.dirname(__file__), 'javascript')
+    node_modules = os.path.join(jsdir, 'node_modules')
+    return os.path.exists(node_modules)
 
 
 def simple_json_from_html_string(html, content_digests=False, node_indexes=False, use_readability=False):
