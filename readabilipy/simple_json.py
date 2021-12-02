@@ -50,7 +50,12 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
         article_json_path = os.path.join(temp_dir, "article.json")
         jsdir = os.path.join(os.path.dirname(__file__), 'javascript')
         with chdir(jsdir):
-            subprocess.check_call(["node", "ExtractArticle.js", "-i", html_path, "-o", article_json_path])
+            subprocess.run(
+                ["node", "ExtractArticle.js", "-i", html_path, "-o", article_json_path],
+                check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
 
         # Read output of call to Readability.parse() from JSON file and return as Python dictionary
         with open(article_json_path) as f:
