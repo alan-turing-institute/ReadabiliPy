@@ -77,53 +77,6 @@ def chdir(path):
         os.chdir(original_path)
 
 
-class CustomInstall(install):
-    def have_npm(self):
-        try:
-            cp = subprocess.run(
-                ["npm", "version"],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-            )
-        except FileNotFoundError:
-            return False
-        return cp.returncode == 0
-
-    def run(self):
-        # run original install code
-        install.run(self)
-
-        # Run NPM installation
-        if not self.have_npm():
-            print(
-                "Warning: A working NPM installation was not found. The package will be installed but will use Python-based article extraction.",
-                file=sys.stderr,
-            )
-            return
-
-        jsdir = os.path.join(self.install_lib, NAME, "javascript")
-        pkgjson = os.path.join(jsdir, "package.json")
-        if not os.path.exists(pkgjson):
-            print(
-                "Error: Couldn't find package.json. Package will fall back on Python-based extraction.",
-                file=sys.stderr,
-            )
-            return
-
-        with chdir(jsdir):
-            try:
-                cp = subprocess.run(["npm", "install"])
-                returncode = cp.returncode
-            except FileNotFoundError:
-                returncode = 1
-
-        if not returncode == 0:
-            print(
-                "Error: Failed to install dependencies with npm. Package will fall back on Python-based extraction.",
-                file=sys.stderr,
-            )
-
-
 # Where the magic happens:
 setup(
     name=NAME,
@@ -143,7 +96,6 @@ setup(
     entry_points={
         "console_scripts": ["readabilipy=readabilipy.__main__:main"],
     },
-    cmdclass={"install": CustomInstall},
     install_requires=REQUIRED,
     extras_require=EXTRAS,
     include_package_data=True,

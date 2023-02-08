@@ -10,7 +10,7 @@ from bs4.element import Comment, NavigableString, CData
 from .simple_tree import simple_tree_from_html_string
 from .extractors import extract_date, extract_title
 from .simplifiers import normalise_text
-from .utils import chdir
+from .utils import chdir, run_npm_install
 
 
 def have_node():
@@ -31,6 +31,9 @@ def have_node():
     # directory, if it doesn't, it wasn't installed with Node support
     jsdir = os.path.join(os.path.dirname(__file__), 'javascript')
     node_modules = os.path.join(jsdir, 'node_modules')
+    if not os.path.exists(node_modules):
+        # Try installing node dependencies
+        run_npm_install()
     return os.path.exists(node_modules)
 
 
