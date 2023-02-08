@@ -31,5 +31,6 @@ jobs:
       - name: Test with pytest
         run: |
           pip install pytest
+          pip install pytest-benchmark
           pip install pytest-cov
           pytest -v . --cov readabilipy --cov-report term-missing --benchmark-disable
