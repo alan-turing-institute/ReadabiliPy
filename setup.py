@@ -3,13 +3,10 @@
 
 import io
 import os
-import subprocess
-import sys
 
 from contextlib import contextmanager
 
 from setuptools import find_packages, setup
-from setuptools.command.install import install
 
 # Package meta-data.
 NAME = "readabilipy"

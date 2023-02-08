@@ -32,7 +32,7 @@ def have_node():
     jsdir = os.path.join(os.path.dirname(__file__), 'javascript')
     node_modules = os.path.join(jsdir, 'node_modules')
     if not os.path.exists(node_modules):
-        # Try installing node dependencies
+        # Try installing node dependencies.
         run_npm_install()
     return os.path.exists(node_modules)
 

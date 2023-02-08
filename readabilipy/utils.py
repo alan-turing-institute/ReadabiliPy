@@ -29,6 +29,7 @@ def have_npm():
             ["npm", "version"],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
+            check=True
         )
     except FileNotFoundError:
         return False
@@ -61,7 +62,7 @@ def run_npm_install():
         except FileNotFoundError:
             returncode = 1
 
-    if not returncode == 0:
+    if returncode != 0:
         print(
             "Error: Failed to install dependencies with npm. Package will fall back on Python-based extraction.",
             file=sys.stderr,
