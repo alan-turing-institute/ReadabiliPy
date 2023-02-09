@@ -84,9 +84,20 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
         if "content" in input_json and input_json["content"]:
             article_json["content"] = input_json["content"]
             article_json["plain_content"] = plain_content(article_json["content"], content_digests, node_indexes)
-            article_json["plain_text"] = extract_text_blocks_as_plain_text(article_json["plain_content"])
+            if use_readability:
+                article_json["plain_text"] = extract_text_blocks_js(article_json["plain_content"])
+            else:
+                article_json["plain_text"] = extract_text_blocks_as_plain_text(article_json["plain_content"])
 
     return article_json
+
+
+def extract_text_blocks_js(paragraph_html):
+    # Load article as DOM
+    soup = BeautifulSoup(paragraph_html, 'html.parser')
+    # Select all text blocks
+    text_blocks = [{"text": str(s)} for s in soup.find_all(string=True)]
+    return text_blocks
 
 
 def extract_text_blocks_as_plain_text(paragraph_html):
