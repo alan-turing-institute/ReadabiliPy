@@ -10,7 +10,6 @@ from bs4.element import Comment, NavigableString, CData
 from .simple_tree import simple_tree_from_html_string
 from .extractors import extract_date, extract_title
 from .simplifiers import normalise_text
-from .utils import chdir
 
 
 def have_node():
@@ -40,26 +39,30 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
         use_readability = False
 
     if use_readability:
-        temp_dir = tempfile.gettempdir()
         # Write input HTML to temporary file so it is available to the node.js script
-        html_path = os.path.join(temp_dir, "full.html")
-        with open(html_path, 'w') as f:
-            f.write(html)
-
+        with tempfile.NamedTemporaryFile(delete=False, mode='w+') as f_html:
+            f_html.write(html)
+            f_html.close()
+        html_path = f_html.name
+        
         # Call Mozilla's Readability.js Readability.parse() function via node, writing output to a temporary file
-        article_json_path = os.path.join(temp_dir, "article.json")
+        article_json_path = f_html.name + ".json"
         jsdir = os.path.join(os.path.dirname(__file__), 'javascript')
-        with chdir(jsdir):
-            subprocess.run(
-                ["node", "ExtractArticle.js", "-i", html_path, "-o", article_json_path],
-                check=True,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-            )
+        subprocess.run(
+            ["node", "ExtractArticle.js", "-i", html_path, "-o", article_json_path],
+            check=True,
+            cwd=jsdir,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
 
         # Read output of call to Readability.parse() from JSON file and return as Python dictionary
-        with open(article_json_path) as f:
-            input_json = json.loads(f.read())
+        with open(article_json_path, "r") as json_file:
+            input_json = json.load(json_file)
+
+        # Deleting files after processing
+        os.unlink(article_json_path)
+        os.unlink(f_html.name)
     else:
         input_json = {
             "title": extract_title(html),
@@ -89,9 +92,20 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
         if "content" in input_json and input_json["content"]:
             article_json["content"] = input_json["content"]
             article_json["plain_content"] = plain_content(article_json["content"], content_digests, node_indexes)
-            article_json["plain_text"] = extract_text_blocks_as_plain_text(article_json["plain_content"])
+            if use_readability:
+                article_json["plain_text"] = extract_text_blocks_js(article_json["plain_content"])
+            else:
+                article_json["plain_text"] = extract_text_blocks_as_plain_text(article_json["plain_content"])
 
     return article_json
+
+
+def extract_text_blocks_js(paragraph_html):
+    # Load article as DOM
+    soup = BeautifulSoup(paragraph_html, 'html.parser')
+    # Select all text blocks
+    text_blocks = [{"text": str(s)} for s in soup.find_all(string=True)]
+    return text_blocks
 
 
 def extract_text_blocks_as_plain_text(paragraph_html):
