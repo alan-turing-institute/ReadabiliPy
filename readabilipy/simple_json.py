@@ -48,7 +48,7 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
             f_html.write(html)
             f_html.close()
         html_path = f_html.name
-        
+
         # Call Mozilla's Readability.js Readability.parse() function via node, writing output to a temporary file
         article_json_path = f_html.name + ".json"
         jsdir = os.path.join(os.path.dirname(__file__), 'javascript')
