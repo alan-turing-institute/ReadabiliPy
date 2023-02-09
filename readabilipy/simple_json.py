@@ -10,7 +10,7 @@ from bs4.element import Comment, NavigableString, CData
 from .simple_tree import simple_tree_from_html_string
 from .extractors import extract_date, extract_title
 from .simplifiers import normalise_text
-from .utils import chdir, run_npm_install
+from .utils import run_npm_install
 
 
 def have_node():
@@ -43,21 +43,25 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
         use_readability = False
 
     if use_readability:
-        temp_dir = tempfile.gettempdir()
         # Write input HTML to temporary file so it is available to the node.js script
-        html_path = os.path.join(temp_dir, "full.html")
-        with open(html_path, 'w') as f:
-            f.write(html)
-
+        with tempfile.NamedTemporaryFile(delete=False, mode='w+') as f_html:
+            f_html.write(html)
+            f_html.close()
+        html_path = f_html.name
+        
         # Call Mozilla's Readability.js Readability.parse() function via node, writing output to a temporary file
-        article_json_path = os.path.join(temp_dir, "article.json")
+        article_json_path = f_html.name + ".json"
         jsdir = os.path.join(os.path.dirname(__file__), 'javascript')
-        with chdir(jsdir):
-            subprocess.check_call(["node", "ExtractArticle.js", "-i", html_path, "-o", article_json_path])
+        subprocess.check_call(
+            ["node", "ExtractArticle.js", "-i", html_path, "-o", article_json_path], cwd=jsdir)
 
         # Read output of call to Readability.parse() from JSON file and return as Python dictionary
-        with open(article_json_path) as f:
-            input_json = json.loads(f.read())
+        with open(article_json_path, "r") as json_file:
+            input_json = json.load(json_file)
+
+        # Deleting files after processing
+        os.unlink(article_json_path)
+        os.unlink(f_html.name)
     else:
         input_json = {
             "title": extract_title(html),
