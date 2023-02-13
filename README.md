@@ -11,7 +11,7 @@ This package augments the output of `Readability.js` to also return a list of pl
 
 ## Installation
 
-To use the `Readability.js` wrapper you need to have a working [Node.js](https://nodejs.org/en/download/) installation of version 10 or higher.
+To use the `Readability.js` wrapper you need to have a working [Node.js](https://nodejs.org/en/download/) installation of version 14 or higher.
 Make sure to install Node.js before installing this package, as this ensures Readability.js will be installed.
 If you only want to use the Python-based article extraction, you **do not need** to install Node.js.
 
