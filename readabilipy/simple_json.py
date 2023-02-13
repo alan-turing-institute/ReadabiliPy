@@ -10,6 +10,7 @@ from bs4.element import Comment, NavigableString, CData
 from .simple_tree import simple_tree_from_html_string
 from .extractors import extract_date, extract_title
 from .simplifiers import normalise_text
+from .utils import run_npm_install
 
 
 def have_node():
@@ -30,6 +31,9 @@ def have_node():
     # directory, if it doesn't, it wasn't installed with Node support
     jsdir = os.path.join(os.path.dirname(__file__), 'javascript')
     node_modules = os.path.join(jsdir, 'node_modules')
+    if not os.path.exists(node_modules):
+        # Try installing node dependencies.
+        run_npm_install()
     return os.path.exists(node_modules)
 
 
@@ -44,11 +48,12 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
             f_html.write(html)
             f_html.close()
         html_path = f_html.name
-        
+
         # Call Mozilla's Readability.js Readability.parse() function via node, writing output to a temporary file
         article_json_path = f_html.name + ".json"
         jsdir = os.path.join(os.path.dirname(__file__), 'javascript')
-        subprocess.check_call(["node", "ExtractArticle.js", "-i", html_path, "-o", json_path], cwd=jsdir)
+        subprocess.check_call(
+            ["node", "ExtractArticle.js", "-i", html_path, "-o", article_json_path], cwd=jsdir)
 
         # Read output of call to Readability.parse() from JSON file and return as Python dictionary
         with open(article_json_path, "r") as json_file:
