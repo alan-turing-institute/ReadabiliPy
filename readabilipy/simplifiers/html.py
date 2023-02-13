@@ -300,7 +300,7 @@ def recursively_prune_elements(soup):
             element.decompose()
             n_removed += 1
         # Remove elements with only zero-length children
-        for element in soup.find_all(lambda elem: sum([len(c) for c in elem.children]) == 0):
+        for element in soup.find_all(lambda elem: sum(len(c) for c in elem.children) == 0):
             element.decompose()
             n_removed += 1
         return n_removed
