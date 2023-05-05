@@ -44,7 +44,7 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
 
     if use_readability:
         # Write input HTML to temporary file so it is available to the node.js script
-        with tempfile.NamedTemporaryFile(delete=False, mode='w+') as f_html:
+        with tempfile.NamedTemporaryFile(delete=False, mode='w+', encoding='utf-8') as f_html:
             f_html.write(html)
             f_html.close()
         html_path = f_html.name
@@ -56,7 +56,7 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
             ["node", "ExtractArticle.js", "-i", html_path, "-o", article_json_path], cwd=jsdir)
 
         # Read output of call to Readability.parse() from JSON file and return as Python dictionary
-        with open(article_json_path, "r") as json_file:
+        with open(article_json_path, "r", encoding='utf-8') as json_file:
             input_json = json.load(json_file)
 
         # Deleting files after processing
