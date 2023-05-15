@@ -55,7 +55,7 @@ def main():
 
     args = parser.parse_args()
 
-    with open(args.input_file) as h:
+    with open(args.input_file, encoding="utf-8") as h:
         html = h.read()
 
     article = simple_json_from_html_string(
@@ -65,7 +65,7 @@ def main():
         use_readability=(not args.use_python_parser),
     )
 
-    with open(args.output_file, "w") as j:
+    with open(args.output_file, "w", encoding="utf-8") as j:
         json.dump(article, j, ensure_ascii=False)
 
 

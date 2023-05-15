@@ -36,7 +36,7 @@ def check_extract_article(test_filename, expected_filename, content_digests=Fals
     test_data_dir = "data"
     # Read HTML test file
     test_filepath = os.path.join(os.path.dirname(__file__), test_data_dir, test_filename)
-    with open(test_filepath) as h:
+    with open(test_filepath, encoding="utf-8") as h:
         html = h.read()
 
     # Extract simplified article HTML
@@ -47,7 +47,7 @@ def check_extract_article(test_filename, expected_filename, content_digests=Fals
 
     # Get expected simplified article HTML
     expected_filepath = os.path.join(os.path.dirname(__file__), test_data_dir, expected_filename)
-    with open(expected_filepath) as h:
+    with open(expected_filepath, encoding="utf-8") as h:
         expected_article_json = json.loads(h.read())
 
     # Test full JSON matches (checks for unexpected fields in either actual or expected JSON)
@@ -58,7 +58,7 @@ def check_extract_paragraphs_as_plain_text(test_filename, expected_filename):
     test_data_dir = "data"
     # Read readable article test file
     test_filepath = os.path.join(os.path.dirname(__file__), test_data_dir, test_filename)
-    with open(test_filepath) as h:
+    with open(test_filepath, encoding="utf-8") as h:
         article = json.loads(h.read())
 
     # Extract plain text paragraphs
@@ -67,7 +67,7 @@ def check_extract_paragraphs_as_plain_text(test_filename, expected_filename):
     # Get expected plain text paragraphs
     expected_filepath = os.path.join(os.path.dirname(__file__),
                                      test_data_dir, expected_filename)
-    with open(expected_filepath) as h:
+    with open(expected_filepath, encoding="utf-8") as h:
         expected_paragraphs = json.loads(h.read())
 
     # Test
@@ -87,5 +87,5 @@ def check_html_output_does_not_contain_tag(test_fragment, vetoed_tag):
     # Check that neither <tag> nor </tag> appear in the output
     content = str(article_json["plain_content"])
     if content is not None:
-        for element in ["<{}>".format(vetoed_tag), "</{}>".format(vetoed_tag)]:
+        for element in [f"<{vetoed_tag}>", f"</{vetoed_tag}>"]:
             assert element not in content

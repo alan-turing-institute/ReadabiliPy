@@ -57,7 +57,7 @@ def run_npm_install():
 
     with chdir(jsdir):
         try:
-            cp = subprocess.run(["npm", "install"])
+            cp = subprocess.run(["npm", "install"], check=True)
             returncode = cp.returncode
         except FileNotFoundError:
             returncode = 1
