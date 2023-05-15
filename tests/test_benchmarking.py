@@ -4,7 +4,7 @@ from readabilipy.extractors import extract_date, extract_title
 
 
 TEST_FILEPATH = os.path.join(os.path.dirname(__file__), "data", "benchmarkinghuge.html")
-with open(TEST_FILEPATH) as h:
+with open(TEST_FILEPATH, encoding="utf-8") as h:
     HTML = h.read()
 
 

@@ -957,6 +957,6 @@ def test_html_special_sup():
 def test_html_remaining_element(element):
     """Simple standalone elements which can contain text.
        Check that the inner text is kept and the tag is discarded."""
-    fragment = "<{0}>Lorem ipsum dolor sit amet</{0}>".format(element)
+    fragment = f"<{element}>Lorem ipsum dolor sit amet</{element}>"
     check_html_output_contains_text(fragment, "Lorem ipsum dolor sit amet")
     check_html_output_does_not_contain_tag(fragment, element)
