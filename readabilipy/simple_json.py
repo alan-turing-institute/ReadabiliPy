@@ -44,7 +44,7 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
 
     if use_readability:
         # Write input HTML to temporary file so it is available to the node.js script
-        with tempfile.NamedTemporaryFile(delete=False, mode='w+') as f_html:
+        with tempfile.NamedTemporaryFile(delete=False, mode="w+", encoding="utf-8") as f_html:
             f_html.write(html)
             f_html.close()
         html_path = f_html.name
@@ -61,7 +61,7 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
         )
 
         # Read output of call to Readability.parse() from JSON file and return as Python dictionary
-        with open(article_json_path, "r") as json_file:
+        with open(article_json_path, "r", encoding="utf-8") as json_file:
             input_json = json.load(json_file)
 
         # Deleting files after processing
@@ -134,7 +134,7 @@ def plain_text_leaf_node(element):
     # Extract all text, stripped of any child HTML elements and normalise it
     plain_text = normalise_text(element.get_text())
     if plain_text != "" and element.name == "li":
-        plain_text = "* {}, ".format(plain_text)
+        plain_text = f"* {plain_text}, "
     if plain_text == "":
         plain_text = None
     if "data-node-index" in element.attrs:
@@ -215,8 +215,7 @@ def add_node_indexes(element, node_index="0"):
     for local_idx, child in enumerate(
             [c for c in element.contents if not is_text(c)], start=1):
         # Can't add attributes to leaf string types
-        child_index = "{stem}.{local}".format(
-            stem=node_index, local=local_idx)
+        child_index = f"{node_index}.{local_idx}"
         add_node_indexes(child, node_index=child_index)
     return element
 
