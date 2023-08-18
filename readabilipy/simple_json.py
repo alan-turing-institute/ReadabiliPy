@@ -44,7 +44,7 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
 
     if use_readability:
         # Write input HTML to temporary file so it is available to the node.js script
-        with tempfile.NamedTemporaryFile(delete=False, mode='w+') as f_html:
+        with tempfile.NamedTemporaryFile(delete=False, mode="w+", encoding="utf-8") as f_html:
             f_html.write(html)
             f_html.close()
         html_path = f_html.name
