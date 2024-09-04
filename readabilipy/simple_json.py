@@ -52,8 +52,17 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
         # Call Mozilla's Readability.js Readability.parse() function via node, writing output to a temporary file
         article_json_path = f_html.name + ".json"
         jsdir = os.path.join(os.path.dirname(__file__), 'javascript')
-        subprocess.check_call(
-            ["node", "ExtractArticle.js", "-i", html_path, "-o", article_json_path], cwd=jsdir)
+        try:
+            result = subprocess.run(
+                ["node", "ExtractArticle.js", "-i", html_path, "-o", json_path],
+                cwd=jsdir,
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                universal_newlines=True)
+        except subprocess.CalledProcessError as e:
+            print(e.stderr)
+            raise
 
         # Read output of call to Readability.parse() from JSON file and return as Python dictionary
         with open(article_json_path, "r", encoding="utf-8") as json_file:
