@@ -44,13 +44,17 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
 
     if use_readability:
         # Write input HTML to temporary file so it is available to the node.js script
-        with tempfile.NamedTemporaryFile(delete=False, mode="w+", encoding="utf-8") as f_html:
+        # It is important that this file be unique in case this function is called concurrently
+        with tempfile.NamedTemporaryFile(delete=False, mode="w+", encoding="utf-8", prefix="readabilipy") as f_html:
             f_html.write(html)
             f_html.close()
         html_path = f_html.name
 
+        # Derive some output name
+        # (making the assumption this will be unique too)
+        json_path = html_path + ".json"
+
         # Call Mozilla's Readability.js Readability.parse() function via node, writing output to a temporary file
-        article_json_path = f_html.name + ".json"
         jsdir = os.path.join(os.path.dirname(__file__), 'javascript')
         try:
             subprocess.run(
@@ -64,12 +68,12 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
             print(e.stderr)
             raise
 
-        # Read output of call to Readability.parse() from JSON file and return as Python dictionary
-        with open(article_json_path, "r", encoding="utf-8") as json_file:
+        # Read output of call to Readability.parse() from JSON file as Python dictionary
+        with open(json_path, "r", encoding="utf-8") as json_file:
             input_json = json.load(json_file)
 
-        # Deleting files after processing
-        os.unlink(article_json_path)
+        # Delete temporary input and output files after processing
+        os.unlink(json_path)
         os.unlink(f_html.name)
     else:
         input_json = {
