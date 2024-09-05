@@ -51,7 +51,7 @@ def check_extract_article(test_filename, expected_filename, content_digests=Fals
         expected_article_json = json.loads(h.read())
 
     # Test full JSON matches (checks for unexpected fields in either actual or expected JSON)
-    assert article_json == expected_article_json
+    assert article_json == expected_article_json, f"{article_json=} != {expected_article_json=}"
 
 
 def check_extract_paragraphs_as_plain_text(test_filename, expected_filename):
