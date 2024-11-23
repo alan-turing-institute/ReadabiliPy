@@ -6,6 +6,7 @@
 
 import argparse
 import json
+import sys
 
 from .__version__ import __version__
 from .simple_json import simple_json_from_html_string, have_node
@@ -13,19 +14,20 @@ from .simple_json import simple_json_from_html_string, have_node
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Extract article data from a HTML file using either Mozilla's Readability.js package or a simplified python-only alternative."
+        description="Extract article data from a HTML file using either Mozilla's Readability.js package or a simplified python-only alternative.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
         "-i",
         "--input-file",
-        required=True,
-        help="Path to input file containing HTML.",
+        default="-",
+        help="Path to input file containing HTML, use '-' for stdin.",
     )
     parser.add_argument(
         "-o",
         "--output-file",
-        required=True,
-        help="Path to file to output the article data to as JSON.",
+        default="-",
+        help="Path to file to output the article data to as JSON, use '-' for stdout.",
     )
     parser.add_argument(
         "-c",
@@ -54,9 +56,15 @@ def main():
     )
 
     args = parser.parse_args()
+    sys.stdin.reconfigure(encoding="utf-8", errors="replace")
+    input_file = sys.stdin
+    output_file = sys.stdout
+    if args.input_file != "-":
+        input_file = open(args.input_file, encoding="utf-8", errors="replace")
+    if args.output_file != "-":
+        output_file = open(args.output_file, "w", encoding="utf-8")
 
-    with open(args.input_file, encoding="utf-8", errors="replace") as h:
-        html = h.read()
+    html = input_file.read()
 
     article = simple_json_from_html_string(
         html,
@@ -65,8 +73,12 @@ def main():
         use_readability=(not args.use_python_parser),
     )
 
-    with open(args.output_file, "w", encoding="utf-8") as j:
-        json.dump(article, j, ensure_ascii=False)
+    json.dump(article, output_file, ensure_ascii=False)
+
+    if not input_file.isatty():
+        input_file.close()
+    if not output_file.isatty():
+        output_file.close()
 
 
 if __name__ == "__main__":
