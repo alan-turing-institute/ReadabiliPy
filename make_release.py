@@ -110,10 +110,10 @@ class Step:
         os.system(cmd)
 
 
-class GitToMaster(Step):
+class GitToMain(Step):
     def action(self, context):
-        self.instruct("Make sure you're on master and changes are merged in")
-        self.print_run("git checkout master")
+        self.instruct("Make sure you're on main and changes are merged in")
+        self.print_run("git checkout main")
 
 
 class UpdateChangelog(Step):
@@ -213,7 +213,7 @@ class PushToPyPI(Step):
 
 class PushToGitHub(Step):
     def action(self, context):
-        self.do_cmd("git push -u --tags origin master")
+        self.do_cmd("git push -u --tags origin main")
 
 
 class WaitForTravis(Step):
@@ -233,7 +233,7 @@ class WaitForRTD(Step):
 
 def main(target=None):
     procedure = [
-        ("gittomaster", GitToMaster()),
+        ("gittomain", GitToMain()),
         ("clean1", MakeClean()),
         ("tests1", RunTests()),
         ("gitadd1", GitAdd()),
