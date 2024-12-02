@@ -28,7 +28,6 @@ except ImportError:
 
 
 URLS = {
-    # "RTD": "https://readthedocs.org/projects/readabilipy/builds/",
     "Travis": "https://travis-ci.org/alan-turing-institute/ReadabiliPy",
 }
 
@@ -243,7 +242,6 @@ def main(target=None):
         ("bumpversion", BumpVersionPackage()),
         ("changelog", UpdateChangelog()),
         ("readme", UpdateReadme()),
-        # ("docs", MakeDocs()),
         ("dist", MakeDist()),
         ("testpypi", PushToTestPyPI()),
         ("install", InstallFromTestPyPI()),
