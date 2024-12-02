@@ -48,16 +48,16 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
         with tempfile.NamedTemporaryFile(delete=False, mode="w+", encoding="utf-8", prefix="readabilipy") as f_html:
             f_html.write(html)
             f_html.close()
-        html_path = f_html.name
+        tmp_html_path = f_html.name
 
         # We assume appending ".json" to the html name will also be a unique filename
-        json_path = html_path + ".json"
+        tmp_json_path = tmp_html_path + ".json"
 
         # Call Mozilla's Readability.js Readability.parse() function via node, writing output to a temporary file
         jsdir = os.path.join(os.path.dirname(__file__), 'javascript')
         try:
             subprocess.run(
-                ["node", "ExtractArticle.js", "-i", html_path, "-o", json_path],
+                ["node", "ExtractArticle.js", "-i", tmp_html_path, "-o", tmp_json_path],
                 cwd=jsdir,
                 check=True,
                 stdout=subprocess.PIPE,
@@ -68,12 +68,12 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
             raise
 
         # Read output of call to Readability.parse() from JSON file as Python dictionary
-        with open(json_path, "r", encoding="utf-8") as json_file:
+        with open(tmp_json_path, "r", encoding="utf-8") as json_file:
             input_json = json.load(json_file)
 
         # Delete temporary input and output files after processing
-        os.unlink(json_path)
-        os.unlink(f_html.name)
+        os.unlink(tmp_json_path)
+        os.unlink(tmp_html_path)
     else:
         input_json = {
             "title": extract_title(html),
