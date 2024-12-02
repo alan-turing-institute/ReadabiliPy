@@ -59,7 +59,8 @@ def main():
 
     # Open input file or stream
     if args.input_file == "-":
-        sys.stdin.reconfigure(encoding="utf-8", errors="replace")
+        if hasattr(sys.stdin, "reconfigure"):
+            sys.stdin.reconfigure(encoding="utf-8", errors="replace")
         input_file = sys.stdin
     else:
         input_file = open(args.input_file, encoding="utf-8", errors="replace")  # pylint: disable=consider-using-with
