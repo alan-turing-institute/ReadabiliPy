@@ -1,6 +1,5 @@
 # ReadabiliPy
 
-[![Build Status](https://travis-ci.org/alan-turing-institute/ReadabiliPy.svg?branch=master)](https://travis-ci.org/alan-turing-institute/ReadabiliPy)
 [![Coverage Status](https://coveralls.io/repos/github/alan-turing-institute/ReadabiliPy/badge.svg?branch=master)](https://coveralls.io/github/alan-turing-institute/ReadabiliPy?branch=master)
 
 `ReadabiliPy` contains a Python wrapper for Mozilla's [Readability.js](https://github.com/mozilla/readability) Node.js package, as well as article extraction routines written in pure Python.
