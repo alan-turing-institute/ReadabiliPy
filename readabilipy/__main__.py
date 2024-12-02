@@ -56,15 +56,18 @@ def main():
     )
 
     args = parser.parse_args()
-    sys.stdin.reconfigure(encoding="utf-8", errors="replace")
-    input_file = sys.stdin
-    output_file = sys.stdout
-    if args.input_file != "-":
-        input_file = open(args.input_file, encoding="utf-8", errors="replace")
-    if args.output_file != "-":
-        output_file = open(args.output_file, "w", encoding="utf-8")
 
+    # Open input file or stream
+    if args.input_file == "-":
+        sys.stdin.reconfigure(encoding="utf-8", errors="replace")
+        input_file = sys.stdin
+    else:
+        input_file = open(args.input_file, encoding="utf-8", errors="replace")
+
+    # Read from input then close if appropriate
     html = input_file.read()
+    if not input_file.isatty():
+        input_file.close()
 
     article = simple_json_from_html_string(
         html,
@@ -73,10 +76,14 @@ def main():
         use_readability=(not args.use_python_parser),
     )
 
-    json.dump(article, output_file, ensure_ascii=False)
+    # Open output file or stream
+    if args.output_file == "-":
+        output_file = sys.stdout
+    else:
+        output_file = open(args.output_file, "w", encoding="utf-8")
 
-    if not input_file.isatty():
-        input_file.close()
+    # Write to output then close if appropriate
+    json.dump(article, output_file, ensure_ascii=False)
     if not output_file.isatty():
         output_file.close()
 
