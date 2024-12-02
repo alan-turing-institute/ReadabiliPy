@@ -50,15 +50,14 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
             f_html.close()
         html_path = f_html.name
 
-        # Derive some output name
-        # (making the assumption this will be unique too)
+        # We assume appending ".json" to the html name will also be a unique filename
         json_path = html_path + ".json"
 
         # Call Mozilla's Readability.js Readability.parse() function via node, writing output to a temporary file
         jsdir = os.path.join(os.path.dirname(__file__), 'javascript')
         try:
             subprocess.run(
-                ["node", "ExtractArticle.js", "-i", html_path, "-o", article_json_path],
+                ["node", "ExtractArticle.js", "-i", html_path, "-o", json_path],
                 cwd=jsdir,
                 check=True,
                 stdout=subprocess.PIPE,
