@@ -11,24 +11,28 @@ jobs:
     runs-on: "ubuntu-20.04"
     strategy:
       matrix:
-        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e .[test]
+          pip install -e ".[test]"
+
       - name: Lint with pyflakes
         run: |
           pyflakes *.py readabilipy tests
+
       - name: check PEP8
         run: |
           pycodestyle --statistics --ignore=E501 --count *.py readabilipy tests
+
       - name: Run pylint for stricter error checking
         run: |
           pylint readabilipy
