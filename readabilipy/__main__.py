@@ -62,7 +62,7 @@ def main():
         sys.stdin.reconfigure(encoding="utf-8", errors="replace")
         input_file = sys.stdin
     else:
-        input_file = open(args.input_file, encoding="utf-8", errors="replace")
+        input_file = open(args.input_file, encoding="utf-8", errors="replace")  # pylint: disable=consider-using-with
 
     # Read from input then close if appropriate
     html = input_file.read()
@@ -80,7 +80,7 @@ def main():
     if args.output_file == "-":
         output_file = sys.stdout
     else:
-        output_file = open(args.output_file, "w", encoding="utf-8")
+        output_file = open(args.output_file, "w", encoding="utf-8")  # pylint: disable=consider-using-with
 
     # Write to output then close if appropriate
     json.dump(article, output_file, ensure_ascii=False)
