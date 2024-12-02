@@ -53,8 +53,8 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
         article_json_path = f_html.name + ".json"
         jsdir = os.path.join(os.path.dirname(__file__), 'javascript')
         try:
-            result = subprocess.run(
-                ["node", "ExtractArticle.js", "-i", html_path, "-o", json_path],
+            subprocess.run(
+                ["node", "ExtractArticle.js", "-i", html_path, "-o", article_json_path],
                 cwd=jsdir,
                 check=True,
                 stdout=subprocess.PIPE,
