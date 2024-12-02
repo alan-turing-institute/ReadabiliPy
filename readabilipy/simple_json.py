@@ -193,7 +193,9 @@ def plain_element(element, content_digests, node_indexes):
             element = type(element)(plain_text)
     else:
         # If not a leaf node or leaf type call recursively on child nodes, replacing
-        element.contents = plain_elements(element.contents, content_digests, node_indexes)
+        plain_conents = plain_elements(element.contents, content_digests, node_indexes)
+        element.clear()
+        element.extend(plain_conents)
     return element
 
 
