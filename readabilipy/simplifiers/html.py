@@ -284,6 +284,10 @@ def wrap_bare_text(soup):
         # - we are adding additional structure that was not present in the original document
         if element.parent.name in block_level_whitelist() and len(element.parent.contents) == 1:
             pass
+        # title elements should not have their text wrapped in <p> tags
+        # as they can only contain text content according to HTML spec.
+        elif element.parent.name == 'title':
+            pass
         # ... otherwise wrap them in <p> tags
         else:
             p_element = soup.new_tag("p")
