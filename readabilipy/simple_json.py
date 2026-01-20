@@ -14,27 +14,60 @@ from .utils import run_npm_install
 
 
 def have_node():
-    """Check that we can run node and have a new enough version """
     try:
         cp = subprocess.run(['node', '-v'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
     except FileNotFoundError:
         return False
 
-    if not cp.returncode == 0:
+    if cp.returncode != 0:
         return False
 
     major = int(cp.stdout.split(b'.')[0].lstrip(b'v'))
     if major < 10:
         return False
 
-    # check that this package has a node_modules dir in the javascript
-    # directory, if it doesn't, it wasn't installed with Node support
     jsdir = os.path.join(os.path.dirname(__file__), 'javascript')
-    node_modules = os.path.join(jsdir, 'node_modules')
-    if not os.path.exists(node_modules):
-        # Try installing node dependencies.
-        run_npm_install()
-    return os.path.exists(node_modules)
+
+    # Create a temporary test script to check if dependencies are available
+    test_content = """try {
+        require.resolve('@mozilla/readability');
+        require.resolve('jsdom');
+        require.resolve('minimist');
+        console.log('OK');
+    } catch (e) {
+        console.error('Missing dependencies');
+        process.exit(1);
+    }
+    """
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.js', delete=False) as f:
+        f.write(test_content)
+        temp_script = f.name
+
+    try:
+        # First check - try to resolve dependencies from current directory
+        cp = subprocess.run(
+            ['node', temp_script],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=jsdir,
+            check=False
+        )
+
+        if cp.returncode != 0:
+            # Dependencies not found, try installing locally
+            run_npm_install()
+            # Check again after install attempt
+            cp = subprocess.run(
+                ['node', temp_script],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                cwd=jsdir,
+                check=False
+            )
+        return cp.returncode == 0 and cp.stdout.strip() == b'OK'
+    finally:
+        if os.path.exists(temp_script):
+            os.unlink(temp_script)
 
 
 def simple_json_from_html_string(html, content_digests=False, node_indexes=False, use_readability=False):
