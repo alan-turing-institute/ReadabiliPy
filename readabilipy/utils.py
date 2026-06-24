@@ -57,7 +57,13 @@ def run_npm_install():
 
     with chdir(jsdir):
         try:
-            cp = subprocess.run(["npm", "install"], check=True)
+            # Send npm's progress/audit/funding output to DEVNULL so it cannot
+            # corrupt programs that communicate over stdout (e.g. an MCP stdio
+            # server importing ReadabiliPy). Mirrors have_npm() above. stderr is
+            # left intact so genuine install failures still surface.
+            cp = subprocess.run(
+                ["npm", "install"], check=True, stdout=subprocess.DEVNULL
+            )
             returncode = cp.returncode
         except FileNotFoundError:
             returncode = 1
