@@ -64,7 +64,7 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
                 stderr=subprocess.PIPE,
                 universal_newlines=True)
         except subprocess.CalledProcessError as e:
-            print(e.stderr)
+            print(e.stderr, file=sys.stderr)
             raise
 
         # Read output of call to Readability.parse() from JSON file as Python dictionary
