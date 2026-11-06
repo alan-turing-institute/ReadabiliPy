@@ -1,5 +1,8 @@
 # Change Log
 
+## Unreleased
+* Fixed an IndexError on empty or contentless HTML with BeautifulSoup 4.13.
+
 ## Version 0.3.0
 * Fixed some bugs. Updated supported Python versions.
 

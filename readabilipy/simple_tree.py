@@ -67,5 +67,6 @@ def simple_tree_from_html_string(html):
 
     # ... otherwise wrap in a div and return that
     root = soup.new_tag("div")
-    root.append(soup)
+    if soup.contents:
+        root.append(soup)
     return root
